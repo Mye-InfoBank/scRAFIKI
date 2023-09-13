@@ -33,6 +33,29 @@ def sanitize_adata(adata):
         for dataset, batch in zip(adata.obs["dataset"], adata.obs["batch"])
     ]
 
+    def to_Florent_case(s: str):
+        if s.lower() in ["na", "nan", "null"]:
+            return "Unknown"
+
+        corrected = s \
+            .replace(" ", "_") \
+            .replace("-", "_")
+        
+        if corrected.endswith("s"):
+            corrected = corrected[:-1]
+
+        corrected = corrected.strip(" _")
+
+        if not corrected:
+            return "Unknown"
+
+        return corrected[0].upper() + corrected[1:]
+
+    adata.obs["tissue"] = adata.obs["tissue"].apply(to_Florent_case)
+    adata.obs["condition"] = adata.obs["condition"].apply(to_Florent_case)
+    adata.obs["cell_type"] = adata.obs["cell_type"].apply(to_Florent_case)
+    adata.obs["sex"] = adata.obs["sex"].apply(lambda original: to_Florent_case(original)[0])
+
     # X should be in CSR format
     adata.X = scipy.sparse.csr_matrix(adata.X)
     adata._sanitize()
