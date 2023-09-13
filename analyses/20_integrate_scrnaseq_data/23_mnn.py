@@ -37,12 +37,12 @@ adata
 # split by batch for mnnpy
 adata_list = []
 
-for batch in set(adata.obs.batch):
+for batch in adata.obs.batch.unique():
     adata_list.append(adata[adata.obs.batch==batch, ].copy())
 
 # %%
 # integration with mnn
-corrected = mnnpy.mnn_correct(*adata_list, batch_categories= list(set(adata.obs.batch)))
+corrected = mnnpy.mnn_correct(*adata_list, batch_categories= adata.obs.batch.unique())
 
 # %%
 corrected_values = corrected[0].X
