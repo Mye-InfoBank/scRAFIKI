@@ -55,6 +55,7 @@ workflow annotate_dataset {
             Channel.fromPath("${baseDir}/tables/gene_annotations/wu_cd8_t_cell_signatures.csv")
         ).collect()
     )
+    /*
     ANNOTATE_CELL_TYPES_EPI(
         Channel.value([
             [id: "annotate_cell_types_epi"],
@@ -106,6 +107,5 @@ workflow annotate_dataset {
         final_atlas = ch_atlas
         scanvi_model = SCANVI.out.scvi_model.map{ id, model -> model }
         scanvi_h5ad = SCANVI.out.adata.map{ id, adata -> adata }
-
     */
 }
