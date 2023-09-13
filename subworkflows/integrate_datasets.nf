@@ -11,6 +11,7 @@ include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_DOUBLET } from "./neigh
 include { JUPYTERNOTEBOOK as MERGE_SOLO }  from "../modules/local/jupyternotebook/main.nf"
 include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_NODOUBLET } from "./neighbors_leiden_umap.nf"
 include { JUPYTERNOTEBOOK as HARMONY }  from "../modules/local/jupyternotebook/main.nf"
+include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.nf"
 
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -79,6 +80,16 @@ workflow integrate_datasets {
             Channel.value([
             [id: "22_harmony"],
             file("${baseDir}/analyses/20_integrate_scrnaseq_data/22_harmony.py")
+        ]),
+        [
+        ],
+        ch_adata_path
+    )
+
+    MNN(
+            Channel.value([
+            [id: "23_mmn"],
+            file("${baseDir}/analyses/20_integrate_scrnaseq_data/23_mnn.py")
         ]),
         [
         ],
