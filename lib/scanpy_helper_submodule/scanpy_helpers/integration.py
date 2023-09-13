@@ -26,7 +26,7 @@ MANDATORY_COLS = [
 VALID_SEX = ["male", "female", "unknown"]
 
 
-def sanitize_adata(adata):
+def sanitize_adata(adata: sc.AnnData):
     # batch should be dataset specific
     adata.obs["batch"] = [
         f"{dataset}_{batch}"
@@ -34,7 +34,9 @@ def sanitize_adata(adata):
     ]
 
     def to_Florent_case(s: str):
-        if s.lower() in ["na", "nan", "null"]:
+        corrected = s.lower().strip()
+
+        if corrected in ["na", "nan", "null", "unknown"]:
             return "Unknown"
 
         corrected = s \
@@ -51,10 +53,10 @@ def sanitize_adata(adata):
 
         return corrected[0].upper() + corrected[1:]
 
-    adata.obs["tissue"] = adata.obs["tissue"].apply(to_Florent_case)
-    adata.obs["condition"] = adata.obs["condition"].apply(to_Florent_case)
-    adata.obs["cell_type"] = adata.obs["cell_type"].apply(to_Florent_case)
-    adata.obs["sex"] = adata.obs["sex"].apply(lambda original: to_Florent_case(original)[0])
+    for column in ["tissue", "condition", "cell_type", "sex"]:
+        adata.obs[column] = adata.obs[column].fillna("Unknown").apply(to_Florent_case)
+
+    adata.obs["sex"] = adata.obs["sex"].str.get(0)
 
     # X should be in CSR format
     adata.X = scipy.sparse.csr_matrix(adata.X)
