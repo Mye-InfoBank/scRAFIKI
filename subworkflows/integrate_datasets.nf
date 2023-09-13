@@ -86,6 +86,7 @@ workflow integrate_datasets {
         ch_adata_path
     )
 
+    /*
     MNN(
             Channel.value([
             [id: "23_mmn"],
@@ -94,7 +95,7 @@ workflow integrate_datasets {
         [
         ],
         ch_adata_path
-    )
+    )*/
 
     ch_scvi_hvg = SCVI.out.adata
     ch_scvi_hvg_model = SCVI.out.scvi_model
