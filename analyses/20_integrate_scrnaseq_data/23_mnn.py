@@ -52,4 +52,6 @@ adata.layers["raw_counts"] = adata.X.copy()
 adata.X = corrected_values
 
 # %%
-adata.write_h5ad("mnn.h5ad")
+os.makedirs("artifacts", exist_ok=True)
+
+adata.write_h5ad("artifacts/mnn.h5ad")
