@@ -1,0 +1,74 @@
+---
+title: "singleR"
+output: html_document
+date: '2023-09-14'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load packages}
+library(celldex)
+library(SingleR)
+library(Seurat)
+
+```
+
+```{r, with built in reference}
+#choose reference from celldex
+#use the Human Primary Cell Atlas (Mabbott et al. 2013), represented as a SummarizedExperiment object containing a matrix of log-expression values with sample-level labels.
+hpca.se <- celldex::HumanPrimaryCellAtlasData()
+hpca.se
+
+```
+
+```{r}
+#import data set for annotation
+seu_obj <- readRDS("/gpfs/gpfs1/scratch/c1041165/STSM_munich/GSE148673/subset/ruli_gao_seurat_metadata_filtered_subset.rds")
+
+#convert to SCE
+#sce <- Seurat::as.SingleCellExperiment(seu_obj) #gave error
+
+#get normalized count data
+counts_seu <- Seurat::GetAssayData(seu_obj)
+```
+
+```{r}
+#take a look at the labels of the reference
+unique(hpca.se$label.main) #36 cell types
+
+#annotate
+pred.ruli <- SingleR(test = counts_seu, ref = hpca.se, assay.type.ref = 1,
+    labels = hpca.se$label.main)
+
+table(pred.ruli$labels)
+
+```
+
+```{r}
+#add the labels back to the metadata
+seu_obj[["SingleR.labels"]] <- pred.ruli$labels
+
+```
+
+```{r}
+#make dimplot and annotate cells based on the singleR results
+#define a better palette
+library(ggplot2)
+library(scCustomize)
+library(qs)
+library(dittoSeq)
+
+
+#define the palettes
+custom_palette_7 <- DiscretePalette_scCustomize(num_colors = 26, palette = "ditto_seq")
+
+#plot results
+p <- DimPlot(seu_obj, group.by = 'SingleR.labels', reduction = "umap")
+
+p + 
+  scale_color_manual(values = custom_palette_7)
+
+```
+
