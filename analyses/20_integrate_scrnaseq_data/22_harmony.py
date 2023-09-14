@@ -38,22 +38,9 @@ adata
 
 # %%
 sc.pp.pca(adata)
-sc.pp.neighbors(adata)
-sc.tl.umap(adata)
 
 # %%
 sc.external.pp.harmony_integrate(adata, key='batch')
-
-# %%
-# Extract the loadings and integrated PCA values
-loadings = adata.varm["PCs"]
-integrated_values = adata.obsm["X_pca_harmony"]
-# Calculate the corrected values
-corrected_values = integrated_values.dot(loadings.T)
-
-# %%
-adata.layers["raw_counts"] = adata.X.copy()
-adata.X = corrected_values
 
 # %%
 os.makedirs("artifacts", exist_ok=True)
