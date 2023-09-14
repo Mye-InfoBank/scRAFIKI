@@ -1,0 +1,9 @@
+services:
+  general:
+    build: 
+      context: ..
+    image: biomedbigdata/sc-integration
+  mnn:
+    build: 
+      context: mnn
+    image: biomedbigdata/mnn

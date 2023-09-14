@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     gcc-8 g++-8 python3 python3-pip \ 
     python3-dev 
 
-RUN pip install mnnpy
+RUN pip install mnnpy nxfvars papermill scanpy
 
 # downgrade package 
 RUN pip install scipy==1.8.1
