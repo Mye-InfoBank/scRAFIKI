@@ -18,7 +18,7 @@
 
 
 import mnnpy
-import anndata
+import scanpy as sc
 import os
 
 # %%
@@ -42,16 +42,13 @@ for batch in adata.obs.batch.unique():
 
 # %%
 # integration with mnn
-corrected = mnnpy.mnn_correct(*adata_list, batch_categories= adata.obs.batch.unique())
+corrected = mnnpy.mnn_correct(*adata_list, batch_categories=adata.obs.batch.unique())
 
 # %%
-corrected_values = corrected[0].X
-
-# %%
-adata.layers["raw_counts"] = adata.X.copy()
-adata.X = corrected_values
+corrected_adata = corrected[0]
+corrected_adata
 
 # %%
 os.makedirs("artifacts", exist_ok=True)
 
-adata.write_h5ad("artifacts/mnn.h5ad")
+corrected_adata.write_h5ad("artifacts/mnn.h5ad")
