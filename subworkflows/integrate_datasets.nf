@@ -86,22 +86,39 @@ workflow integrate_datasets {
         ch_adata_path
     )
 
-    /*
+    ch_harmony_adata = HARMONY.out.artifacts.filter{
+        it.getExtension() == "h5ad"
+    }
+
+    ch_harmony_adata.view()
+
     MNN(
             Channel.value([
-            [id: "23_mmn"],
+            [id: "23_mnn"],
             file("${baseDir}/analyses/20_integrate_scrnaseq_data/23_mnn.py")
         ]),
         [
         ],
         ch_adata_path
-    )*/
+    )
 
     ch_scvi_hvg = SCVI.out.adata
     ch_scvi_hvg_model = SCVI.out.scvi_model
 
     ch_scanvi_hvg = SCANVI.out.adata
     ch_scanvi_hvg_model = SCANVI.out.scvi_model
+
+    ch_batches = MERGE_ALL.out.artifacts.flatten().filter{
+            it -> it.getName() == "obs_all.csv"
+        }.splitCsv(header : true).filter{
+            it -> it["run_solo"] == "True"
+        }.map{ it -> it["batch"] }
+
+    ch_integrations = Channel.from([
+        ["scvi_hvg", ch_scvi_hvg, ch_scvi_hvg_model],
+        ["scanvi_hvg", ch_scanvi_hvg, ch_scanvi_hvg_model],
+        ["harmony", ch_harmony_adata, null]
+    ])
 
     NEIGHBORS_LEIDEN_UMAP_DOUBLET(
         ch_scanvi_hvg,
@@ -112,11 +129,7 @@ workflow integrate_datasets {
     SOLO(
         ch_scanvi_hvg,
         ch_scanvi_hvg_model,
-        MERGE_ALL.out.artifacts.flatten().filter{
-            it -> it.getName() == "obs_all.csv"
-        }.splitCsv(header : true).filter{
-            it -> it["run_solo"] == "True"
-        }.map{ it -> it["batch"] }
+        ch_batches
     )
 
     MERGE_SOLO(
