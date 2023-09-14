@@ -110,8 +110,8 @@ workflow integrate_datasets {
     )
 
     SOLO(
-        ch_scvi_hvg,
-        ch_scvi_hvg_model,
+        ch_scanvi_hvg,
+        ch_scanvi_hvg_model,
         MERGE_ALL.out.artifacts.flatten().filter{
             it -> it.getName() == "obs_all.csv"
         }.splitCsv(header : true).filter{
