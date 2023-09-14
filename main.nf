@@ -1,18 +1,25 @@
 #!/usr/bin/env nextflow
 
+@Grab('com.xlson.groovycsv:groovycsv:1.3')
+import static com.xlson.groovycsv.CsvParser.parseCsv
+
 nextflow.enable.dsl = 2
 
-include { build_atlas } from "./workflows/build_atlas.nf"
-include { downstream_analyses } from "./workflows/downstream_analyses.nf"
+include { integrate_datasets } from "../workflows/integrate_datasets.nf"
+include { annotate_dataset } from "../workflows/annotate_dataset.nf"
+include { add_additional_datasets } from "../workflows/add_additional_datasets.nf"
 
-workflow {
+workflow build_atlas {
 
-    if(params.workflow == "build_atlas") {
-        build_atlas()
-    } else if (params.workflow == "downstream_analyses") {
-        downstream_analyses()
-    } else {
-        assert False: "Invalid --workflow parameter"
-    }
+    integrate_datasets()
 
+    annotate_dataset(integrate_datasets.out.adata_integrated)
+
+    /*
+    add_additional_datasets(
+        annotate_dataset.out.final_atlas,
+        annotate_dataset.out.scanvi_h5ad,
+        annotate_dataset.out.scanvi_model
+    )
+    */
 }
