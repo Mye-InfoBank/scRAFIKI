@@ -5,11 +5,11 @@ import static com.xlson.groovycsv.CsvParser.parseCsv
 
 nextflow.enable.dsl = 2
 
-include { integrate_datasets } from "../workflows/integrate_datasets.nf"
-include { annotate_dataset } from "../workflows/annotate_dataset.nf"
-include { add_additional_datasets } from "../workflows/add_additional_datasets.nf"
+include { integrate_datasets } from "./workflows/integrate_datasets.nf"
+include { annotate_dataset } from "./workflows/annotate_dataset.nf"
+include { add_additional_datasets } from "./workflows/add_additional_datasets.nf"
 
-workflow build_atlas {
+workflow {
 
     integrate_datasets()
 
