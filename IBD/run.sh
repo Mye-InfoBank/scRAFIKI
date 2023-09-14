@@ -1,3 +1,3 @@
 #!/bin/bash
 
-~/.nextflow/nextflow run .. -resume --samplesheet sampleSheet.csv --samplesheet2 sampleSheet2.csv --outdir out
+nextflow run .. -resume --samplesheet sampleSheet.csv --samplesheet2 sampleSheet2.csv --outdir out
