@@ -5,3 +5,4 @@ unpublished,/nfs/data/COST_IBD/preprocessing/dataset_preprocessing/raw/ibd/unpub
 kong,/nfs/data/COST_IBD/preprocessing/dataset_preprocessing/raw/ibd/kong.h5ad,1000,1000000000,200,1000000000,15,batch,TRUE
 boland,/nfs/data/COST_IBD/preprocessing/dataset_preprocessing/raw/ibd/boland.h5ad,541,1000000000,384,100000000000,100,batch,TRUE
 devlin,/nfs/data/COST_IBD/preprocessing/dataset_preprocessing/raw/ibd/devlin.h5ad,650,1000000000,321,100000000000,10,batch,TRUE
+smillie,/nfs/data/COST_IBD/preprocessing/dataset_preprocessing/raw/ibd/smillie.h5ad,304,14500,245,3500,18,batch,TRUE
