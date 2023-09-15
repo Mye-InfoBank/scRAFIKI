@@ -20,6 +20,11 @@
 import mnnpy
 import scanpy as sc
 import os
+from nxfvars import nxfvars
+
+#%%
+cpus = int(nxfvars.get("cpus", "8"))
+cpus
 
 # %%
 paths = [file for file in os.listdir(".") if file.endswith(".h5ad")]
@@ -37,12 +42,12 @@ adata
 # split by batch for mnnpy
 adata_list = []
 
-for batch in adata.obs.batch.unique():
-    adata_list.append(adata[adata.obs.batch==batch, ].copy())
+for batch in adata.obs["batch"].unique():
+    adata_list.append(adata[adata.obs["batch"] == batch])
 
 # %%
 # integration with mnn
-corrected = mnnpy.mnn_correct(*adata_list, batch_categories=adata.obs.batch.unique())
+corrected = mnnpy.mnn_correct(*adata_list, batch_categories=adata.obs["batch"].unique(), n_jobs=cpus)
 
 # %%
 corrected_adata = corrected[0]
