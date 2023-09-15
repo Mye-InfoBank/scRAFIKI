@@ -1,4 +1,4 @@
-# Single cell atlas creation pipeline
+# **S**ingle-cell **I**ntegration **M**ethods pipeline for **B**ig **A**tlases
 
 This pipeline is written in nextflow and based on the LUCA pipeline:
   
