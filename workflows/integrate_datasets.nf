@@ -12,6 +12,7 @@ include { JUPYTERNOTEBOOK as MERGE_SOLO }  from "../modules/local/jupyternoteboo
 include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_NODOUBLET } from "./neighbors_leiden_umap.nf"
 include { JUPYTERNOTEBOOK as HARMONY }  from "../modules/local/jupyternotebook/main.nf"
 include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.nf"
+include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -146,7 +147,11 @@ workflow integrate_datasets {
         ch_mnn_complete
     )
 
-    
+    MERGE_INTEGRATIONS(
+        ch_adata_merged,
+        ch_integrations.map { it[2] }.collect(),
+        ch_integrations.map { it[1] }.collect()
+    )
 
     NEIGHBORS_LEIDEN_UMAP_DOUBLET(
         ch_scanvi_hvg,
