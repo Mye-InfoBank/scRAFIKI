@@ -154,7 +154,7 @@ assert (
 ), "The number of unique samples equals the number of rows"
 
 # %%
-merged_all = merge_datasets(datasets.values(), symbol_in_n_datasets=1)
+merged_all = merge_datasets(datasets.values(), symbol_in_n_datasets=2)
 
 # %%
 merged_all.shape
@@ -168,12 +168,7 @@ merged_all.shape
 # %%
 # updating values is very slow in sparse matrices.
 # We can afford the memory for making this dense temporarily.
-merged_all.layers["raw_counts"] = merged_all.X.toarray()
-
-# %%
-merged_all.layers["raw_counts"] = scipy.sparse.csr_matrix(
-    merged_all.layers["raw_counts"]
-)
+merged_all.layers["raw_counts"] = merged_all.X
 
 # %% [markdown]
 # ## Export all
