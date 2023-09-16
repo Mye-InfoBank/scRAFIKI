@@ -1,8 +1,9 @@
-
-
 process NEIGHBORS {
-    container = "biomedbigdata/sc-integration"
+    container = "bigdatainbiomedicine/sc-integration"
     cpus 8
+    memory {50.GB * task.attempt}
+    errorStrategy 'retry'
+    maxRetries 3
 
     input:
     tuple val(id), path(adata)
@@ -28,8 +29,11 @@ process NEIGHBORS {
 }
 
 process UMAP {
-    container = "biomedbigdata/sc-integration"
+    container = "bigdatainbiomedicine/sc-integration"
     cpus 8
+    memory {50.GB * task.attempt}
+    errorStrategy 'retry'
+    maxRetries 3
 
     input:
     tuple val(id), path(adata)
@@ -54,8 +58,11 @@ process UMAP {
 }
 
 process LEIDEN {
-    container = "biomedbigdata/sc-integration"
+    container = "bigdatainbiomedicine/sc-integration"
     cpus 1
+    memory {50.GB * task.attempt}
+    errorStrategy 'retry'
+    maxRetries 3
 
     input:
     tuple val(id), path(adata)
@@ -81,8 +88,11 @@ process LEIDEN {
 }
 
 process MERGE_UMAP_LEIDEN {
-    container = "biomedbigdata/sc-integration"
+    container = "bigdatainbiomedicine/sc-integration"
     cpus 1
+    memory {50.GB * task.attempt}
+    errorStrategy 'retry'
+    maxRetries 3
 
     input:
     tuple val(id), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
