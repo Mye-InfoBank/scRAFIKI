@@ -1,0 +1,7 @@
+id,input_adata,min_counts,max_counts,min_genes,max_genes,max_pct_mito,batch_key,run_solo
+bassez,/nfs/data/COST_IBD/data/annData/BrCa/bassez.h5ad,401,1000000000,201,100000000000,15,batch,TRUE
+kester,/nfs/data/COST_IBD/data/annData/BrCa/kester.h5ad,0,1000000000,0,1000000000,100,batch,TRUE
+pal,/nfs/data/COST_IBD/data/annData/BrCa/pal.h5ad,0,1000000000,0,1000000000,100,batch,TRUE
+ruli_gao,/nfs/data/COST_IBD/data/annData/BrCa/ruli_gao_subset.h5ad,701,1000000000,500,1000000000,36,batch,TRUE
+slyper,/nfs/data/COST_IBD/data/annData/BrCa/slyper_filtered.h5ad,0,1000000000,0,100000000000,100,batch,TRUE
+wu,/nfs/data/COST_IBD/data/annData/BrCa/wu.h5ad,0,1000000000,0,1000000000,100,batch,TRUE

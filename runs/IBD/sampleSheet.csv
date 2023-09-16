@@ -1,0 +1,8 @@
+id,input_adata,min_counts,max_counts,min_genes,max_genes,max_pct_mito,batch_key,run_solo
+elmentaite,/nfs/data/COST_IBD/data/annData/IBD/elmentaite.h5ad,2367,1000000000,366,1000000000,8,batch,TRUE
+martin,/nfs/data/COST_IBD/data/annData/IBD/martin.h5ad,106,1000000000,100,1000000000,8,batch,TRUE
+unpublished,/nfs/data/COST_IBD/data/annData/IBD/unpublished.h5ad,6000,1000000000,72,1000000000,20,batch,TRUE
+kong,/nfs/data/COST_IBD/data/annData/IBD/kong.h5ad,1000,1000000000,200,1000000000,15,batch,TRUE
+boland,/nfs/data/COST_IBD/data/annData/IBD/boland.h5ad,541,1000000000,384,100000000000,100,batch,TRUE
+devlin,/nfs/data/COST_IBD/data/annData/IBD/devlin.h5ad,650,1000000000,321,100000000000,10,batch,TRUE
+smillie,/nfs/data/COST_IBD/data/annData/IBD/smillie.h5ad,304,14500,245,3500,18,batch,TRUE
