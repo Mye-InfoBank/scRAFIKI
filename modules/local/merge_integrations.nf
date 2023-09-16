@@ -9,7 +9,7 @@ process MERGE_INTEGRATIONS {
   
   script:
   """
-  #!/usr/bin/python3
+  #!/usr/local/bin/python3
   import scanpy as sc
   import anndata as ad
 
