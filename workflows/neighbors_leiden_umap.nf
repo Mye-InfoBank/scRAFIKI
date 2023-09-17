@@ -1,5 +1,5 @@
 process NEIGHBORS {
-    container = "bigdatainbiomedicine/sc-integration"
+    container = "bigdatainbiomedicine/sc-python"
     cpus 8
     memory {50.GB * task.attempt}
     errorStrategy 'retry'
@@ -29,7 +29,7 @@ process NEIGHBORS {
 }
 
 process UMAP {
-    container = "bigdatainbiomedicine/sc-integration"
+    container = "bigdatainbiomedicine/sc-python"
     cpus 8
     memory {50.GB * task.attempt}
     errorStrategy 'retry'
@@ -58,7 +58,7 @@ process UMAP {
 }
 
 process LEIDEN {
-    container = "bigdatainbiomedicine/sc-integration"
+    container = "bigdatainbiomedicine/sc-python"
     cpus 1
     memory {50.GB * task.attempt}
     errorStrategy 'retry'
@@ -88,7 +88,7 @@ process LEIDEN {
 }
 
 process MERGE_UMAP_LEIDEN {
-    container = "bigdatainbiomedicine/sc-integration"
+    container = "bigdatainbiomedicine/sc-python"
     cpus 1
     memory {50.GB * task.attempt}
     errorStrategy 'retry'

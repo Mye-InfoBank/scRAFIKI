@@ -1,8 +1,8 @@
 services:
-  general:
+  python:
     build: 
       context: ..
-    image: bigdatainbiomedicine/sc-integration
+    image: bigdatainbiomedicine/sc-python
   mnn:
     build: 
       context: mnn
