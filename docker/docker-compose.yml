@@ -3,6 +3,10 @@ services:
     build: 
       context: ..
     image: bigdatainbiomedicine/sc-python
+  r:
+    build: 
+      context: r
+    image: bigdatainbiomedicine/sc-r
   mnn:
     build: 
       context: mnn
