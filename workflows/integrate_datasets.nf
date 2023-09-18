@@ -14,6 +14,7 @@ include { JUPYTERNOTEBOOK as HARMONY }  from "../modules/local/jupyternotebook/m
 include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.nf"
 include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
+include { DECONTX } from "../modules/local/decontX.nf"
 
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -170,6 +171,11 @@ workflow integrate_datasets {
     SOLO(
         ch_scanvi_hvg,
         ch_scanvi_hvg_model,
+        ch_batches
+    )
+
+    DECONTX(
+        ch_adata_merged,
         ch_batches
     )
 

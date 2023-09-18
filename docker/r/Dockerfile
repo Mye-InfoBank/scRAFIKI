@@ -4,3 +4,10 @@ RUN Rscript -e 'install.packages(c("BiocManager", "Seurat", "anndata", "MatrixEx
 
 RUN Rscript -e 'BiocManager::install(c("celda", "SingleR"))'
 
+RUN apt install -y git libffi-dev libssl-dev libsqlite3-dev
+
+RUN Rscript -e 'reticulate::install_python()'
+
+RUN Rscript -e 'reticulate::virtualenv_create()'
+
+RUN Rscript -e 'anndata::install_anndata()'

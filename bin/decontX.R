@@ -1,23 +1,22 @@
-args = commandArgs(trailingOnly=TRUE)
+#!/usr/bin/env Rscript
 
-if (length(args)==0) {
-  stop("At least one argument must be supplied (input file).n", call.=FALSE)
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) < 2) {
+  stop("At least two arguments must be supplied (annData file, batch)",
+    call. = FALSE)
 }
 
 library(anndata)
-library(MatrixExtra)
 library(celda)
 
+batch <- args[2]
 ad <- read_h5ad(args[1])
-counts <- ad$T$X
-counts <- as.csc.matrix(counts)
 
-results <- decontX(counts)
+ad <- ad[ad$obs$batch == batch, ]$copy()
 
-decontXcounts <- results$decontXcounts
+results <- decontX(ad$T$X)
 
-ad$layers[["before_ambient_correction"]] <- ad$X
-ad$X <- t(decontXcounts)
+ad$X <- t(results$decontXcounts)
 
-write_h5ad(ad, "after_ambient_correction.h5ad")
-
+write_h5ad(ad, paste0(batch, "_ambient.h5ad"))
