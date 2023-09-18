@@ -1,7 +1,6 @@
 process DECONTX {
   input:
-    file adata
-    val batch
+    tuple file(adata), val(batch)
   
   output:
     file "${batch}_ambient.h5ad"

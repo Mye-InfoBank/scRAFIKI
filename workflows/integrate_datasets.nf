@@ -175,8 +175,7 @@ workflow integrate_datasets {
     )
 
     DECONTX(
-        ch_adata_merged,
-        ch_batches
+        ch_adata_merged.combine(ch_batches)
     )
 
     MERGE_SOLO(
