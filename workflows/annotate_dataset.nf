@@ -37,39 +37,8 @@ workflow annotate_dataset {
         "X_scANVI",
         Channel.from(0.5, 0.75, 1.0, 1.5)
     )
+    
     /*
-    ANNOTATE_CELL_TYPES_FINE(
-        Channel.value([
-            [id: "annotate_cell_types_fine"],
-            file("${baseDir}/analyses/30_annotate_scrnaseq_data/32_annotate_cell_types_fine.py")
-        ]),
-        [
-            "input_dir": '.',
-            "main_adata": 'adata_cell_type_coarse.h5ad',
-            "hlca_markers": 'hlca_cell_type_signatures.csv',
-            "wu_markers": "wu_cd8_t_cell_signatures.csv"
-        ],
-        NEIGHBORS_LEIDEN_UMAP_CELL_TYPES.out.adata.map{ id, adata -> adata }.mix(
-            ch_adata_annotated,
-            Channel.fromPath("${baseDir}/tables/gene_annotations/hlca_cell_type_signatures.csv"),
-            Channel.fromPath("${baseDir}/tables/gene_annotations/wu_cd8_t_cell_signatures.csv")
-        ).collect()
-    )
-    /*
-    ANNOTATE_CELL_TYPES_EPI(
-        Channel.value([
-            [id: "annotate_cell_types_epi"],
-            file("${baseDir}/analyses/30_annotate_scrnaseq_data/33_epithelial_cells.py")
-        ]),
-        [
-            "input_adata": 'adata_cell_type_coarse_epithelial_cell.umap_leiden.h5ad',
-            "hlca_markers": 'hlca_cell_type_signatures.csv'
-        ],
-        NEIGHBORS_LEIDEN_UMAP_CELL_TYPES.out.adata.map{ id, adata -> adata }.filter(
-            it -> it.name.equals("adata_cell_type_coarse_epithelial_cell.umap_leiden.h5ad")
-        ).mix(Channel.fromPath("${baseDir}/tables/gene_annotations/hlca_cell_type_signatures.csv")).collect()
-    )
-
     EXPORT_ATLAS(
         Channel.value([
             [id: "export_atlas"],
