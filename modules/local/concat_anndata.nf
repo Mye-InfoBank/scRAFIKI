@@ -4,7 +4,7 @@ process CONCAT_ADATA {
     file anndatas
   
   output:
-    file("concatenated.h5ad")
+    file "concatenated.h5ad"
   
   script:
   """
