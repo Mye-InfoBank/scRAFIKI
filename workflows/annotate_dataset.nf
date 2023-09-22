@@ -1,5 +1,5 @@
 
-include { JUPYTERNOTEBOOK as ANNOTATE_CELL_TYPES_COARSE }  from "../modules/local/jupyternotebook/main.nf"
+include { JUPYTERNOTEBOOK as CELLTYPIST }  from "../modules/local/jupyternotebook/main.nf"
 include { JUPYTERNOTEBOOK as ANNOTATE_CELL_TYPES_FINE }  from "../modules/local/jupyternotebook/main.nf"
 include { JUPYTERNOTEBOOK as ANNOTATE_CELL_TYPES_EPI }  from "../modules/local/jupyternotebook/main.nf"
 include { SPLIT_ANNDATA }  from "../modules/local/scconversion/main.nf"
@@ -19,15 +19,15 @@ workflow annotate_dataset {
         adata_integrated
 
     main:
-    ANNOTATE_CELL_TYPES_COARSE(
+    CELLTYPIST(
         Channel.value([
-            [id: "annotate_cell_types_coarse"],
-            file("${baseDir}/analyses/30_annotate_scrnaseq_data/31_annotate_cell_types_coarse.py")
+            [id: "celltypist"],
+            file("${baseDir}/analyses/30_annotate_scrnaseq_data/31_celltypist.py")
         ]),
         [:],
         adata_integrated
     )
-    ch_adata_annotated = ANNOTATE_CELL_TYPES_COARSE.out.artifacts
+    ch_adata_annotated = CELLTYPIST.out.artifacts
     
     /*
     TODO: Find out if this analysis makes sens

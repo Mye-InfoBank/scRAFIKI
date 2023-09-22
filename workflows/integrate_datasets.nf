@@ -199,6 +199,6 @@ workflow integrate_datasets {
     )
 
     emit:
-        adata_integrated = NEIGHBORS_LEIDEN_UMAP_NODOUBLET.out.adata.map{ meta, ad -> ad }
+        adata_integrated = NEIGHBORS_LEIDEN_UMAP_NODOUBLET.out.adata
 
 }

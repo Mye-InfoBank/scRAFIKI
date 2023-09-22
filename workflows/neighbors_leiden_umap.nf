@@ -136,7 +136,7 @@ workflow NEIGHBORS_LEIDEN_UMAP {
     UMAP(NEIGHBORS.out.adata)
     LEIDEN(NEIGHBORS.out.adata, leiden_res)
 
-    MERGE_UMAP_LEIDEN(UMAP.out.adata.join(LEIDEN.out.groupTuple()))
+    MERGE_UMAP_LEIDEN(UMAP.out.adata.combine(LEIDEN.out.collect()))
 
     emit:
     adata = MERGE_UMAP_LEIDEN.out.adata
