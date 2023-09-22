@@ -16,7 +16,7 @@ include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
 include { CONCAT_ADATA as CONCAT_BATCHES } from "../modules/local/concat_anndata.nf"
-include { SPLIT_ANNDATA as SPLIT_BATCHES } from "../modules/local/scconversion/main.nf"
+include { FILTER_ANNDATA as SPLIT_BATCHES } from "../modules/local/scconversion/main.nf"
 include { FILTER_SOLO } from "../modules/local/solo/main.nf"
 
 
@@ -160,12 +160,9 @@ workflow integrate_datasets {
     )
 
     SPLIT_BATCHES(
-        MERGE_INTEGRATIONS.out.map{ ["splitBatch", it] },
-        "batch"
+        ch_batches.combine(MERGE_INTEGRATIONS.out),
+        "lambda x: x['batch'] == process_id"
     )
-
-    ch_adata_batches = SPLIT_BATCHES.out.adata.flatten()
-        .map{ adata -> [adata.baseName.replaceAll("splitBatch_", "").replaceAll(".h5ad", ""), adata] }
 
     SOLO(
         ch_scanvi_hvg,
@@ -183,7 +180,7 @@ workflow integrate_datasets {
 
 
     DECONTX(
-        ch_adata_batches
+        SPLIT_BATCHES.out.adata
     )
 
     FILTER_SOLO(

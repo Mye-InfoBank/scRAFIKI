@@ -102,7 +102,7 @@ process SPLIT_ANNDATA {
 }
 
 process FILTER_ANNDATA {
-    container "${baseDir}/containers/pircher-sc-integrate2_2021-11-27_patched_annotation_helper.sif"
+    container "bigdatainbiomedicine/sc-python"
     input:
         tuple val(id), path(input_adata)
         val(query) // this is a labmda expression, e.g. lambda x: x["origin"] == "tumor_primary"
@@ -115,6 +115,8 @@ process FILTER_ANNDATA {
     #!/usr/bin/env python
 
     import scanpy as sc
+
+    process_id = "${id}"
 
     adata = sc.read_h5ad("${input_adata}")
     index = adata.obs.loc[${query}].index

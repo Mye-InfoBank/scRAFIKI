@@ -1,17 +1,19 @@
 process CONCAT_ADATA {
+  container = "bigdatainbiomedicine/sc-python"
   input:
-    val anndatas
+    file anndatas
   
   output:
     file("concatenated.h5ad")
   
   script:
   """
+    #!/usr/bin/env python
     import scanpy as sc
     import anndata as ad
 
-    anndata_list = [sc.read_h5ad(adata) for adata in ["${anndatas.join("\", \"")}}"]]
-    concatenated = ad.concatenate(anndata_list)
+    adata_list = [sc.read_h5ad(adata_path) for adata_path in ["${anndatas.join("\", \"")}"]]
+    concatenated = ad.concat(adata_list)
 
     concatenated.write("concatenated.h5ad")
   """
