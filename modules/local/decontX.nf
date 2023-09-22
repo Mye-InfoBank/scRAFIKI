@@ -1,12 +1,12 @@
 process DECONTX {
   input:
-    tuple file(adata), val(batch)
+    tuple val(batch), file(adata)
   
   output:
-    file "${batch}_ambient.h5ad"
+    tuple val(batch), file("*_ambient.h5ad")
   
   script:
   """
-  decontX.R ${adata} ${batch}
+  decontX.R ${adata}
   """
 }

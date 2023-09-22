@@ -15,6 +15,9 @@ include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.
 include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
+include { CONCAT_ADATA as CONCAT_BATCHES } from "../modules/local/concat_anndata.nf"
+include { SPLIT_ANNDATA as SPLIT_BATCHES } from "../modules/local/scconversion/main.nf"
+include { FILTER_SOLO } from "../modules/local/solo/main.nf"
 
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -149,11 +152,27 @@ workflow integrate_datasets {
         ch_mnn_complete
     )
 
+ 
     MERGE_INTEGRATIONS(
         ch_adata_merged,
         ch_integrations.map { it[2] }.collect(),
         ch_integrations.map { it[1] }.collect()
     )
+
+    SPLIT_BATCHES(
+        MERGE_INTEGRATIONS.out.map{ ["splitBatch", it] },
+        "batch"
+    )
+
+    ch_adata_batches = SPLIT_BATCHES.out.adata.flatten()
+        .map{ adata -> [adata.baseName.replaceAll("splitBatch_", "").replaceAll(".h5ad", ""), adata] }
+
+    SOLO(
+        ch_scanvi_hvg,
+        ch_scanvi_hvg_model,
+        ch_batches
+    )
+
 
     /*
     BENCHMARK_INTEGRATIONS(
@@ -162,43 +181,22 @@ workflow integrate_datasets {
     )
     */
 
-    NEIGHBORS_LEIDEN_UMAP_DOUBLET(
-        ch_scanvi_hvg,
-        "X_scANVI",
-        1.0
-    )
-
-    SOLO(
-        ch_scanvi_hvg,
-        ch_scanvi_hvg_model,
-        ch_batches
-    )
 
     DECONTX(
-        ch_adata_merged.combine(ch_batches)
+        ch_adata_batches
     )
 
-    MERGE_SOLO(
-        Channel.value([
-            [id: "25_merge_solo"],
-            file("${baseDir}/analyses/20_integrate_scrnaseq_data/25_merge_solo.py")
-        ]),
-        [
-            "adata_path": "all.umap_leiden.h5ad",
-            // this is to re-integrate all genes (not only HVG)
-            "adata_merged": "merged_all.h5ad"
-        ],
-        NEIGHBORS_LEIDEN_UMAP_DOUBLET.out.adata.map{ id, adata -> adata}.mix(
-            SOLO.out.doublets
-        ).mix(ch_adata_merged).flatten().collect()
+    FILTER_SOLO(
+        DECONTX.out.join(SOLO.out.map{ [it[0], it[1]] }),
     )
 
-    //re-compute neighbors, leiden, umap after doublet filtering.
-    ch_adata_doublet_filtered = MERGE_SOLO.out.artifacts.filter{
-        it -> it.baseName.contains("doublet_filtered")
-    }.map{ it -> [it.baseName, it] }
+    CONCAT_BATCHES(
+        FILTER_SOLO.out.map{ it[1] }.collect()
+    )
+
+
     NEIGHBORS_LEIDEN_UMAP_NODOUBLET(
-        ch_adata_doublet_filtered,
+        CONCAT_BATCHES.out,
         "X_scANVI",
         1.0
     )

@@ -28,6 +28,9 @@ workflow annotate_dataset {
         adata_integrated
     )
     ch_adata_annotated = ANNOTATE_CELL_TYPES_COARSE.out.artifacts
+    
+    /*
+    TODO: Find out if this analysis makes sens
     SPLIT_ANNDATA(
         ch_adata_annotated.map{ it -> [it.baseName, it]},
         "cell_type"
@@ -37,6 +40,7 @@ workflow annotate_dataset {
         "X_scANVI",
         Channel.from(0.5, 0.75, 1.0, 1.5)
     )
+    */
     
     /*
     EXPORT_ATLAS(

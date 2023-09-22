@@ -9,7 +9,7 @@ process SOLO {
         each batch
 
     output:
-        path("solo*.csv"), emit: doublets
+        tuple val(batch), path("solo*.tsv")
 
     script:
     """
@@ -40,16 +40,41 @@ process SOLO {
 
     set_all_seeds()
 
-    adata = sc.read_h5ad("${adata}")
+    adata_raw = sc.read_h5ad("${adata}")
+    adata_batch = adata_raw[adata_raw.obs.batch == "${batch}"].copy()
 
-    scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
-    scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
-    solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
+    scvi.model.SCANVI.setup_anndata(adata_batch, labels_key="cell_type", unlabeled_category="Unknown")
+    scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata_batch)
+    solo = scvi.external.SOLO.from_scvi_model(scvi_model)
     solo.train()
     res = solo.predict()
     res["label"] = solo.predict(False)
 
-    res.to_csv("solo_${batch}.csv")
+    res.to_csv("solo_${batch}.tsv", sep="\t")
     """
 }
 
+process FILTER_SOLO {
+    container "bigdatainbiomedicine/sc-python"
+    input:
+        tuple val(batch), path(adata), path(info_df)
+
+    output:
+        tuple val(batch), path("*_dedup.h5ad")
+
+    script:
+    """
+    #!/usr/bin/env python
+    import scanpy as sc
+    import pandas as pd
+    from threadpoolctl import threadpool_limits
+    threadpool_limits(${task.cpus})
+
+    adata = sc.read_h5ad("${adata}")
+    info_df = pd.read_csv("${info_df}", sep="\t", index_col=0)
+
+    adata_filtered = adata[info_df['label'] == "singlet"].copy()
+
+    adata_filtered.write("solo_${batch}_dedup.h5ad")
+    """
+}

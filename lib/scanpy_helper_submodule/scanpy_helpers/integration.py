@@ -53,7 +53,7 @@ def sanitize_adata(adata: sc.AnnData):
 
         return corrected[0].upper() + corrected[1:]
 
-    for column in ["tissue", "condition", "cell_type", "sex"]:
+    for column in ["tissue", "condition", "cell_type", "sex", "batch"]:
         adata.obs[column] = adata.obs[column].fillna("Unknown").apply(to_Florent_case)
 
     adata.obs["sex"] = adata.obs["sex"].str.get(0)
