@@ -1,5 +1,5 @@
 
-include { JUPYTERNOTEBOOK as CELLTYPIST }  from "../modules/local/jupyternotebook/main.nf"
+include { CELLTYPIST }  from "../modules/local/celltypist.nf"
 include { JUPYTERNOTEBOOK as ANNOTATE_CELL_TYPES_FINE }  from "../modules/local/jupyternotebook/main.nf"
 include { JUPYTERNOTEBOOK as ANNOTATE_CELL_TYPES_EPI }  from "../modules/local/jupyternotebook/main.nf"
 include { SPLIT_ANNDATA }  from "../modules/local/scconversion/main.nf"
@@ -16,18 +16,15 @@ include { SCANVI } from "../modules/local/scvi/main.nf"
  */
 workflow annotate_dataset {
     take:
-        adata_integrated
+        adata_integrated // id, rep, adata
 
     main:
     CELLTYPIST(
-        Channel.value([
-            [id: "celltypist"],
-            file("${baseDir}/analyses/30_annotate_scrnaseq_data/31_celltypist.py")
-        ]),
-        [:],
-        adata_integrated
+        adata_integrated,
+        false,
+        "Cells_Intestinal_Tract.pkl"
     )
-    ch_adata_annotated = CELLTYPIST.out.artifacts
+    ch_adata_annotated = CELLTYPIST.out
     
     /*
     TODO: Find out if this analysis makes sens
