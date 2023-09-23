@@ -136,13 +136,13 @@ workflow integrate_datasets {
         }.map{ it -> it["batch"] }
 
     ch_scvi_hvg_complete = ch_scvi_hvg.map{ it[1] }.merge(ch_scvi_hvg_model.map{ it[1] })
-        .map{ adata, model -> ["scvi_hvg", "scVI", adata, model] }
+        .map{ adata, model -> ["scvi_hvg", "scVI", adata, model, "embed"] }
 
     ch_scanvi_hvg_complete = ch_scanvi_hvg.map{ it[1] }.merge(ch_scanvi_hvg_model.map{ it[1] })
-        .map{ adata, model -> ["scanvi_hvg", "scANVI", adata, model] }
+        .map{ adata, model -> ["scanvi_hvg", "scANVI", adata, model, "embed"] }
 
-    ch_harmony_complete = ch_harmony_adata.map{ adata -> ["harmony", "pca_harmony", adata, null] }
-    ch_mnn_complete = ch_mnn.map{ adata -> ["mnn", "MNN", adata, null] }
+    ch_harmony_complete = ch_harmony_adata.map{ adata -> ["harmony", "pca_harmony", adata, null, "embed"] }
+    ch_mnn_complete = ch_mnn.map{ adata -> ["mnn", "MNN", adata, null, "embed"] }
 
 
     ch_integrations = Channel.empty().mix(
@@ -152,7 +152,11 @@ workflow integrate_datasets {
         ch_mnn_complete
     )
 
- 
+    BENCHMARK_INTEGRATIONS(
+        ch_adata_merged.combine(ch_integrations.map { [it[0], "X_" + it[1], it[2], it[4]] }),
+        params.organism
+    )
+
     MERGE_INTEGRATIONS(
         ch_adata_merged,
         ch_integrations.map { it[2] }.collect(),
@@ -169,14 +173,6 @@ workflow integrate_datasets {
         ch_scanvi_hvg_model,
         ch_batches
     )
-
-
-    /*
-    BENCHMARK_INTEGRATIONS(
-        MERGE_INTEGRATIONS.out,
-        ch_integrations.map { it[1] }.collect()
-    )
-    */
 
 
     DECONTX(

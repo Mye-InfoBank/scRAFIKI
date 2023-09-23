@@ -43,6 +43,7 @@ if __name__ == '__main__':
     parser.add_argument('--hvgs', default=0,
                         help='Number of highly variable genes. Use 0 to specify that no feature selection had been used.',
                         type=int)
+    parser.add_argument('--embed_key', default='X_emb', help='Key of embedding in adata.obsm')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
@@ -139,10 +140,10 @@ if __name__ == '__main__':
     # case 2: embedding output
     if (type_ == "embed"):
         n_hvgs = None
-        embed = "X_emb"
+        embed = args.embed_key
         # legacy check
         if ('emb' in adata_int.uns) and (adata_int.uns['emb']):
-            adata_int.obsm["X_emb"] = adata_int.obsm["X_pca"].copy()
+            adata_int.obsm[embed] = adata_int.obsm["X_pca"].copy()
 
     # case3: kNN graph output
     elif (type_ == "knn"):

@@ -11,3 +11,4 @@ leidenalg
 celltypist
 harmonypy
 scib
+louvain
