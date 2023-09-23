@@ -195,7 +195,7 @@ workflow integrate_datasets {
     NEIGHBORS_LEIDEN_UMAP_NODOUBLET(
         CONCAT_BATCHES.out.map{ ["all", it]},
         ch_integrations.map{ "X_" + it[1] },
-        Channel.from(0.25, 0.5, 0.75, 1, 1.5, 2)
+        Channel.from(params.clustering_resolutions)
     )
 
     emit:

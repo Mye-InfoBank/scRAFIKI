@@ -21,8 +21,8 @@ workflow annotate_dataset {
     main:
     CELLTYPIST(
         adata_integrated,
-        true,
-        "Cells_Intestinal_Tract.pkl"
+        params.celltypist_majority_voting,
+        params.celltypist_model
     )
     ch_adata_annotated = CELLTYPIST.out
     
