@@ -193,9 +193,9 @@ workflow integrate_datasets {
 
 
     NEIGHBORS_LEIDEN_UMAP_NODOUBLET(
-        CONCAT_BATCHES.out,
-        "X_scANVI",
-        1.0
+        CONCAT_BATCHES.out.map{ ["all", it]},
+        Channel.from("X_scANVI", "X_scVI"),
+        Channel.from(0.5, 0.75, 1, 1.5)
     )
 
     emit:
