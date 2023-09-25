@@ -154,7 +154,8 @@ workflow integrate_datasets {
 
     BENCHMARK_INTEGRATIONS(
         ch_adata_merged.combine(ch_integrations.map { [it[0], "X_" + it[1], it[2], it[4]] }),
-        params.organism
+        params.organism,
+        params.scib_fast
     )
 
     MERGE_INTEGRATIONS(

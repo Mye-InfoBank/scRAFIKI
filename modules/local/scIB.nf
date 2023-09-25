@@ -8,6 +8,7 @@ process BENCHMARK_INTEGRATIONS {
     input: 
         tuple path(uncorrected), val(name), val(embed_acc), path(integrated), val(integration_type)
         val(organism)
+        val(fast)
 
     output:
         path("${name}.csv")
@@ -16,6 +17,6 @@ process BENCHMARK_INTEGRATIONS {
         """
         scIB.py -u ${uncorrected} -i ${integrated} \
          -m ${name} -o ${name}.csv -b batch -l cell_type --organism ${organism} \
-         --type ${integration_type} --embed_key ${embed_acc}
+         --type ${integration_type} --embed_key ${embed_acc} ${fast ? '-f' : ''}
         """
 }
