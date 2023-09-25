@@ -18,7 +18,10 @@ include { DECONTX } from "../modules/local/decontX.nf"
 include { CONCAT_ADATA as CONCAT_BATCHES } from "../modules/local/concat_anndata.nf"
 include { FILTER_ANNDATA as SPLIT_BATCHES } from "../modules/local/scconversion/main.nf"
 include { FILTER_SOLO } from "../modules/local/solo/main.nf"
-
+include { ADATA_METRICS as AFTER_QC_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
+include { ADATA_METRICS as FILTERED_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
+include { ADATA_METRICS as RAW_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
+include { COMBINE_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -46,6 +49,7 @@ workflow integrate_datasets {
     )
     SCQC_MERGE_STATS(SCQC.out.qc_stats.collect())
 
+    RAW_ADATA_METRICS(ch_samples)
 
     // MERGE and INTEGRATE all datasets
     MERGE_ALL(
@@ -67,6 +71,7 @@ workflow integrate_datasets {
         it.getExtension() == "h5ad"
     }
 
+    AFTER_QC_ADATA_METRICS(ch_adata_merged.map{ [[id: "after_qc"], it] })
 
     ch_adata_merged_meta = ch_adata_merged.collect().map{
         out -> ["all", out]
@@ -152,11 +157,13 @@ workflow integrate_datasets {
         ch_mnn_complete
     )
 
+/*
     BENCHMARK_INTEGRATIONS(
         ch_adata_merged.combine(ch_integrations.map { [it[0], "X_" + it[1], it[2], it[4]] }),
         params.organism,
         params.scib_fast
     )
+*/
 
     MERGE_INTEGRATIONS(
         ch_adata_merged,
@@ -186,6 +193,14 @@ workflow integrate_datasets {
 
     CONCAT_BATCHES(
         FILTER_SOLO.out.map{ it[1] }.collect()
+    )
+
+    FILTERED_ADATA_METRICS(
+        CONCAT_BATCHES.out.map{ [[id: "no_doublets"], it] }
+    )
+
+    COMBINE_ADATA_METRICS(
+        AFTER_QC_ADATA_METRICS.out.mix(FILTERED_ADATA_METRICS.out, RAW_ADATA_METRICS.out).collect()
     )
 
 
