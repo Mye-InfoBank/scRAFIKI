@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.11
 
 COPY requirements.txt setup_env.sh /tmp/
 COPY lib /tmp/lib

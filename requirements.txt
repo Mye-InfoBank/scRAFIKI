@@ -12,3 +12,4 @@ celltypist
 harmonypy
 scib
 louvain
+git+https://github.com/saketkc/pysctransform.git@develop

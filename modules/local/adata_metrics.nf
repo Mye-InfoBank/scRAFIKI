@@ -23,7 +23,7 @@ process ADATA_METRICS {
 
         patient_count = len(adata.obs['patient'].unique())
         cell_count = len(adata.obs_names)
-        cell_type_counts = adata.obs['cell_type'].value_counts().to_dict()
+        cell_type_counts = adata.obs['cell_type'].value_counts().to_dict() if 'cell_type' in adata.obs.columns else {}
 
         cell_types = list(cell_type_counts.keys())
         cell_types.sort()

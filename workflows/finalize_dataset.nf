@@ -7,6 +7,7 @@ include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_CELL_TYPES } from "./ne
 include { JUPYTERNOTEBOOK as EXPORT_ATLAS }  from "../modules/local/jupyternotebook/main.nf"
 include { SCVI } from "../modules/local/scvi/main.nf"
 include { SCANVI } from "../modules/local/scvi/main.nf"
+include { NORMALIZATION } from "../modules/local/normalize_anndata.nf"
 
 /**
  * Annotate cell-types of the lung cancer atlas.
@@ -14,7 +15,7 @@ include { SCANVI } from "../modules/local/scvi/main.nf"
  *   - perform DE analysis on some clusters
  *   - manually annotate sub-clusters to obtain a fine-grained cell-type annotation.
  */
-workflow annotate_dataset {
+workflow finalize_dataset {
     take:
         adata_integrated // id, rep, adata
 
@@ -25,6 +26,13 @@ workflow annotate_dataset {
         params.celltypist_model
     )
     ch_adata_annotated = CELLTYPIST.out
+
+    NORMALIZATION(
+        adata_integrated
+        //params.var_stabilisation
+    )
+    ch_adata_normalised = NORMALIZATION.out
+
     
     /*
     TODO: Find out if this analysis makes sens
