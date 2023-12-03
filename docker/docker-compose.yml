@@ -11,3 +11,7 @@ services:
     build: 
       context: mnn
     image: bigdatainbiomedicine/mnn
+  sctransform:
+    build:
+      context: sctransform
+    image: bigdatainbiomedicine/sctransform

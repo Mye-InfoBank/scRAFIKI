@@ -12,7 +12,8 @@ library(celda)
 
 ad <- read_h5ad(args[1])
 
-results <- decontX(ad$T$X)
+print(t(ad$X))
+results <- decontX(t(ad$X))
 
 ad$X <- t(results$decontXcounts)
 

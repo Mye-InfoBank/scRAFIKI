@@ -1,13 +1,8 @@
-FROM rocker/r2u:latest
+FROM rocker/r2u:22.04
 
-RUN Rscript -e 'install.packages(c("BiocManager", "Seurat", "anndata", "MatrixExtra"))'
+ENV WORKON_HOME=/opt/venv
 
-RUN Rscript -e 'BiocManager::install(c("celda", "SingleR"))'
+RUN apt-get update && apt install -y git libffi-dev libssl-dev libsqlite3-dev curl python3
 
-RUN apt install -y git libffi-dev libssl-dev libsqlite3-dev
-
-RUN Rscript -e 'reticulate::install_python()'
-
-RUN Rscript -e 'reticulate::virtualenv_create()'
-
-RUN Rscript -e 'anndata::install_anndata()'
+COPY install.R /tmp/
+RUN Rscript /tmp/install.R

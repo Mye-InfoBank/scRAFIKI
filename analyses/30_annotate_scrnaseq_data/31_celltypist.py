@@ -36,7 +36,8 @@ predictions = celltypist.annotate(
 )
 predictions_adata = predictions.to_adata()
 
-if args.majority_voting:
+# Additional check since majority voting is not performed if number of cells is too low
+if args.majority_voting and "majority_voting" in predictions_adata.obs.columns:
     adata.obs["celltypist_majority"] = predictions_adata.obs.loc[
         adata.obs.index, "majority_voting"
     ]

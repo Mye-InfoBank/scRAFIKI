@@ -49,7 +49,7 @@ process SOLO {
     res = solo.predict()
     res["label"] = solo.predict(False)
 
-    res.to_csv("solo_${batch}.tsv", sep="\t")
+    res.to_csv("solo_${batch}.tsv", sep="\\t")
     """
 }
 
@@ -70,7 +70,7 @@ process FILTER_SOLO {
     threadpool_limits(${task.cpus})
 
     adata = sc.read_h5ad("${adata}")
-    info_df = pd.read_csv("${info_df}", sep="\t", index_col=0)
+    info_df = pd.read_csv("${info_df}", sep="\\t", index_col=0)
 
     adata_filtered = adata[info_df['label'] == "singlet"].copy()
 
