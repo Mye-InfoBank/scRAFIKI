@@ -46,38 +46,11 @@ The following metadata fields are required:
 | patient | The patient identifier, needs to be unique across datasets | obs |  |
 | tissue | The tissue type | obs | |
 
-### 3. Configure nextflow
-
-Depending on your HPC/cloud setup you will need to adjust the nextflow profile in `nextflow.config`, to tell
-nextflow how to submit the jobs. Using a `withName:...` directive, special
-resources may be assigned to GPU-jobs. You can get an idea by checking out the `icbi_lung` profile - which we used to run the
-workflow on our on-premise cluster. Only the `build_atlas` workflow makes use of GPU processes.
-
-### 4. Launch the workflows
+### 3. Pipeline execution
 
 ```bash
-# Run `build_atlas` workflow
-nextflow run main.nf --workflow build_atlas -resume -profile <YOUR_PROFILE> \
-    --outdir "./data/20_build_atlas"
-
-# Run `downstream_analysis` workflow
-nextflow run main.nf --workflow downstream_analyses -resume -profile <YOUR_PROFILE> \
-    --build_atlas_dir "./data/20_build_atlas" \
-    --outdir "./data/30_downstream_analyses"
+nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --outdir "results" --samplesheet "samplesheet.csv"
 ```
-
-As you can see, the `downstream_analysis` workflow requires the output of the `build_atlas` workflow as input.
-The intermediate results from zenodo contain the output of the `build_atlas` workflow.
-
-## Structure of this repository
-
-* `analyses`: Place for e.g. jupyter/rmarkdown notebooks, grouped by their respective (sub-)workflows.
-* `bin`: executable scripts called by the workflow
-* `conf`: nextflow configuration files for all processes
-* `lib`: custom libraries and helper functions
-* `modules`: nextflow DSL2.0 modules
-* `tables`: contains static content that should be under version control
-* `workflows`: the main nextflow workflows
 
 ## Contact
 

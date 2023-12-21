@@ -7,7 +7,7 @@ nextflow.enable.dsl = 2
 
 include { integrate_datasets } from "./workflows/integrate_datasets.nf"
 include { finalize_dataset } from "./workflows/finalize_dataset.nf"
-include { add_additional_datasets } from "./workflows/add_additional_datasets.nf"
+// include { add_additional_datasets } from "./workflows/add_additional_datasets.nf"
 
 workflow {
 
