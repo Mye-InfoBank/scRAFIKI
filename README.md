@@ -22,16 +22,15 @@ The following integration methods are available:
 - scANVI
 - Harmony
 - MNN
-- scArches (transfer learning)
 
 The resulting dataset can be annotated using cellypist. The result file is prepared for further investigation using cellxgene.
 
-## Launching the workflows
+## Usage
 
-### 1. Prerequisites
+### Prerequisites
 
 * [Nextflow](https://www.nextflow.io/index.html#GetStarted), version 21.10.6 or higher
-* [Docker](https://docs.docker.com/get-docker/) or [Singularity](https://sylabs.io/guides/3.0/user-guide/quick_start.html)
+* [Docker](https://docs.docker.com/get-docker/), [Apptainer](https://apptainer.org/docs/admin/main/installation.html) or one of the other [supported container engines](https://www.nextflow.io/docs/latest/container.html)
 
 ### 2. Prepare data
 
