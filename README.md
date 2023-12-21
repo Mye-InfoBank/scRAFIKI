@@ -2,7 +2,7 @@
 
 <img src="./www/SIMBA_sticker.png" width="250">
 
-SIMBA is a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
+SIMBA isvgs a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
 
 This pipeline is written in nextflow and based on the LUCA pipeline:
   
@@ -10,20 +10,8 @@ This pipeline is written in nextflow and based on the LUCA pipeline:
 
 ## Overview
 
-The goal of the pipeline is to check the quality of the input data, integrate the datasets, and annotate the cell-types.
-
-The following quality control steps are performed:
-- Dataset-specific cutoff for number of detected genes and read counts as well as mitochondrial fraction
-- Doublet detection with [SOLO](https://docs.scvi-tools.org/en/stable/api/reference/scvi.external.SOLO.html)
-- Removal of ambient RNA
-
-The following integration methods are available:
-- scVI
-- scANVI
-- Harmony
-- MNN
-
-The resulting dataset can be annotated using cellypist. The result file is prepared for further investigation using cellxgene.
+![Metro map](./media/metro.png)
+Created using [Tennessine](https://tennessine.co.uk/metro/)
 
 ## Usage
 
