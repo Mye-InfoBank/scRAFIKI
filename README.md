@@ -73,7 +73,7 @@ The samplesheet is a csv file with the following column names as header:
 | max_counts | Maximum number of counts per cell | Infinity |
 | min_genes | Minimum number of genes per cell | 0 |
 | max_genes | Maximum number of genes per cell | Infinity |
-| max_pct_mito | Maximum percentage of mitochondrial genes per cell | 1 |
+| max_pct_mito | Maximum percentage of mitochondrial genes per cell | 100 |
 | run_solo | Run SOLO for doublet detection | true |
 
 Cell filtering will be handled by the pipeline if the respective columns are specified. If filtering has been done before, the columns can be omitted.

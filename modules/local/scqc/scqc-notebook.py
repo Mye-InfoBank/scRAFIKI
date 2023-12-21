@@ -9,19 +9,18 @@ from qc_plots import plot_qc_metrics, get_stats_df
 import pandas as pd
 
 # %%
-dataset_id = nxfvars.get("dataset_id", None)
-input_adata = nxfvars.get("input_adata", None)
-output_adata = nxfvars.get("output_adata", "/tmp/adata.h5ad")
-output_stats = nxfvars.get("output_stats", "/tmp/qc_stats.tsv")
+dataset_id = nxfvars["dataset_id"]
+input_adata = nxfvars["input_adata"]
+output_adata = nxfvars["output_adata"]
+output_stats = nxfvars["output_stats"]
 thresholds = {
-    key: int(nxfvars.get(key, default_value))
-    for key, default_value in {
-        "min_genes": 500,
-        "max_genes": float("inf"),
-        "min_counts": 1800,
-        "max_counts": 50000,
-        "max_pct_mito": 20,
-    }.items()
+    key: float(nxfvars[key])
+    for key in [
+        "min_genes",
+        "max_genes",
+        "min_counts",
+        "max_counts",
+        "max_pct_mito"]
 }
 
 # %%
