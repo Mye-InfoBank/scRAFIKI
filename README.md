@@ -39,18 +39,44 @@ You have to create AnnData objects for each dataset, containing the UMI counts f
 The following metadata fields are required:
 | Field | Description | Axis | Default |
 | --- | --- | --- | --- |
-| batch | Batch identifier, for integration | obs | |
+| batch | Batch identifier, for integration | obs | *required* |
 | cell_type | Cell-type annotation | obs | unknown |
 | condition | The condition of the tissue sample | obs | unknown |
 | sex | The sex of the patient (`female` or `male`) | obs | unknown |
-| patient | The patient identifier, needs to be unique across datasets | obs |  |
-| tissue | The tissue type | obs | |
+| patient | The patient identifier, needs to be unique across datasets | obs | *required* |
+| tissue | The tissue type | obs | *required* |
 
 ### 3. Pipeline execution
 
 ```bash
 nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --outdir "results" --samplesheet "samplesheet.csv"
 ```
+
+#### Profiles
+The following profiles are available:
+- `standard`: Run the pipeline on your local machine without containerization, requires all dependencies to be installed (not recommended)
+- `docker` (if running on an ARM-based machine, use `docker,arm`)
+- `singularity`
+- `podman`
+- `shifter`
+- `charliecloud`
+- `apptainer`
+- `gitpod`
+
+#### Samplesheet
+The samplesheet is a csv file with the following column names as header:
+| Column | Description | Default |
+| --- | --- | --- |
+| id | The dataset identifier, needs to be unique across datasets | *required* |
+| input_adata | Path to the input AnnData object | *required* |
+| min_counts | Minimum number of counts per cell | 0 |
+| max_counts | Maximum number of counts per cell | Infinity |
+| min_genes | Minimum number of genes per cell | 0 |
+| max_genes | Maximum number of genes per cell | Infinity |
+| max_pct_mito | Maximum percentage of mitochondrial genes per cell | 1 |
+| run_solo | Run SOLO for doublet detection | true |
+
+Cell filtering will be handled by the pipeline if the respective columns are specified. If filtering has been done before, the columns can be omitted.
 
 ## Contact
 
