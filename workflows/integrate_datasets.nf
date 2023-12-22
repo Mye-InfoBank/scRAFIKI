@@ -136,9 +136,7 @@ workflow integrate_datasets {
 
     ch_batches = MERGE_ALL.out.artifacts.flatten().filter{
             it -> it.getName() == "obs_all.csv"
-        }.splitCsv(header : true).filter{
-            it -> it["run_solo"] == "True"
-        }.map{ it -> it["batch"] }
+        }.splitCsv(header : true).map{ it -> it["batch"] ?: "batch" }
 
     ch_scvi_hvg_complete = ch_scvi_hvg.map{ it[1] }.merge(ch_scvi_hvg_model.map{ it[1] })
         .map{ adata, model -> ["scvi_hvg", "scVI", adata, model, "embed"] }
