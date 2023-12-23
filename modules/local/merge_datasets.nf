@@ -2,7 +2,6 @@ process MERGE_DATASETS {
   container "bigdatainbiomedicine/sc-python"
 
   label "process_medium"
-  label "error_retry"
 
   input:
   path(adatas)

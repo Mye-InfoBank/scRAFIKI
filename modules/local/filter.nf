@@ -3,7 +3,6 @@ process FILTER {
   container "bigdatainbiomedicine/sc-python"
 
   label "process_medium"
-  label "error_retry"
 
   input:
   tuple val(meta), path(input)

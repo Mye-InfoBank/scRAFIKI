@@ -2,8 +2,8 @@ process INTEGRATE {
   tag "${method}"
   container "bigdatainbiomedicine/sc-python"
 
-  label "process_medium"
-  label "error_retry"
+  label "process_high"
+  label "scale_resources"
 
   input:
   path(input)

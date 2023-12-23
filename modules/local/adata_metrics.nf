@@ -3,7 +3,6 @@ process ADATA_METRICS {
     container "bigdatainbiomedicine/sc-python"
 
     label "process_medium"
-    label "error_retry"
 
     input:
         tuple val(meta), file(adata)
