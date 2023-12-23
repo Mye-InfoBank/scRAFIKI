@@ -7,9 +7,8 @@ include { JUPYTERNOTEBOOK as MERGE_ALL } from "../modules/local/jupyternotebook/
 include { SCVI } from "../modules/local/scvi/main.nf"
 include { SCANVI } from "../modules/local/scvi/main.nf"
 include { SOLO } from "../modules/local/solo/main.nf"
-include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_DOUBLET } from "./neighbors_leiden_umap.nf"
 include { JUPYTERNOTEBOOK as MERGE_SOLO }  from "../modules/local/jupyternotebook/main.nf"
-include { NEIGHBORS_LEIDEN_UMAP as NEIGHBORS_LEIDEN_UMAP_NODOUBLET } from "./neighbors_leiden_umap.nf"
+include { NEIGHBORS_LEIDEN_UMAP } from "./neighbors_leiden_umap.nf"
 include { JUPYTERNOTEBOOK as HARMONY }  from "../modules/local/jupyternotebook/main.nf"
 include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.nf"
 include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
@@ -201,14 +200,13 @@ workflow integrate_datasets {
         AFTER_QC_ADATA_METRICS.out.mix(FILTERED_ADATA_METRICS.out, RAW_ADATA_METRICS.out).collect()
     )
 
-
-    NEIGHBORS_LEIDEN_UMAP_NODOUBLET(
+    NEIGHBORS_LEIDEN_UMAP(
         CONCAT_BATCHES.out.map{ ["all", it]},
         ch_integrations.map{ "X_" + it[1] },
         Channel.from(params.clustering_resolutions)
     )
 
     emit:
-        adata_integrated = NEIGHBORS_LEIDEN_UMAP_NODOUBLET.out.adata
+        adata_integrated = NEIGHBORS_LEIDEN_UMAP.out.adata
 
 }

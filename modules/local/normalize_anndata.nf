@@ -11,8 +11,6 @@ process NORMALIZATION {
 
     script:
     """
-    
     normalization.py ${adata} ${id}_${rep}_normalized.h5ad
-
     """
 }
