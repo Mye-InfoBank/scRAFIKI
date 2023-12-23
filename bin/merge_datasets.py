@@ -20,9 +20,9 @@ parser.add_argument("--output", help="Output file", type=str)
 
 args = parser.parse_args()
 
-datasets = {os.path.basename(f): ad.read_h5ad(f) for f in args.input}
+datasets = [ad.read_h5ad(f) for f in args.input]
 
-for dataset in datasets.values():
+for dataset in datasets:
     # Make sure all required columns are present
     for column, required in columns_required.items():
         if column not in dataset.obs.columns:
@@ -36,7 +36,7 @@ for dataset in datasets.values():
     # Subset columns
     dataset.obs = dataset.obs[columns_required.keys()]
 
-merged = ad.concat(datasets, join="outer", label="dataset")
+merged = ad.concat(datasets, join="outer")
 
 for column in columns_required.keys():
     merged.obs[column] = merged.obs[column].astype("category")
