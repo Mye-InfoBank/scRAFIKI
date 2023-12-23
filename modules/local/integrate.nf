@@ -1,10 +1,9 @@
 process INTEGRATE {
-  container = "bigdatainbiomedicine/sc-python"
-  cpus = 4
-  memory = {50.GB * task.attempt}
-  maxRetries = 4
-  errorStrategy = 'retry'
   tag "${method}"
+  container "bigdatainbiomedicine/sc-python"
+
+  label "process_medium"
+  label "error_retry"
 
   input:
   path(input)

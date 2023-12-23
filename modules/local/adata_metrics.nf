@@ -1,11 +1,9 @@
 process ADATA_METRICS {
-    container = "bigdatainbiomedicine/sc-python"
-    cpus = 1
-    memory = {50.GB * task.attempt}
-    maxRetries = 4
-    errorStrategy = 'retry'
     tag "${meta.id}"
+    container "bigdatainbiomedicine/sc-python"
 
+    label "process_medium"
+    label "error_retry"
 
     input:
         tuple val(meta), file(adata)
@@ -41,7 +39,6 @@ process ADATA_METRICS {
 
 process COMBINE_ADATA_METRICS {
     container = "bigdatainbiomedicine/sc-python"
-    cpus = 1
 
     input:
         file(metrics)
