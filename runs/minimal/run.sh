@@ -1,3 +1,3 @@
 #!/bin/bash
 
-nextflow run ../.. -resume -profile docker --samplesheet sampleSheet.csv --samplesheet2 sampleSheet2.csv --outdir out
+nextflow run ../.. -resume -profile apptainer --samplesheet sampleSheet.csv --outdir out

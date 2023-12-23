@@ -1,4 +1,4 @@
-id,input_adata,min_counts,max_counts,min_genes,max_genes,max_pct_mito,batch_key,run_solo
-elmentaite,/nfs/data/COST_IBD/data/annData/IBD/elmentaite.h5ad,2367,1000000000,366,1000000000,8,batch,TRUE
-unpublished,/nfs/data/COST_IBD/data/annData/IBD/unpublished.h5ad,6000,1000000000,72,1000000000,20,batch,TRUE
-devlin,/nfs/data/COST_IBD/data/annData/IBD/devlin.h5ad,650,1000000000,321,100000000000,10,batch,TRUE
+id,input_adata
+elmentaite,/nfs/data/COST_IBD/data/annData/IBD/elmentaite.h5ad
+unpublished,/nfs/data/COST_IBD/data/annData/IBD/unpublished.h5ad
+devlin,/nfs/data/COST_IBD/data/annData/IBD/devlin.h5ad
