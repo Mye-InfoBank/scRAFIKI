@@ -1,0 +1,19 @@
+# Data structures
+pandas
+anndata
+scanpy
+
+# Clustering
+louvain
+leidenalg
+
+# Integration tools
+mnnpy
+harmony
+scvi-tools
+scib
+
+# Misc
+seaborn
+scikit-misc
+celltypist

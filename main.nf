@@ -6,14 +6,14 @@ import static com.xlson.groovycsv.CsvParser.parseCsv
 nextflow.enable.dsl = 2
 
 include { integrate_datasets } from "./workflows/integrate_datasets.nf"
-include { finalize_dataset } from "./workflows/finalize_dataset.nf"
+// include { finalize_dataset } from "./workflows/finalize_dataset.nf"
 // include { add_additional_datasets } from "./workflows/add_additional_datasets.nf"
 
 workflow {
 
     integrate_datasets()
 
-    finalize_dataset(integrate_datasets.out.adata_integrated)
+    //finalize_dataset(integrate_datasets.out.adata_integrated)
 
     /*
     add_additional_datasets(

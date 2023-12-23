@@ -1,16 +1,10 @@
 include { check_samplesheet } from '../modules/local/check_samplesheet'
 
-include { SCQC } from "../modules/local/scqc/main"
-include { SCQC_MERGE_STATS } from "../modules/local/scqc_merge_stats/main.nf"
+include { FILTER } from "../modules/local/filter.nf"
 
-include { JUPYTERNOTEBOOK as MERGE_ALL } from "../modules/local/jupyternotebook/main.nf"
-include { SCVI } from "../modules/local/scvi/main.nf"
-include { SCANVI } from "../modules/local/scvi/main.nf"
+
 include { SOLO } from "../modules/local/solo/main.nf"
-include { JUPYTERNOTEBOOK as MERGE_SOLO }  from "../modules/local/jupyternotebook/main.nf"
 include { NEIGHBORS_LEIDEN_UMAP } from "./neighbors_leiden_umap.nf"
-include { JUPYTERNOTEBOOK as HARMONY }  from "../modules/local/jupyternotebook/main.nf"
-include { JUPYTERNOTEBOOK as MNN }  from "../modules/local/jupyternotebook/main.nf"
 include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
@@ -21,6 +15,9 @@ include { ADATA_METRICS as AFTER_QC_ADATA_METRICS } from "../modules/local/adata
 include { ADATA_METRICS as FILTERED_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 include { ADATA_METRICS as RAW_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 include { COMBINE_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
+
+include { INTEGRATE } from "../modules/local/integrate.nf"
+include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -38,33 +35,16 @@ workflow integrate_datasets {
     main:
 
     ch_samples = Channel.from(check_samplesheet(ch_samplesheet.toString()))
-
-    SCQC(
-        [
-            file("${baseDir}/modules/local/scqc/scqc-notebook.py", checkIfExists: true),
-            file("${baseDir}/modules/local/scqc/qc_plots.py", checkIfExists: true)
-        ],
-        ch_samples
-    )
-    SCQC_MERGE_STATS(SCQC.out.qc_stats.collect())
-
     RAW_ADATA_METRICS(ch_samples)
 
+    FILTER(ch_samples)
+
+    FILTERED_ADATA_METRICS(FILTER.out)
+
     // MERGE and INTEGRATE all datasets
-    MERGE_ALL(
-        Channel.value([
-            [id: "21_merge_all"],
-            file("${baseDir}/analyses/20_integrate_scrnaseq_data/21_merge_all.py")
-        ]),
-        [
-            samplesheet: ch_samplesheet.toString(),
-            gene_symbol_table: "gene_symbol_dict.csv"
-        ],
-        SCQC.out.adata.flatMap{ id, adata -> adata }.mix(
-            Channel.value(ch_samplesheet),
-            Channel.fromPath("${baseDir}/tables/gene_symbol_dict.csv")
-        ).collect()
-    )
+    MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect())
+
+    /*
 
     ch_adata_merged = MERGE_ALL.out.artifacts.flatten().filter{
         it.getExtension() == "h5ad"
@@ -75,57 +55,16 @@ workflow integrate_datasets {
     ch_adata_merged_meta = ch_adata_merged.collect().map{
         out -> ["all", out]
     }
+    */
 
-    SCVI(
-        ch_adata_merged_meta,
-        1, // 1 = use HVG
-        ["batch", "dataset", null]
+    ch_integration_methods = Channel.from(params.integration_methods)
+
+    INTEGRATE(
+        MERGE_DATASETS.out,
+        ch_integration_methods
     )
 
-    SCANVI(
-        SCVI.out.adata.join(SCVI.out.scvi_model),
-        "batch",
-        "cell_type"
-    )
-
-    HARMONY(
-            Channel.value([
-            [id: "22_harmony"],
-            file("${baseDir}/analyses/20_integrate_scrnaseq_data/22_harmony.py")
-        ]),
-        [
-        ],
-        ch_adata_merged
-    )
-
-    ch_harmony_adata = HARMONY.out.artifacts.filter{
-        it.getExtension() == "h5ad"
-    }
-
-    // ch_harmony_adata.view()
-
-    // Takes very long according to this https://github.com/chriscainx/mnnpy#speed
-    if (params.mnn) {
-        MNN(
-            Channel.value([
-                [id: "23_mnn"],
-                file("${baseDir}/analyses/20_integrate_scrnaseq_data/23_mnn.py")
-            ]),
-            [
-            ],
-            ch_adata_merged
-        )
-
-        ch_mnn_adata = MNN.out.artifacts.filter{
-            it.getExtension() == "h5ad"
-        }
-
-        ch_mnn = Channel.from([
-            ["mnn", "MNN", ch_mnn_adata, null]
-        ])
-    } else {
-        ch_mnn = Channel.empty()
-    }
+    /*
   
     ch_scvi_hvg = SCVI.out.adata
     ch_scvi_hvg_model = SCVI.out.scvi_model
@@ -154,13 +93,13 @@ workflow integrate_datasets {
         ch_mnn_complete
     )
 
-/*
+
+
     BENCHMARK_INTEGRATIONS(
         ch_adata_merged.combine(ch_integrations.map { [it[0], "X_" + it[1], it[2], it[4]] }),
         params.organism,
         params.scib_fast
     )
-*/
 
     MERGE_INTEGRATIONS(
         ch_adata_merged,
@@ -208,5 +147,7 @@ workflow integrate_datasets {
 
     emit:
         adata_integrated = NEIGHBORS_LEIDEN_UMAP.out.adata
+
+    */
 
 }

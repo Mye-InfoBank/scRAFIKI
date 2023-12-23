@@ -14,7 +14,7 @@ process ADATA_METRICS {
     
     script:
     """
-        #!/usr/bin/env python
+        #!/usr/bin/env python3
 
         import scanpy as sc
         import pandas as pd
