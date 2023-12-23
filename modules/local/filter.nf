@@ -4,6 +4,7 @@ process FILTER {
   memory = {50.GB * task.attempt}
   maxRetries = 4
   errorStrategy = 'retry'
+  tag "${meta.id}"
 
   input:
   tuple val(meta), path(input)
