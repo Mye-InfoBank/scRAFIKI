@@ -10,12 +10,12 @@ methods = {
     "desc": scib.ig.desc,
     "harmony": scib.ig.harmony,
     "mnn": scib.ig.mnn,
-    "saucie": scib.ig.saucie,
+    #"saucie": scib.ig.saucie, # Deactivated because dependencies are not available
     "scanorama": scib.ig.scanorama,
     "scanvi": scib.ig.scanvi,
-    "scgen": scib.ig.scgen,
+    #"scgen": scib.ig.scgen, # Deactivated because of problems with deprecated dependencies
     "scvi": scib.ig.scvi,
-    "trvae": scib.ig.trvae,
+    #"trvae": scib.ig.trvae, # Deactivated because it requires keras==2.2.4 which is incompatible with other dependencies
     "trvaep": scib.ig.trvaep,
 }
 

@@ -3,11 +3,11 @@ FROM mambaorg/micromamba:1.5-jammy
 RUN micromamba install -y -n base -c conda-forge -c bioconda \
         python \
         pandas anndata scanpy \
-        louvain leidenalg \
+        louvain leidenalg keras \
         mnnpy harmony-pytorch scvi-tools scib \
         seaborn scikit-misc celltypist scanorama bbknn && \
     micromamba run -n base pip install --no-cache-dir \
-        desc trvae trvaep && \
+        desc trvae trvaep scgen && \
     micromamba clean --all --yes
 
 ENV PATH /opt/conda/bin:$PATH
