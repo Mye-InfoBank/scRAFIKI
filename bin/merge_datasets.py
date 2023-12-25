@@ -39,7 +39,8 @@ for dataset in datasets:
 merged = ad.concat(datasets, join="outer")
 
 for column in columns_required.keys():
-    merged.obs[column] = merged.obs[column].astype("category")
+    # Convert first to string and then to category
+    merged.obs[column] = merged.obs[column].astype(str).astype("category")
 
 merged.layers["counts"] = merged.X.copy()
 
