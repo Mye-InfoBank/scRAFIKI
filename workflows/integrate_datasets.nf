@@ -8,7 +8,7 @@ include { NEIGHBORS_LEIDEN_UMAP } from "./neighbors_leiden_umap.nf"
 include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
-include { CONCAT_ADATA as CONCAT_BATCHES } from "../modules/local/concat_anndata.nf"
+include { CONCAT_ADATA as CONCAT_DECONTX } from "../modules/local/concat_anndata.nf"
 include { FILTER_SOLO } from "../modules/local/solo/main.nf"
 include { ADATA_METRICS as AFTER_QC_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 include { ADATA_METRICS as FILTERED_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
@@ -81,6 +81,10 @@ workflow integrate_datasets {
     
     DECONTX(
         ch_unintegrated_batches
+    )
+
+    CONCAT_DECONTX(
+        DECONTX.out.map{ it[1] }.collect().map{ [[id: "decont"], it] }
     )
 
     ch_integration_methods = Channel.from(params.integration_methods)

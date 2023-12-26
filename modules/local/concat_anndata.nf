@@ -1,10 +1,13 @@
 process CONCAT_ADATA {
+  tag "$meta.id"
   container = "bigdatainbiomedicine/sc-python"
+  label "process_medium"
+
   input:
-    file anndatas
+    tuple val(meta), file(anndatas)
   
   output:
-    file "concatenated.h5ad"
+    tuple val(meta), file("concatenated.h5ad")
   
   script:
   """
