@@ -31,7 +31,7 @@ adata = ad.read_h5ad(args.input)
 method = methods[args.method]
 
 if args.method in ["scgen", "scanvi"]:
-    adata = method(adata, "batch", "cell_type")
+    adata = method(adata, "batch", "celltype")
 else:
     adata = method(adata, "batch")
 

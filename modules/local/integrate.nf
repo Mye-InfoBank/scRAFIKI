@@ -10,10 +10,11 @@ process INTEGRATE {
   val(method)
   
   output:
-  path("${method}.adata")
+  tuple val(meta), path("${method}.h5ad")
   
   script:
+  meta = ["id": "${method}", "integration": "${method}"]
   """
-  integrate.py --input ${input} --method ${method} --output ${method}.adata
+  integrate.py --input ${input} --method ${method} --output ${method}.h5ad
   """
 }

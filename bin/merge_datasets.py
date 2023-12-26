@@ -7,7 +7,7 @@ import os
 columns_required = {
     "sex": False,
     "batch": True,
-    "cell_type": False,
+    "celltype": False,
     "condition": False,
     "patient": True,
     "tissue": True,

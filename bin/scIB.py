@@ -104,6 +104,7 @@ if __name__ == "__main__":
     print("reading adata before integration")
     adata = sc.read(args.uncorrected, cache=True)
     print(adata)
+    print(adata.obs[label_key].value_counts())
     print("reading adata after integration")
     if os.stat(args.integrated).st_size == 0:
         print(f"{args.integrated} is empty, setting all metrics to NA.")
