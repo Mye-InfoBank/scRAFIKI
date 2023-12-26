@@ -4,10 +4,10 @@ RUN micromamba install -y -n base -c conda-forge -c bioconda \
         python \
         pandas anndata scanpy \
         louvain leidenalg keras \
-        mnnpy harmony-pytorch scvi-tools scib \
+        mnnpy harmony-pytorch git scvi-tools \
         seaborn scikit-misc celltypist scanorama bbknn && \
     micromamba run -n base pip install --no-cache-dir \
-        desc trvae trvaep scgen && \
+        desc trvae trvaep scgen git+https://github.com/Mye-InfoBank/scib && \
     micromamba clean --all --yes
 
 ENV PATH /opt/conda/bin:$PATH
