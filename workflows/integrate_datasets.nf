@@ -40,8 +40,8 @@ integration_accessions = [
     "harmony": "X_emb",
     "mnn": "X_mnn",
     "scanorama": "X_scanorama",
-    "scanvi": "X_scanvi",
-    "scvi": "X_scvi",
+    "scanvi": "X_emb",
+    "scvi": "X_emb",
     "trvaep": "X_trvaep"
 ]
 
