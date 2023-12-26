@@ -34,12 +34,12 @@ integration_types = [
 ]
 
 integration_accessions = [
-    "bbknn": "X_pca",
-    "combat": "X_combat",
+    "bbknn": "X_pca", // TODO: Needs to be adjusted later on
+    "combat": "NONE",
     "desc": "X_desc",
     "harmony": "X_emb",
     "mnn": "X_mnn",
-    "scanorama": "X_scanorama",
+    "scanorama": "X_emb",
     "scanvi": "X_emb",
     "scvi": "X_emb",
     "trvaep": "X_trvaep"
@@ -88,13 +88,15 @@ workflow integrate_datasets {
         )
     }
 
-    /*
-
     MERGE_INTEGRATIONS(
-        ch_adata_merged,
-        ch_integrations.map { it[2] }.collect(),
-        ch_integrations.map { it[1] }.collect()
+        MERGE_DATASETS.out,
+        ch_integrated.map { meta, adata, type, accession -> meta.integration }.collect(),
+        ch_integrated.map { meta, adata, type, accession -> type }.collect(),
+        ch_integrated.map { meta, adata, type, accession -> accession }.collect(),
+        ch_integrated.map { meta, adata, type, accession -> adata }.collect(),
     )
+
+    /*
 
     SPLIT_BATCHES(
         ch_batches.combine(MERGE_INTEGRATIONS.out),
