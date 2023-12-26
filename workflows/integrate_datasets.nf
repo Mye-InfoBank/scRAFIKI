@@ -9,7 +9,6 @@ include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
 include { CONCAT_ADATA as CONCAT_BATCHES } from "../modules/local/concat_anndata.nf"
-include { FILTER_ANNDATA as SPLIT_BATCHES } from "../modules/local/scconversion/main.nf"
 include { FILTER_SOLO } from "../modules/local/solo/main.nf"
 include { ADATA_METRICS as AFTER_QC_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 include { ADATA_METRICS as FILTERED_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
@@ -18,6 +17,7 @@ include { COMBINE_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 
 include { INTEGRATE } from "../modules/local/integrate.nf"
 include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
+include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -68,10 +68,25 @@ workflow integrate_datasets {
     // MERGE and INTEGRATE all datasets
     MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect())
 
+    ch_unintegrated = MERGE_DATASETS.out
+        .map{ adata -> [[id: "unintegrated"], adata] }
+
+    SPLIT_BATCHES(ch_unintegrated)
+    ch_unintegrated_batches = SPLIT_BATCHES.out
+        .transpose()
+        .map{ meta, adata -> 
+            batch = adata.simpleName;
+            return [[id: "unintegrated_" + batch, batch: batch], adata]
+        }
+    
+    DECONTX(
+        ch_unintegrated_batches
+    )
+
     ch_integration_methods = Channel.from(params.integration_methods)
 
     INTEGRATE(
-        MERGE_DATASETS.out,
+        ch_unintegrated,
         ch_integration_methods
     )
 
@@ -81,7 +96,7 @@ workflow integrate_datasets {
 
     if (params.benchmark) {
         BENCHMARK_INTEGRATIONS(
-            MERGE_DATASETS.out,
+            ch_unintegrated,
             ch_integrated,
             params.organism,
             params.benchmark_hvgs
@@ -89,7 +104,7 @@ workflow integrate_datasets {
     }
 
     MERGE_INTEGRATIONS(
-        MERGE_DATASETS.out,
+        ch_unintegrated,
         ch_integrated.map { meta, adata, type, accession -> meta.integration }.collect(),
         ch_integrated.map { meta, adata, type, accession -> type }.collect(),
         ch_integrated.map { meta, adata, type, accession -> accession }.collect(),

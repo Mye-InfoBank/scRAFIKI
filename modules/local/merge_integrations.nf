@@ -4,7 +4,7 @@ process MERGE_INTEGRATIONS {
   label "process_high_memory"
 
   input:
-    file original_adata
+    tuple val(meta), path(original_adata)
     val  integration_names
     val  integration_types
     val  integration_accessions
