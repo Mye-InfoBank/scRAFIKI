@@ -18,6 +18,8 @@ include { COMBINE_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 include { INTEGRATE } from "../modules/local/integrate.nf"
 include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
 include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
+include { INTEGRATE as INTEGRATE_SCVI } from "../modules/local/integrate.nf"
+include { INTEGRATE as INTEGRATE_SCANVI } from "../modules/local/integrate.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -31,18 +33,6 @@ integration_types = [
     "scanvi": "embed",
     "scvi": "embed",
     "trvaep": "embed"
-]
-
-integration_accessions = [
-    "bbknn": "X_pca", // TODO: Needs to be adjusted later on
-    "combat": "NONE",
-    "desc": "X_desc",
-    "harmony": "X_emb",
-    "mnn": "X_mnn",
-    "scanorama": "X_emb",
-    "scanvi": "X_emb",
-    "scvi": "X_emb",
-    "trvaep": "X_trvaep"
 ]
 
 /**
@@ -76,7 +66,7 @@ workflow integrate_datasets {
         .transpose()
         .map{ meta, adata -> 
             batch = adata.simpleName;
-            return [[id: "unintegrated_" + batch, batch: batch], adata]
+            return [[id: batch], adata]
         }
     
     DECONTX(
@@ -84,18 +74,30 @@ workflow integrate_datasets {
     )
 
     CONCAT_DECONTX(
-        DECONTX.out.map{ it[1] }.collect().map{ [[id: "decont"], it] }
+        DECONTX.out.map{ it[1] }.collect().map{ [[id: "decontX"], it] }
     )
 
     ch_integration_methods = Channel.from(params.integration_methods)
+        .filter{ it != "scvi" && it != "scanvi" }
 
     INTEGRATE(
         ch_unintegrated,
         ch_integration_methods
     )
 
+    INTEGRATE_SCVI(
+        ch_unintegrated,
+        "scvi"
+    )
+
+    // INTEGRATE_SCANVI(
+    //     ch_unintegrated,
+    //     "scanvi"
+    // )
+
     ch_integrated = INTEGRATE.out
-        .map{ meta, adata -> [meta, adata, integration_types[meta.integration], integration_accessions[meta.integration]] }
+        .mix(INTEGRATE_SCVI.out)
+        .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
 
     if (params.benchmark) {
@@ -109,10 +111,9 @@ workflow integrate_datasets {
 
     MERGE_INTEGRATIONS(
         ch_unintegrated,
-        ch_integrated.map { meta, adata, type, accession -> meta.integration }.collect(),
-        ch_integrated.map { meta, adata, type, accession -> type }.collect(),
-        ch_integrated.map { meta, adata, type, accession -> accession }.collect(),
-        ch_integrated.map { meta, adata, type, accession -> adata }.collect(),
+        ch_integrated.map { meta, adata, type -> meta.integration }.collect(),
+        ch_integrated.map { meta, adata, type -> type }.collect(),
+        ch_integrated.map { meta, adata, type -> adata }.collect(),
     )
 
     /*

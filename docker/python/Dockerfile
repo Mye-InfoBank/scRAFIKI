@@ -1,13 +1,9 @@
 FROM mambaorg/micromamba:1.5-jammy
 
 RUN micromamba install -y -n base -c conda-forge -c bioconda \
-        python \
-        pandas anndata scanpy \
-        louvain leidenalg keras \
-        mnnpy harmony-pytorch git scvi-tools \
-        seaborn scikit-misc celltypist scanorama bbknn && \
+        python=3.9 git celltypist && \
     micromamba run -n base pip install --no-cache-dir \
-        desc trvae trvaep scgen git+https://github.com/Mye-InfoBank/scib && \
+        git+https://github.com/Mye-InfoBank/scib.git#egg=scib[louvain,desc,bbknn,scanorama,scgen,scvi,trvaep,harmony] && \
     micromamba clean --all --yes
 
 ENV PATH /opt/conda/bin:$PATH

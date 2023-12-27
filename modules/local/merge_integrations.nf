@@ -7,7 +7,6 @@ process MERGE_INTEGRATIONS {
     tuple val(meta), path(original_adata)
     val  integration_names
     val  integration_types
-    val  integration_accessions
     file integration_adatas
   
   output:
@@ -26,10 +25,9 @@ process MERGE_INTEGRATIONS {
   #   - embed
   #   - knn
 
-  for integration_name, integration_type, integration_accession, integration_adata_path in zip(
+  for integration_name, integration_type, integration_adata_path in zip(
         ["${integration_names.join("\",\"")}"],
         ["${integration_types.join("\",\"")}"],
-        ["${integration_accessions.join("\",\"")}"],
         ["${integration_adatas.join("\",\"")}"]):
       integration_adata = ad.read_h5ad(integration_adata_path)
 
@@ -41,7 +39,7 @@ process MERGE_INTEGRATIONS {
       if integration_type == 'full':
         adata.layers[integration_string] = integration_adata.X.copy() # TODO: Check if this works
       elif integration_type == 'embed' or integration_type == 'knn':
-        adata.obsm[integration_string] = integration_adata.obsm[integration_accession].copy()
+        adata.obsm[integration_string] = integration_adata.obsm["X_emb"].copy()
       # elif integration_type == 'knn':
         # TODO: Revisit
         # column_name = 'X_' + integration_name + '_knn'
