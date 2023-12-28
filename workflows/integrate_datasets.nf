@@ -117,23 +117,12 @@ workflow integrate_datasets {
         ch_integrated.map { meta, adata, type -> adata }.collect(),
     )
 
-    /*
-
-    SPLIT_BATCHES(
-        ch_batches.combine(MERGE_INTEGRATIONS.out),
-        "lambda x: x['batch'] == process_id"
-    )
-
     SOLO(
-        ch_scanvi_hvg,
-        ch_scanvi_hvg_model,
-        ch_batches
+        ch_unintegrated,
+        INTEGRATE_SCANVI.out.model
     )
 
-
-    DECONTX(
-        SPLIT_BATCHES.out.adata
-    )
+    /*
 
     FILTER_SOLO(
         DECONTX.out.join(SOLO.out.map{ [it[0], it[1]] }),

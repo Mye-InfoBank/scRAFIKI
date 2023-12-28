@@ -3,13 +3,17 @@ nextflow.enable.dsl = 2
 
 
 process SOLO {
+    tag "${meta.id}"
+    container "bigdatainbiomedicine/sc-python"
+
+    label "process_medium"
+
     input:
-        tuple val(id), path(adata)
-        tuple val(id), path(scvi_model)
-        each batch
+        tuple val(meta), path(adata)
+        tuple val(meta), path(scvi_model)
 
     output:
-        tuple val(batch), path("solo*.tsv")
+        tuple val(meta), path("solo*.tsv")
 
     script:
     """
@@ -44,12 +48,12 @@ process SOLO {
 
     scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="celltype", unlabeled_category="Unknown")
     scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
-    solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
+    solo = scvi.external.SOLO.from_scvi_model(scvi_model)
     solo.train()
     res = solo.predict()
     res["label"] = solo.predict(False)
 
-    res.to_csv("solo_${batch}.tsv", sep="\\t")
+    res.to_csv("solo_${meta.id}.tsv", sep="\\t")
     """
 }
 
