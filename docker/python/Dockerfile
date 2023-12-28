@@ -1,7 +1,7 @@
 FROM mambaorg/micromamba:1.5-jammy
 
 RUN micromamba install -y -n base -c conda-forge -c bioconda \
-        python=3.9 git celltypist && \
+        python=3.9 git graphviz celltypist && \
     micromamba run -n base pip install --no-cache-dir \
         git+https://github.com/Mye-InfoBank/scib.git#egg=scib[louvain,desc,bbknn,scanorama,scgen,scvi,trvaep,harmony] && \
     micromamba clean --all --yes

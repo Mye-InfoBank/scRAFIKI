@@ -19,7 +19,7 @@ include { INTEGRATE } from "../modules/local/integrate.nf"
 include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
 include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/local/integrate.nf"
-include { INTEGRATE as INTEGRATE_SCANVI } from "../modules/local/integrate.nf"
+include { INTEGRATE_SCANVI } from "../modules/local/integrate_scanvi.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -32,7 +32,8 @@ integration_types = [
     "scanorama": "embed",
     "scanvi": "embed",
     "scvi": "embed",
-    "trvaep": "embed"
+    "trvaep": "embed",
+    "scgen": "full",
 ]
 
 /**
@@ -90,13 +91,13 @@ workflow integrate_datasets {
         "scvi"
     )
 
-    // INTEGRATE_SCANVI(
-    //     ch_unintegrated,
-    //     "scanvi"
-    // )
+    INTEGRATE_SCANVI(
+        ch_unintegrated,
+        INTEGRATE_SCVI.out.model
+    )
 
-    ch_integrated = INTEGRATE.out
-        .mix(INTEGRATE_SCVI.out)
+    ch_integrated = INTEGRATE.out.integrated
+        .mix(INTEGRATE_SCVI.out.integrated)
         .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
 
