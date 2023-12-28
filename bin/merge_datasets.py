@@ -2,7 +2,6 @@
 
 import argparse
 import anndata as ad
-import os
 
 columns_required = {
     "sex": False,
@@ -37,6 +36,9 @@ for dataset in datasets:
     dataset.obs = dataset.obs[columns_required.keys()]
 
 merged = ad.concat(datasets, join="outer")
+
+merged.obs["batch"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["batch"].astype(str)
+merged.obs["patient"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["patient"].astype(str)
 
 for column in columns_required.keys():
     # Convert first to string and then to category

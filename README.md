@@ -34,8 +34,10 @@ The following metadata fields are required:
 | patient | The patient identifier | obs | *required* |
 | tissue | The tissue type | obs | *required* |
 
-Patient and batch identifiers will be prepended with the dataset identifier to ensure uniqueness.
-Only alphanumeric characters and underscores are allowed for all metadata fields.
+Some additional information:
+- Patient and batch identifiers will be prepended with the dataset identifier to ensure uniqueness.
+- Only alphanumeric characters and underscores are allowed for all metadata fields.
+- The first character must be a letter.
 
 ### 3. Pipeline execution
 
