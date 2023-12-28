@@ -7,7 +7,7 @@ process INTEGRATE_SCANVI {
 
   input:
   tuple val(meta), path(input)
-  tuple val(meta2), path(scvi_model)
+  tuple val(meta2), path(scvi_model, stageAs: "scvi_model")
   
   output:
   tuple val(meta_out), path("${method}.h5ad"), emit: integrated

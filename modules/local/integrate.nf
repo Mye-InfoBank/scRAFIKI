@@ -4,6 +4,7 @@ process INTEGRATE {
 
   label "process_high"
   label "scale_resources"
+  errorStrategy 'retry'
 
   input:
   tuple val(meta), path(input)
