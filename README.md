@@ -31,8 +31,11 @@ The following metadata fields are required:
 | celltype | Cell-type annotation | obs | unknown |
 | condition | The condition of the tissue sample | obs | unknown |
 | sex | The sex of the patient (`female` or `male`) | obs | unknown |
-| patient | The patient identifier, needs to be unique across datasets | obs | *required* |
+| patient | The patient identifier | obs | *required* |
 | tissue | The tissue type | obs | *required* |
+
+Patient and batch identifiers will be prepended with the dataset identifier to ensure uniqueness.
+Only alphanumeric characters and underscores are allowed for all metadata fields.
 
 ### 3. Pipeline execution
 
