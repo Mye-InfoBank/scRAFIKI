@@ -11,7 +11,7 @@ process INTEGRATE_SCANVI {
   
   output:
   tuple val(meta_out), path("${method}.h5ad"), emit: integrated
-  tuple val(meta_out), path("model/model.pt"), emit: model
+  tuple val(meta_out), path("model"), emit: model
   
   script:
   method = "scanvi"
