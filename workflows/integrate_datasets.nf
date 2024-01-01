@@ -98,6 +98,7 @@ workflow integrate_datasets {
 
     ch_integrated = INTEGRATE.out.integrated
         .mix(INTEGRATE_SCVI.out.integrated)
+        .mix(INTEGRATE_SCANVI.out.integrated)
         .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
 
