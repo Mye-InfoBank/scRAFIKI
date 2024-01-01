@@ -40,7 +40,6 @@ integration_types = [
  * Integrate individual datasets into a single-cell atlas
  *   - Perfom QC on individual datasets
  *   - Perform manual "seed" annotation of two datasets (one SS2, one 10x)
-
  *   - Perform data integration using SCANVI
  *   - Call doublets using solo
  */

@@ -6,7 +6,7 @@ import anndata as ad
 columns_required = {
     "sex": False,
     "batch": True,
-    "celltype": False,
+    "cell_type": False,
     "condition": False,
     "patient": True,
     "tissue": True,

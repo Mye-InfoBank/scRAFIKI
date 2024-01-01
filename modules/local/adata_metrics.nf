@@ -21,15 +21,15 @@ process ADATA_METRICS {
 
         patient_count = len(adata.obs['patient'].unique())
         cell_count = len(adata.obs_names)
-        celltype_counts = adata.obs['celltype'].value_counts().to_dict() if 'celltype' in adata.obs.columns else {}
+        cell_type_counts = adata.obs['cell_type'].value_counts().to_dict() if 'cell_type' in adata.obs.columns else {}
 
-        celltypes = list(celltype_counts.keys())
-        celltypes.sort()
+        cell_types = list(cell_type_counts.keys())
+        cell_types.sort()
 
-        celltype_count_values = [celltype_counts[celltype] for celltype in celltypes]
+        cell_type_count_values = [cell_type_counts[cell_type] for cell_type in cell_types]
 
-        # Create a dataframe with columns: patient_count, cell_count, celltype_1, celltype_2, ...
-        df = pd.DataFrame([[patient_count, cell_count] + celltype_count_values], columns=['patient_count', 'cell_count'] + celltypes)
+        # Create a dataframe with columns: patient_count, cell_count, cell_type_1, cell_type_2, ...
+        df = pd.DataFrame([[patient_count, cell_count] + cell_type_count_values], columns=['patient_count', 'cell_count'] + cell_types)
         df.index = ["${meta.id}"]
 
         df.to_csv("${meta.id}_metrics.csv", index=True)

@@ -37,11 +37,11 @@ method = methods[args.method]
 
 if args.method == "scanvi":
     if args.scvi_model is None:
-        adata = method(adata, "batch", "celltype", save_model=True)
+        adata = method(adata, "batch", "cell_type", save_model=True)
     else:
-        adata = method(adata, "batch", "celltype", scvi_model_path=args.scvi_model, save_model=True)
+        adata = method(adata, "batch", "cell_type", scvi_model_path=args.scvi_model, save_model=True)
 elif args.method == "scgen":
-        adata = method(adata, "batch", "celltype")
+        adata = method(adata, "batch", "cell_type")
 elif args.method == "scvi":
     adata = method(adata, "batch", save_model=True)
 else:

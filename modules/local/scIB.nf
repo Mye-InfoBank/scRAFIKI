@@ -5,6 +5,10 @@ process BENCHMARK_INTEGRATIONS {
     label "scale_resources"
 
     container = "bigdatainbiomedicine/sc-python"
+    cpus = 4
+    memory = {50.GB * task.attempt}
+    maxRetries = 4
+    errorStrategy = 'retry'
     
     input: 
         tuple val(meta1), path(uncorrected)
@@ -18,7 +22,7 @@ process BENCHMARK_INTEGRATIONS {
     script:
         """
         scIB.py -u ${uncorrected} -i ${integrated} \
-         -m ${meta2.integration} -o ${meta2.integration}.csv -b batch -l celltype --organism ${organism} \
+         -m ${meta2.integration} -o ${meta2.integration}.csv -b batch -l cell_type --organism ${organism} \
          --type ${integration_type} -f --hvgs ${hvgs}
         """
 }

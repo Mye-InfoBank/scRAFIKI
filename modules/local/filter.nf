@@ -8,7 +8,7 @@ process FILTER {
   tuple val(meta), path(input)
   
   output:
-  tuple val(meta), path("${meta.id}.filtered.adata")
+  tuple val(meta), path("${meta.id}.filtered.h5ad")
   
   script:
   min_counts = meta.min_counts ? "--min_counts ${meta.min_counts}" : ""
@@ -17,6 +17,6 @@ process FILTER {
   max_genes = meta.max_genes ? "--max_genes ${meta.max_genes}" : ""
   max_pct_mito = meta.max_pct_mito ? "--max_pct_mito ${meta.max_pct_mito}" : ""
   """
-  filter.py --input ${input} --id ${meta.id} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.filtered.adata
+  filter.py --input ${input} --id ${meta.id} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.filtered.h5ad
   """
 }
