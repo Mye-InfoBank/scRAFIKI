@@ -5,7 +5,7 @@ include { FILTER } from "../modules/local/filter.nf"
 
 include { SOLO } from "../modules/local/solo/main.nf"
 include { NEIGHBORS_LEIDEN_UMAP } from "./neighbors_leiden_umap.nf"
-include { MERGE_INTEGRATIONS } from "../modules/local/merge_integrations.nf"
+include { MERGE } from "../modules/local/merge.nf"
 include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
 include { CONCAT_ADATA as CONCAT_DECONTX } from "../modules/local/concat_anndata.nf"
@@ -20,7 +20,6 @@ include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
 include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/local/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/local/integrate_scanvi.nf"
-include { DROPLET_CORRECT } from "../modules/local/droplet_correct.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -111,25 +110,25 @@ workflow integrate_datasets {
         )
     }
 
-    MERGE_INTEGRATIONS(
-        ch_unintegrated,
-        ch_integrated.map { meta, adata, type -> meta.integration }.collect(),
-        ch_integrated.map { meta, adata, type -> type }.collect(),
-        ch_integrated.map { meta, adata, type -> adata }.collect(),
-    )
+    ch_resolutions = Channel.from(params.clustering_resolutions)
 
-    ch_merged_integrations = MERGE_INTEGRATIONS.out
-        .map{ adata -> [[id: "integrated"], adata] }
+    NEIGHBORS_LEIDEN_UMAP(
+        ch_integrated.map{ meta, adata, type -> [meta, adata]},
+        "X_emb",
+        ch_resolutions
+    )
 
     SOLO(
         ch_unintegrated,
         INTEGRATE_SCANVI.out.model
     )
 
-    DROPLET_CORRECT (
-        ch_merged_integrations,
+    MERGE(
+        ch_unintegrated,
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> [meta.integration, rep, adata] }.collect(),
         SOLO.out,
-        CONCAT_DECONTX.out
+        CONCAT_DECONTX.out,
+        ch_resolutions.collect()
     )
 
     /*
@@ -141,11 +140,7 @@ workflow integrate_datasets {
         AFTER_QC_ADATA_METRICS.out.mix(FILTERED_ADATA_METRICS.out, RAW_ADATA_METRICS.out).collect()
     )
 
-    NEIGHBORS_LEIDEN_UMAP(
-        CONCAT_BATCHES.out.map{ ["all", it]},
-        ch_integrations.map{ "X_" + it[1] },
-        Channel.from(params.clustering_resolutions)
-    )
+
 
     emit:
         adata_integrated = NEIGHBORS_LEIDEN_UMAP.out.adata

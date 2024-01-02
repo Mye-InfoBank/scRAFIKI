@@ -1,16 +1,15 @@
 process NEIGHBORS {
+    tag "${meta.id}"
+
     container = "bigdatainbiomedicine/sc-python"
-    cpus 8
-    memory {50.GB * task.attempt}
-    errorStrategy 'retry'
-    maxRetries 3
+    label "process_medium"
 
     input:
-    tuple val(id), path(adata)
+    tuple val(meta), path(adata)
     each use_rep
 
     output:
-    tuple val(id), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -24,22 +23,21 @@ process NEIGHBORS {
 
     adata = sc.read_h5ad("${adata}")
     sc.pp.neighbors(adata, use_rep="${use_rep}")
-    adata.write_h5ad("${id}.rep_${use_rep}.neighbors.h5ad")
+    adata.write_h5ad("${meta.id}.rep_${use_rep}.neighbors.h5ad")
     """
 }
 
 process UMAP {
+    tag "${meta.id}"
+
     container = "bigdatainbiomedicine/sc-python"
-    cpus 8
-    memory {50.GB * task.attempt}
-    errorStrategy 'retry'
-    maxRetries 3
+    label "process_medium"
 
     input:
-    tuple val(id), val(use_rep), path(adata)
+    tuple val(meta), val(use_rep), path(adata)
 
     output:
-    tuple val(id), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -53,23 +51,22 @@ process UMAP {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.umap(adata)
-    adata.write_h5ad("${id}.rep_${use_rep}.umap.h5ad")
+    adata.write_h5ad("${meta.id}.rep_${use_rep}.umap.h5ad")
     """
 }
 
 process LEIDEN {
+    tag "${meta.id}:${resolution}"
+
     container = "bigdatainbiomedicine/sc-python"
-    cpus 1
-    memory {50.GB * task.attempt}
-    errorStrategy 'retry'
-    maxRetries 3
+    label "process_single"
 
     input:
-    tuple val(id), val(use_rep), path(adata)
+    tuple val(meta), val(use_rep), path(adata)
     each resolution
 
     output:
-    tuple val(id), val(use_rep), val(resolution), path("*.h5ad"), emit: adata
+    tuple val(meta), val(use_rep), val(resolution), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -83,23 +80,22 @@ process LEIDEN {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.leiden(adata, resolution=${resolution})
-    adata.write_h5ad("${id}.res_${resolution}.rep_${use_rep}.leiden.h5ad")
+    adata.write_h5ad("${meta.id}.res_${resolution}.rep_${use_rep}.leiden.h5ad")
     """
 }
 
 process MERGE_UMAP_LEIDEN {
+    tag "${meta.id}"
+
     container = "bigdatainbiomedicine/sc-python"
-    cpus 1
-    memory {50.GB * task.attempt}
-    errorStrategy 'retry'
-    maxRetries 3
+    label "process_medium"
 
 
     input:
-    tuple val(id), val(use_rep), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
+    tuple val(meta), val(use_rep), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
 
     output:
-    tuple val(id), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -120,7 +116,7 @@ process MERGE_UMAP_LEIDEN {
     for res, adata_path in zip(resolutions, leiden_adatas):
         tmp_adata = sc.read_h5ad(adata_path)
         adata_umap.obs[f"leiden_{res:.2f}"] = tmp_adata.obs["leiden"]
-    adata_umap.write_h5ad("${id}.rep_${use_rep}.umap_leiden.h5ad")
+    adata_umap.write_h5ad("${meta.id}.rep_${use_rep}.umap_leiden.h5ad")
     """
 }
 

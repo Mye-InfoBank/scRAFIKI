@@ -18,6 +18,6 @@ process INTEGRATE {
   script:
   meta_out = ["id": "${method}", "integration": "${method}"]
   """
-  integrate.py --input ${input} --method ${method} --output ${method}.h5ad
+  integrate.py --input ${input} --method ${method} --output ${method}.h5ad --cpus ${task.cpus}
   """
 }

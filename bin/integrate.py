@@ -2,7 +2,9 @@
 
 import anndata as ad
 import scib
+import scanpy as sc
 import argparse
+from threadpoolctl import threadpool_limits
 
 # Disable warnings
 import warnings
@@ -28,8 +30,12 @@ parser.add_argument('--input', help='Input file', type=str)
 parser.add_argument('--output', help='Output file', type=str)
 parser.add_argument('--method', help='Integration method', type=str, choices=methods.keys())
 parser.add_argument('--scvi_model', help='scvi model', type=str)
+parser.add_argument('--cpus', help='Number of cpus', type=int, default=1)
 
 args = parser.parse_args()
+
+threadpool_limits(args.cpus)
+sc.settings.n_jobs = args.cpus
 
 adata = ad.read_h5ad(args.input)
 
@@ -46,5 +52,9 @@ elif args.method == "scvi":
     adata = method(adata, "batch", save_model=True)
 else:
     adata = method(adata, "batch")
+
+if "X_emb" not in adata.obsm:
+    sc.pp.pca(adata)
+    adata.obsm["X_emb"] = adata.obsm["X_pca"]
 
 adata.write_h5ad(args.output)
