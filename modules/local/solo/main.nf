@@ -10,10 +10,10 @@ process SOLO {
 
     input:
         tuple val(meta), path(adata)
-        tuple val(meta), path(scvi_model)
+        tuple val(meta2), path(scvi_model)
 
     output:
-        tuple val(meta), path("solo*.tsv")
+        tuple val(meta), path("solo_${meta.id}.tsv")
 
     script:
     """
