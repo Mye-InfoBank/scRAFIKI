@@ -125,7 +125,9 @@ workflow integrate_datasets {
 
     MERGE(
         ch_unintegrated,
-        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> [meta.integration, rep, adata] }.collect(),
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> meta.integration }.collect(),
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> rep }.collect(),
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> adata }.collect(),
         SOLO.out,
         CONCAT_DECONTX.out,
         ch_resolutions.collect()

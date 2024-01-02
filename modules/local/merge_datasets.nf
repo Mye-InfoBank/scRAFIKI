@@ -7,10 +7,10 @@ process MERGE_DATASETS {
   path(adatas)
   
   output:
-  path("merged.h5ad")
+  path("merged_datasets.h5ad")
   
   script:
   """
-  merge_datasets.py --input ${adatas} --output merged.h5ad
+  merge_datasets.py --input ${adatas} --output merged_datasets.h5ad
   """
 }
