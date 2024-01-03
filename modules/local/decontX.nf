@@ -1,7 +1,7 @@
 process DECONTX {
   tag "$meta.id"
 
-  container "bigdatainbiomedicine/sc-r"
+  container "bigdatainbiomedicine/sc-rpy"
 
   label "process_medium"
 
@@ -9,25 +9,25 @@ process DECONTX {
     tuple val(meta), file(adata)
   
   output:
-    tuple val(meta), file("*_ambient.h5ad")
+    tuple val(meta), file("${meta.id}_ambient.h5ad")
   
   script:
   """
-  #!/usr/bin/env Rscript
+  #!/opt/conda/bin/python
 
-  library(anndata)
-  library(celda)
+  import anndata as ad
+  import anndata2ri
+  import rpy2.robjects as ro
+  celda = ro.packages.importr('celda')
 
-  file_path <- "$adata"
+  adata = ad.read_h5ad("${adata}")
+  sc_experiment = anndata2ri.py2rpy(adata)
 
-  ad <- read_h5ad(file_path)
+  corrected = celda.decontX(sc_experiment)
+  counts = celda.decontXcounts(corrected)
 
-  results <- decontX(t(ad\$X))
-
-  ad\$X <- t(results\$decontXcounts)
-
-  basename <- gsub(".h5ad", "", basename(file_path))
-
-  write_h5ad(ad, paste0(basename, "_ambient.h5ad"))
+  adata.layers['ambient'] = anndata2ri.rpy2py(counts).T
+  adata.X = adata.layers['ambient']
+  adata.write_h5ad("${meta.id}_ambient.h5ad")
   """
 }

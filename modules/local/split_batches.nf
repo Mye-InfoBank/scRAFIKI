@@ -1,5 +1,5 @@
 process SPLIT_BATCHES {
-    container "bigdatainbiomedicine/sc-python"
+    container "bigdatainbiomedicine/sc-rpy"
     input:
         tuple val(meta), path(input_adata)
 
@@ -8,7 +8,7 @@ process SPLIT_BATCHES {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
 
     import anndata as ad
 

@@ -1,6 +1,6 @@
 process ADATA_METRICS {
     tag "${meta.id}"
-    container "bigdatainbiomedicine/sc-python"
+    container "bigdatainbiomedicine/sc-rpy"
 
     label "process_medium"
 
@@ -12,7 +12,7 @@ process ADATA_METRICS {
     
     script:
     """
-        #!/usr/bin/env python3
+        #!/opt/conda/bin/python
 
         import scanpy as sc
         import pandas as pd

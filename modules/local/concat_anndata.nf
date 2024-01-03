@@ -1,6 +1,6 @@
 process CONCAT_ADATA {
   tag "$meta.id"
-  container = "bigdatainbiomedicine/sc-python"
+  container = "bigdatainbiomedicine/sc-rpy"
   label "process_medium"
 
   input:
@@ -11,7 +11,7 @@ process CONCAT_ADATA {
   
   script:
   """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
     import scanpy as sc
     import anndata as ad
 

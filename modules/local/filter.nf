@@ -1,6 +1,6 @@
 process FILTER {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-python"
+  container "bigdatainbiomedicine/sc-rpy"
 
   label "process_medium"
 

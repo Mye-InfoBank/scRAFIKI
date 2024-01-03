@@ -1,13 +1,9 @@
 services:
-  python:
+  scib:
     build: 
-      context: python
-    image: bigdatainbiomedicine/sc-python
-  r:
+      context: scib
+    image: bigdatainbiomedicine/sc-scib
+  rpy:
     build: 
-      context: r
-    image: bigdatainbiomedicine/sc-r
-  sctransform:
-    build:
-      context: sctransform
-    image: bigdatainbiomedicine/sctransform
+      context: rpy
+    image: bigdatainbiomedicine/sc-rpy

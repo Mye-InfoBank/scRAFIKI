@@ -4,7 +4,7 @@ process BENCHMARK_INTEGRATIONS {
     label "process_high"
     label "scale_resources"
 
-    container = "bigdatainbiomedicine/sc-python"
+    container = "bigdatainbiomedicine/sc-scib"
     cpus = 4
     memory = {50.GB * task.attempt}
     maxRetries = 4

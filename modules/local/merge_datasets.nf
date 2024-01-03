@@ -1,5 +1,5 @@
 process MERGE_DATASETS {
-  container "bigdatainbiomedicine/sc-python"
+  container "bigdatainbiomedicine/sc-rpy"
 
   label "process_medium"
 

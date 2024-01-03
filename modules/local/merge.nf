@@ -1,6 +1,6 @@
 process MERGE {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-python"
+  container "bigdatainbiomedicine/sc-rpy"
 
   publishDir "${params.outdir}", mode: 'symlink'
 
@@ -20,7 +20,7 @@ process MERGE {
   
   script:
   """
-  #!/usr/bin/env python3
+  #!/opt/conda/bin/python
 
   import anndata as ad
   import pandas as pd

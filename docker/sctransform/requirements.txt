@@ -1,5 +1,0 @@
-scanpy
-scipy
-anndata
-rpy2
-anndata2ri

@@ -1,7 +1,7 @@
 process NEIGHBORS {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-python"
+    container = "bigdatainbiomedicine/sc-rpy"
     label "process_medium"
 
     input:
@@ -13,7 +13,7 @@ process NEIGHBORS {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
 
     import scanpy as sc
     from threadpoolctl import threadpool_limits
@@ -30,7 +30,7 @@ process NEIGHBORS {
 process UMAP {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-python"
+    container = "bigdatainbiomedicine/sc-rpy"
     label "process_medium"
 
     input:
@@ -41,7 +41,7 @@ process UMAP {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
 
     import scanpy as sc
     from threadpoolctl import threadpool_limits
@@ -58,7 +58,7 @@ process UMAP {
 process LEIDEN {
     tag "${meta.id}:${resolution}"
 
-    container = "bigdatainbiomedicine/sc-python"
+    container = "bigdatainbiomedicine/sc-rpy"
     label "process_single"
 
     input:
@@ -70,7 +70,7 @@ process LEIDEN {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
 
     import scanpy as sc
     from threadpoolctl import threadpool_limits
@@ -87,7 +87,7 @@ process LEIDEN {
 process MERGE_UMAP_LEIDEN {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-python"
+    container = "bigdatainbiomedicine/sc-rpy"
     label "process_medium"
 
 
@@ -99,7 +99,7 @@ process MERGE_UMAP_LEIDEN {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/opt/conda/bin/python
 
     import scanpy as sc
     from threadpoolctl import threadpool_limits

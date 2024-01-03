@@ -4,7 +4,7 @@ nextflow.enable.dsl = 2
 
 process SOLO {
     tag "${meta.id}"
-    container "bigdatainbiomedicine/sc-python"
+    container "bigdatainbiomedicine/sc-scib"
 
     label "process_medium"
 
@@ -17,7 +17,8 @@ process SOLO {
 
     script:
     """
-    #!/usr/bin/env python
+    #!/usr/bin/env python3
+
     import scanpy as sc
     from threadpoolctl import threadpool_limits
     threadpool_limits(${task.cpus})
