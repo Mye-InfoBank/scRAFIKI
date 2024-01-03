@@ -21,7 +21,7 @@ sc_experiment = anndata2ri.py2rpy(adata)
 # Convert to Seurat object using the as.Seurat function
 # Need to extract the function beforehand, since it contains a dot
 as_seurat = ro.r('as.Seurat')
-seurat_object = as_seurat(sc_experiment, counts="X", data=ro.r('NULL'))
+seurat_object = as_seurat(sc_experiment, counts="ambient", data=ro.r('NULL'))
 
 # transformed is a Seurat object with an assay called "SCT"
 transformed = seurat.SCTransform(seurat_object, assay="originalexp")

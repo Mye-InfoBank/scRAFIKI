@@ -12,7 +12,7 @@ process MERGE {
     val(integration_embeddings)
     path(integration_adatas)
     tuple val(meta2), path(solo)
-    tuple val(meta3), path(decontX)
+    tuple val(meta3), path(counts)
     val(resolutions)
   
   output:
@@ -43,9 +43,11 @@ process MERGE {
       del integration_adata
 
   solo_df = pd.read_csv("$solo", sep="\\t", index_col=0)
-  decontX_adata = ad.read_h5ad("$decontX")
+  counts_adata = ad.read_h5ad("$counts")
 
-  adata.layers["decontX"] = decontX_adata.X
+  for layer in counts_adata.layers.keys():
+    adata.layers[layer] = counts_adata.layers[layer]
+
   adata.obs["solo_doublet_score"] = solo_df["doublet"].values
   adata.obs["solo_singlet_score"] = solo_df["singlet"].values
   adata.obs["solo_label"] = solo_df["label"].values
