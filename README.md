@@ -10,8 +10,8 @@ This pipeline is written in nextflow and based on the LUCA pipeline:
 
 ## Overview
 
-![Metro map](./www/metro.png)
-Created using [Tennessine](https://tennessine.co.uk/metro/)
+![Metro map](./www/SIMBA.png)
+Created using [Tennessine](https://tennessine.co.uk/metro/fc8a8ba6ac25fca)
 
 ## Usage
 
