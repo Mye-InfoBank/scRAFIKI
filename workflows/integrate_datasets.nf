@@ -21,6 +21,7 @@ include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/local/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/local/integrate_scanvi.nf"
 include { NORMALIZE } from "../modules/local/normalize.nf"
+include { CELLTYPIST } from "../modules/local/celltypist.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -80,6 +81,11 @@ workflow integrate_datasets {
 
     NORMALIZE(
         CONCAT_DECONTX.out
+    )
+
+    CELLTYPIST(
+        NORMALIZE.out,
+        params.celltypist_model
     )
 
     ch_integration_methods = Channel.from(params.integration_methods)
