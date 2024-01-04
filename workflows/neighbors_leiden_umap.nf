@@ -6,10 +6,9 @@ process NEIGHBORS {
 
     input:
     tuple val(meta), path(adata)
-    each use_rep
 
     output:
-    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -22,8 +21,8 @@ process NEIGHBORS {
     sc.settings.n_jobs = ${task.cpus}
 
     adata = sc.read_h5ad("${adata}")
-    sc.pp.neighbors(adata, use_rep="${use_rep}")
-    adata.write_h5ad("${meta.id}.rep_${use_rep}.neighbors.h5ad")
+    sc.pp.neighbors(adata, use_rep="X_emb")
+    adata.write_h5ad("${meta.id}.neighbors.h5ad")
     """
 }
 
@@ -34,10 +33,10 @@ process UMAP {
     label "process_medium"
 
     input:
-    tuple val(meta), val(use_rep), path(adata)
+    tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -51,7 +50,7 @@ process UMAP {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.umap(adata)
-    adata.write_h5ad("${meta.id}.rep_${use_rep}.umap.h5ad")
+    adata.write_h5ad("${meta.id}.umap.h5ad")
     """
 }
 
@@ -62,11 +61,11 @@ process LEIDEN {
     label "process_single"
 
     input:
-    tuple val(meta), val(use_rep), path(adata)
+    tuple val(meta), path(adata)
     each resolution
 
     output:
-    tuple val(meta), val(use_rep), val(resolution), path("*.h5ad"), emit: adata
+    tuple val(meta), val(resolution), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -80,8 +79,27 @@ process LEIDEN {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.leiden(adata, resolution=${resolution})
-    adata.write_h5ad("${meta.id}.res_${resolution}.rep_${use_rep}.leiden.h5ad")
+    adata.write_h5ad("${meta.id}.res_${resolution}.leiden.h5ad")
     """
+}
+
+process CELLTYPIST_MAJORITY {
+  tag "${meta.id}"
+
+  container "bigdatainbiomedicine/sc-rpy"
+  label "process_medium"
+
+  input:
+  tuple val(meta), val(resolution), path(adata)
+  tuple val(meta2), path(celltypist)
+  
+  output:
+  tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.majority.h5ad"), emit: adata
+  
+  script:
+  """
+  celltypist_majority.py --input_clustering ${adata} --input_celltypist ${celltypist} --output ${meta.id}.res_${resolution}.majority.h5ad
+  """
 }
 
 process MERGE_UMAP_LEIDEN {
@@ -92,10 +110,10 @@ process MERGE_UMAP_LEIDEN {
 
 
     input:
-    tuple val(meta), val(use_rep), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
+    tuple val(meta), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
 
     output:
-    tuple val(meta), val(use_rep), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad"), emit: adata
 
     script:
     """
@@ -116,7 +134,8 @@ process MERGE_UMAP_LEIDEN {
     for res, adata_path in zip(resolutions, leiden_adatas):
         tmp_adata = sc.read_h5ad(adata_path)
         adata_umap.obs[f"leiden_{res:.2f}"] = tmp_adata.obs["leiden"]
-    adata_umap.write_h5ad("${meta.id}.rep_${use_rep}.umap_leiden.h5ad")
+        adata_umap.obs[f"leiden_{res:.2f}_celltypist_majority"] = tmp_adata.obs["celltypist_majority"]
+    adata_umap.write_h5ad("${meta.id}.umap_leiden.h5ad")
     """
 }
 
@@ -125,17 +144,18 @@ process MERGE_UMAP_LEIDEN {
 workflow NEIGHBORS_LEIDEN_UMAP {
     take:
     adata
-    neihbors_rep
     leiden_res
+    ch_celltypist
 
     main:
-    NEIGHBORS(adata, neihbors_rep)
+    NEIGHBORS(adata)
     UMAP(NEIGHBORS.out.adata)
     LEIDEN(NEIGHBORS.out.adata, leiden_res)
+    CELLTYPIST_MAJORITY(LEIDEN.out.adata, ch_celltypist)
 
     MERGE_UMAP_LEIDEN(
         UMAP.out.adata.join(
-            LEIDEN.out.groupTuple(by: [0, 1]), by: [0, 1]
+            CELLTYPIST_MAJORITY.out.adata.groupTuple(by: 0), by: 0
         )
     )
 

@@ -84,7 +84,7 @@ workflow integrate_datasets {
     )
 
     CELLTYPIST(
-        NORMALIZE.out,
+        ch_unintegrated,
         params.celltypist_model
     )
 
@@ -125,8 +125,8 @@ workflow integrate_datasets {
 
     NEIGHBORS_LEIDEN_UMAP(
         ch_integrated.map{ meta, adata, type -> [meta, adata]},
-        "X_emb",
-        ch_resolutions
+        ch_resolutions,
+        CELLTYPIST.out
     )
 
     SOLO(
@@ -136,9 +136,8 @@ workflow integrate_datasets {
 
     MERGE(
         ch_unintegrated,
-        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> meta.integration }.collect(),
-        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> rep }.collect(),
-        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, rep, adata -> adata }.collect(),
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, adata -> meta.integration }.collect(),
+        NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, adata -> adata }.collect(),
         SOLO.out,
         NORMALIZE.out,
         ch_resolutions.collect()
