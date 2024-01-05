@@ -23,7 +23,7 @@ as_seurat = ro.r('as.Seurat')
 seurat_object = as_seurat(sc_experiment, counts="ambient", data=ro.r('NULL'))
 
 # transformed is a Seurat object with an assay called "SCT"
-transformed = seurat.SCTransform(seurat_object, assay="originalexp")
+transformed = seurat.SCTransform(seurat_object, assay="originalexp", min_cells=0)
 
 # Convert to singleCellExperiment object
 as_sce = ro.r('as.SingleCellExperiment')
