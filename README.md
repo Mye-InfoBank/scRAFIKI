@@ -50,7 +50,7 @@ nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --samplesheet "s
 | --- | --- | --- |
 | `samplesheet` | Path to the samplesheet | *required* |
 | `outdir` | Path to the output directory | `./output` |
-| `celltypist_model` | Celltypist model to use for annotation, a list of possible values can be found [here](https://www.celltypist.org/models) | *requried* |
+| `celltypist_model` | Celltypist model to use for annotation, a list of possible values can be found [here](https://www.celltypist.org/models). Make sure to add the `.pkl` extension, e.g. `Cells_Intestinal_Tract.pkl` | *requried* |
 | `clustering_resolutions` | List of resolutions for clustering | `[0.25, 0.5, 0.75, 1, 1.5, 2]` |
 | `integration_methods` | List of integration methods to use | `["scvi", "scanvi", "harmony", "scgen", "scanorama", "bbknn", "desc", "combat", "trvaep"]` |
 | `benchmark` | Run scIB benchmarking | `false` |
