@@ -1,7 +1,7 @@
-include { SPLIT_BATCHES } from "../modules/local/split_batches.nf"
-include { DECONTX } from "../modules/local/decontX.nf"
-include { CONCAT_ADATA as CONCAT_DECONTX } from "../modules/local/concat_anndata.nf"
-include { NORMALIZE } from "../modules/local/normalize.nf"
+include { SPLIT_BATCHES } from "../modules/split_batches.nf"
+include { DECONTX } from "../modules/decontX.nf"
+include { CONCAT_ADATA as CONCAT_DECONTX } from "../modules/concat_anndata.nf"
+include { NORMALIZE } from "../modules/normalize.nf"
 
 workflow COUNTS {
     take:

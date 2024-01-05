@@ -1,7 +1,7 @@
-include { check_samplesheet } from '../modules/local/check_samplesheet'
+include { check_samplesheet } from '../modules/check_samplesheet'
 
-include { FILTER } from "../modules/local/filter.nf"
-include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
+include { FILTER } from "../modules/filter.nf"
+include { MERGE_DATASETS } from "../modules/merge_datasets.nf"
 
 workflow PREPROCESSING {
     take:

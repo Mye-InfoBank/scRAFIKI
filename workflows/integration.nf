@@ -1,6 +1,6 @@
-include { INTEGRATE } from "../modules/local/integrate.nf"
-include { INTEGRATE as INTEGRATE_SCVI } from "../modules/local/integrate.nf"
-include { INTEGRATE_SCANVI } from "../modules/local/integrate_scanvi.nf"
+include { INTEGRATE } from "../modules/integrate.nf"
+include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
+include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
 
 
 integration_types = [

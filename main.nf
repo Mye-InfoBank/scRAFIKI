@@ -6,10 +6,10 @@ import static com.xlson.groovycsv.CsvParser.parseCsv
 nextflow.enable.dsl = 2
 
 // Modules
-include { CELLTYPIST } from "./modules/local/celltypist.nf"
-include { BENCHMARK_INTEGRATIONS } from "./modules/local/scIB.nf"
-include { SOLO } from "./modules/local/solo.nf"
-include { MERGE } from "./modules/local/merge.nf"
+include { CELLTYPIST } from "./modules/celltypist.nf"
+include { BENCHMARK_INTEGRATIONS } from "./modules/scIB.nf"
+include { SOLO } from "./modules/solo.nf"
+include { MERGE } from "./modules/merge.nf"
 
 // Workflows
 include { PREPROCESSING } from "./workflows/preprocessing.nf"
