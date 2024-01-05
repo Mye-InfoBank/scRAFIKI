@@ -2,7 +2,7 @@
 
 <img src="./www/SIMBA_sticker.png" width="250">
 
-SIMBA isvgs a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
+SIMBA is a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
 
 This pipeline is written in nextflow and based on the LUCA pipeline:
   
