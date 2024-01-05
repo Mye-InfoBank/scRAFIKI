@@ -12,6 +12,7 @@ process MERGE {
     path(integration_adatas)
     tuple val(meta2), path(solo)
     tuple val(meta3), path(counts)
+    tuple val(meta4), path(celltypist)
     val(resolutions)
   
   output:
@@ -47,6 +48,12 @@ process MERGE {
 
   for layer in counts_adata.layers.keys():
     adata.layers[layer] = counts_adata.layers[layer]
+  del counts_adata
+
+  celltypist_adata = ad.read_h5ad("$celltypist")
+  adata.obs["celltypist_prediction"] = celltypist_adata.obs["celltypist_prediction"].values
+  adata.obs["celltypist_conf_score"] = celltypist_adata.obs["celltypist_conf_score"].values
+  del celltypist_adata
 
   adata.obs["solo_doublet_score"] = solo_df["doublet"].values
   adata.obs["solo_singlet_score"] = solo_df["singlet"].values

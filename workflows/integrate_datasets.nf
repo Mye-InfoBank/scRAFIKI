@@ -140,6 +140,7 @@ workflow integrate_datasets {
         NEIGHBORS_LEIDEN_UMAP.out.adata.map { meta, adata -> adata }.collect(),
         SOLO.out,
         NORMALIZE.out,
+        CELLTYPIST.out,
         ch_resolutions.collect()
     )
 
