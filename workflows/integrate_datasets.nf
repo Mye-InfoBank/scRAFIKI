@@ -2,7 +2,6 @@ include { check_samplesheet } from '../modules/local/check_samplesheet'
 
 include { FILTER } from "../modules/local/filter.nf"
 
-
 include { SOLO } from "../modules/local/solo.nf"
 include { NEIGHBORS_LEIDEN_UMAP } from "./neighbors_leiden_umap.nf"
 include { MERGE } from "../modules/local/merge.nf"
@@ -10,10 +9,6 @@ include { BENCHMARK_INTEGRATIONS } from "../modules/local/scIB.nf"
 include { DECONTX } from "../modules/local/decontX.nf"
 include { CONCAT_ADATA as CONCAT_DECONTX } from "../modules/local/concat_anndata.nf"
 include { FILTER_SOLO } from "../modules/local/solo.nf"
-include { ADATA_METRICS as AFTER_QC_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
-include { ADATA_METRICS as FILTERED_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
-include { ADATA_METRICS as RAW_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
-include { COMBINE_ADATA_METRICS } from "../modules/local/adata_metrics.nf"
 
 include { INTEGRATE } from "../modules/local/integrate.nf"
 include { MERGE_DATASETS } from "../modules/local/merge_datasets.nf"
@@ -51,11 +46,9 @@ workflow integrate_datasets {
     main:
 
     ch_samples = Channel.from(check_samplesheet(ch_samplesheet.toString()))
-    RAW_ADATA_METRICS(ch_samples)
 
     FILTER(ch_samples)
 
-    FILTERED_ADATA_METRICS(FILTER.out)
 
     // MERGE and INTEGRATE all datasets
     MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect())
@@ -144,20 +137,9 @@ workflow integrate_datasets {
         ch_resolutions.collect()
     )
 
-    /*
-    FILTERED_ADATA_METRICS(
-        CONCAT_BATCHES.out.map{ [[id: "no_doublets"], it] }
-    )
-
-    COMBINE_ADATA_METRICS(
-        AFTER_QC_ADATA_METRICS.out.mix(FILTERED_ADATA_METRICS.out, RAW_ADATA_METRICS.out).collect()
-    )
-
 
 
     emit:
         adata_integrated = NEIGHBORS_LEIDEN_UMAP.out.adata
-
-    */
 
 }
