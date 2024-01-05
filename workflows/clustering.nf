@@ -8,7 +8,7 @@ process NEIGHBORS {
     tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad")
 
     script:
     """
@@ -36,7 +36,7 @@ process UMAP {
     tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad")
 
     script:
     """
@@ -65,7 +65,7 @@ process LEIDEN {
     each resolution
 
     output:
-    tuple val(meta), val(resolution), path("*.h5ad"), emit: adata
+    tuple val(meta), val(resolution), path("*.h5ad")
 
     script:
     """
@@ -94,7 +94,7 @@ process CELLTYPIST_MAJORITY {
   tuple val(meta2), path(celltypist)
   
   output:
-  tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.majority.h5ad"), emit: adata
+  tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.majority.h5ad")
   
   script:
   """
@@ -113,7 +113,7 @@ process MERGE_UMAP_LEIDEN {
     tuple val(meta), path(adata_umap), val(leiden_resolutions), path(adata_leiden)
 
     output:
-    tuple val(meta), path("*.h5ad"), emit: adata
+    tuple val(meta), path("*.h5ad")
 
     script:
     """
@@ -141,24 +141,24 @@ process MERGE_UMAP_LEIDEN {
 
 
 
-workflow NEIGHBORS_LEIDEN_UMAP {
+workflow CLUSTERING {
     take:
-    adata
-    leiden_res
-    ch_celltypist
+        ch_adata
+        ch_resolutions
+        ch_celltypist
 
     main:
-    NEIGHBORS(adata)
-    UMAP(NEIGHBORS.out.adata)
-    LEIDEN(NEIGHBORS.out.adata, leiden_res)
-    CELLTYPIST_MAJORITY(LEIDEN.out.adata, ch_celltypist)
+        NEIGHBORS(ch_adata)
+        UMAP(NEIGHBORS.out)
+        LEIDEN(NEIGHBORS.out, ch_resolutions)
+        CELLTYPIST_MAJORITY(LEIDEN.out, ch_celltypist)
 
-    MERGE_UMAP_LEIDEN(
-        UMAP.out.adata.join(
-            CELLTYPIST_MAJORITY.out.adata.groupTuple(by: 0), by: 0
+        MERGE_UMAP_LEIDEN(
+            UMAP.out.join(
+                CELLTYPIST_MAJORITY.out.groupTuple(by: 0), by: 0
+            )
         )
-    )
 
     emit:
-    adata = MERGE_UMAP_LEIDEN.out.adata
+        MERGE_UMAP_LEIDEN.out
 }
