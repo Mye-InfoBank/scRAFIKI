@@ -1,0 +1,18 @@
+// first only scTransform implemented
+process NORMALIZE {
+    tag "${meta.id}"
+
+    container = "bigdatainbiomedicine/sc-rpy"
+    label "process_high"
+
+    input:
+    tuple val(meta), path(adata) 
+
+    output:
+    tuple val(meta), path("normalized.h5ad")
+
+    script:
+    """
+    normalize.py --input ${adata} --output normalized.h5ad
+    """
+}

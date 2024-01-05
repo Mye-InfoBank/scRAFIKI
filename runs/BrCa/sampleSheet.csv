@@ -1,0 +1,7 @@
+id,input_adata
+bassez,/nfs/data/COST_IBD/data/annData/BrCa/bassez.h5ad
+kester,/nfs/data/COST_IBD/data/annData/BrCa/kester.h5ad
+pal,/nfs/data/COST_IBD/data/annData/BrCa/pal.h5ad
+ruli_gao,/nfs/data/COST_IBD/data/annData/BrCa/ruli_gao_subset.h5ad
+slyper,/nfs/data/COST_IBD/data/annData/BrCa/slyper_filtered.h5ad
+wu,/nfs/data/COST_IBD/data/annData/BrCa/wu.h5ad

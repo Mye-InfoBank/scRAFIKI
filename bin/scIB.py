@@ -41,14 +41,6 @@ if __name__ == "__main__":
         help='Key of annotated labels e.g. "cell_type"',
     )
     parser.add_argument(
-        "-f",
-        "--fast",
-        action="store_true",
-        help="Use fast metrics (no cell cycle, no HVGs)",
-    )
-
-    parser.add_argument("--organism", required=True)
-    parser.add_argument(
         "--type",
         required=True,
         choices=RESULT_TYPES,
@@ -75,9 +67,7 @@ if __name__ == "__main__":
     batch_key = args.batch_key
     label_key = args.label_key
     assay = args.assay
-    organism = args.organism
     n_hvgs = args.hvgs if args.hvgs > 0 else None
-    fast = args.fast
 
     # encode setup for column name
     setup = f"{args.method}_{args.type}"
@@ -92,7 +82,6 @@ if __name__ == "__main__":
         print(f"    batch_key:\t{batch_key}")
         print(f"    label_key:\t{label_key}")
         print(f"    assay:\t{assay}")
-        print(f"    organism:\t{organism}")
         print(f"    n_hvgs:\t{n_hvgs}")
         print(f"    setup:\t{setup}")
         print(f"    optimised clustering results:\t{cluster_nmi}")
@@ -266,43 +255,16 @@ if __name__ == "__main__":
         print(f"    LISI:\t{lisi_graph_}")
         print(f"    Trajectory:\t{trajectory_}")
 
-    if fast:
-        results = scib.me.metrics_fast(
-            adata,
-            adata_int,
-            verbose=verbose,
-            batch_key=batch_key,
-            label_key=label_key,
-            embed=embed,
-            n_isolated=None,
-        )
-    else:
-        results = scib.me.metrics(
-            adata,
-            adata_int,
-            verbose=verbose,
-            hvg_score_=hvg_score_,
-            cluster_nmi=cluster_nmi,
-            batch_key=batch_key,
-            label_key=label_key,
-            silhouette_=silhouette_,
-            embed=embed,
-            type_=type_,
-            nmi_=nmi_,
-            nmi_method="arithmetic",
-            nmi_dir=None,
-            ari_=ari_,
-            pcr_=pcr_,
-            cell_cycle_=cell_cycle_,
-            organism=organism,
-            isolated_labels_=isolated_labels_,
-            n_isolated=None,
-            graph_conn_=graph_conn_,
-            kBET_=kBET_,
-            # lisi_=lisi_,
-            lisi_graph_=lisi_graph_,
-            trajectory_=trajectory_,
-        )
+    results = scib.me.metrics_fast(
+        adata,
+        adata_int,
+        verbose=verbose,
+        batch_key=batch_key,
+        label_key=label_key,
+        embed=embed,
+        n_isolated=None,
+    )
+
     results.rename(columns={results.columns[0]: setup}, inplace=True)
 
     if verbose:
