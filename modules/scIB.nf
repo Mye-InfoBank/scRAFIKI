@@ -25,3 +25,31 @@ process BENCHMARK_INTEGRATIONS {
          --type ${integration_type} --hvgs ${hvgs}
         """
 }
+
+process MERGE_BENCHMARKS {
+    label "process_single"
+
+    publishDir "${params.outdir}", mode: "${params.publish_mode}"
+
+    container = "bigdatainbiomedicine/sc-rpy"
+
+    input:
+        path(benchmarks)
+
+    output:
+        path("benchmarking.tsv")
+
+    script:
+        """
+        #!/opt/conda/bin/python
+
+        import pandas as pd
+
+        benchmark_paths = "${benchmarks}".split(" ")
+        benchmarks = [pd.read_csv(path, index_col=0) for path in benchmark_paths]
+
+        merged = pd.concat(benchmarks, axis=1)
+
+        merged.to_csv("benchmarking.tsv", sep="\\t")
+        """
+}
