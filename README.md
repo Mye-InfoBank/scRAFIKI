@@ -42,8 +42,26 @@ Some additional information:
 ### 3. Pipeline execution
 
 ```bash
-nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --outdir "results" --samplesheet "samplesheet.csv"
+nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --samplesheet "samplesheet.csv"
 ```
+
+#### Parameters
+| Parameter | Description | Default |
+| --- | --- | --- |
+| `samplesheet` | Path to the samplesheet | *required* |
+| `outdir` | Path to the output directory | `./output` |
+| `celltypist_model` | Celltypist model to use for annotation, a list of possible values can be found [here](https://www.celltypist.org/models) | *requried* |
+| `organism` | Organism for scIB benchmarking (human or mouse) | `human` |
+| `clustering_resolutions` | List of resolutions for clustering | `[0.25, 0.5, 0.75, 1, 1.5, 2]` |
+| `integration_methods` | List of integration methods to use | `["scvi", "scanvi", "harmony", "scgen", "scanorama", "bbknn", "desc", "combat", "trvaep"]` |
+| `benchmark` | Run scIB benchmarking | `false` |
+| `benchmark_hvgs` | Number of highly variable genes to use for scIB benchmarking | `2000` |
+| `max_cpus` | Maximum number of CPUs to use | `60` |
+| `max_memory` | Maximum amount of memory to use | `300.GB` |
+| `max_time` | Maximum runtime of a job | `48.h` |
+
+Parameters can be applied as documented in the [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html#configuration).
+
 
 #### Profiles
 The following profiles are available:
