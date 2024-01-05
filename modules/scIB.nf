@@ -13,7 +13,6 @@ process BENCHMARK_INTEGRATIONS {
     input: 
         tuple val(meta1), path(uncorrected)
         tuple val(meta2), path(integrated), val(integration_type)
-        val(organism)
         val(hvgs)
 
     output:
@@ -22,7 +21,7 @@ process BENCHMARK_INTEGRATIONS {
     script:
         """
         scIB.py -u ${uncorrected} -i ${integrated} \
-         -m ${meta2.integration} -o ${meta2.integration}.csv -b batch -l cell_type --organism ${organism} \
-         --type ${integration_type} -f --hvgs ${hvgs}
+         -m ${meta2.integration} -o ${meta2.integration}.csv -b batch -l cell_type \
+         --type ${integration_type} --hvgs ${hvgs}
         """
 }

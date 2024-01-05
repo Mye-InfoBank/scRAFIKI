@@ -40,7 +40,6 @@ workflow {
         BENCHMARK_INTEGRATIONS(
             ch_preprocessed,
             INTEGRATION.out.integrated_types,
-            params.organism,
             params.benchmark_hvgs
         )
     }
