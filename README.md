@@ -61,6 +61,7 @@ nextflow run Mye-InfoBank/SIMBA -resume -profile <YOUR_PROFILE> --samplesheet "s
 
 Parameters can be applied as documented in the [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html#configuration).
 
+Note that the integration methods `scvi` and `scanvi` will be executed regardless of the specified integration methods, as they are required for some downstream analysis steps.
 
 #### Profiles
 The following profiles are available:
