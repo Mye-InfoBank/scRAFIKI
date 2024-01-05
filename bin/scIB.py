@@ -5,7 +5,6 @@
 
 import scanpy as sc
 import scib
-import numpy as np
 import warnings
 
 warnings.filterwarnings("ignore")

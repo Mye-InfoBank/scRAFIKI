@@ -13,6 +13,7 @@ process MERGE {
     tuple val(meta2), path(solo)
     tuple val(meta3), path(counts)
     tuple val(meta4), path(celltypist)
+    tuple val(meta5), val(cell_cycle)
     val(resolutions)
   
   output:
@@ -55,6 +56,12 @@ process MERGE {
   adata.obs["celltypist_prediction"] = celltypist_adata.obs["celltypist_prediction"].values
   adata.obs["celltypist_conf_score"] = celltypist_adata.obs["celltypist_conf_score"].values
   del celltypist_adata
+
+  cell_cycle_adata = ad.read_h5ad("$cell_cycle")
+  adata.obs["S_score"] = cell_cycle_adata.obs["S_score"].values
+  adata.obs["G2M_score"] = cell_cycle_adata.obs["G2M_score"].values
+  adata.obs["cycle_phase"] = cell_cycle_adata.obs["phase"].values
+  del cell_cycle_adata
 
   adata.obs["solo_doublet_score"] = solo_df["doublet"].values
   adata.obs["solo_singlet_score"] = solo_df["singlet"].values
