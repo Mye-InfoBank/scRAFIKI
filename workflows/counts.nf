@@ -23,8 +23,14 @@ workflow COUNTS {
             DECONTX.out.map{ it[1] }.collect().map{ [[id: "counts"], it] }
         )
 
-        NORMALIZE(CONCAT_DECONTX.out)
+        ch_counts = CONCAT_DECONTX.out
+
+        if (params.normalize) {
+            NORMALIZE(CONCAT_DECONTX.out)
+
+            ch_counts = NORMALIZE.out
+        }
 
     emit:
-        NORMALIZE.out
+        ch_counts
 }

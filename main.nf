@@ -8,6 +8,7 @@ nextflow.enable.dsl = 2
 // Modules
 include { CELLTYPIST } from "./modules/celltypist.nf"
 include { SOLO } from "./modules/solo.nf"
+include { CELL_CYCLE } from "./modules/cell_cycle.nf"
 include { MERGE } from "./modules/merge.nf"
 
 // Workflows
@@ -50,6 +51,11 @@ workflow {
         INTEGRATION.out.scanvi_model
     )
 
+    CELL_CYCLE(
+        ch_preprocessed,
+        "human"
+    )
+
     ch_resolutions = Channel.from(params.clustering_resolutions)
 
     CLUSTERING(
@@ -65,6 +71,7 @@ workflow {
         SOLO.out,
         COUNTS.out,
         CELLTYPIST.out,
+        CELL_CYCLE.out,
         ch_resolutions.collect()
     )
 
