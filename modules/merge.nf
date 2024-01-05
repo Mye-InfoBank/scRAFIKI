@@ -48,6 +48,7 @@ process MERGE {
 
   for layer in counts_adata.layers.keys():
     adata.layers[layer] = counts_adata.layers[layer]
+  adata.X = counts_adata.X
   del counts_adata
 
   celltypist_adata = ad.read_h5ad("$celltypist")
