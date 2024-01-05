@@ -7,7 +7,6 @@ nextflow.enable.dsl = 2
 
 // Modules
 include { CELLTYPIST } from "./modules/celltypist.nf"
-include { BENCHMARK_INTEGRATIONS } from "./modules/scIB.nf"
 include { SOLO } from "./modules/solo.nf"
 include { MERGE } from "./modules/merge.nf"
 
@@ -16,6 +15,7 @@ include { PREPROCESSING } from "./workflows/preprocessing.nf"
 include { COUNTS } from "./workflows/counts.nf"
 include { INTEGRATION } from "./workflows/integration.nf"
 include { CLUSTERING } from "./workflows/clustering.nf"
+include { BENCHMARKING } from "./workflows/benchmarking.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -37,7 +37,7 @@ workflow {
     )
 
     if (params.benchmark) {
-        BENCHMARK_INTEGRATIONS(
+        BENCHMARKING(
             ch_preprocessed,
             INTEGRATION.out.integrated_types,
             params.benchmark_hvgs
