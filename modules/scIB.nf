@@ -2,7 +2,6 @@ process BENCHMARK_INTEGRATIONS {
     tag "$meta2.id"
 
     label "process_high"
-    label "scale_resources"
 
     container = "bigdatainbiomedicine/sc-scib"
 

@@ -4,7 +4,6 @@ process INTEGRATE {
 
   label "process_high"
   label "process_high_memory"
-  label "scale_resources"
   errorStrategy 'retry'
 
   input:

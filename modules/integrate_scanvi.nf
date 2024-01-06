@@ -3,7 +3,6 @@ process INTEGRATE_SCANVI {
   container "bigdatainbiomedicine/sc-scib"
 
   label "process_high"
-  label "scale_resources"
 
   input:
   tuple val(meta), path(input)
