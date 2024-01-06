@@ -9,7 +9,7 @@ process DECONTX {
     tuple val(meta), file(adata)
   
   output:
-    tuple val(meta), file("${meta.id}_ambient.h5ad")
+    tuple val(meta), file("${meta.id}.ambient.h5ad")
   
   script:
   """
@@ -23,11 +23,11 @@ process DECONTX {
   adata = ad.read_h5ad("${adata}")
   sc_experiment = anndata2ri.py2rpy(adata)
 
-  corrected = celda.decontX(sc_experiment)
+  corrected = celda.decontX(sc_experiment, batch="batch")
   counts = celda.decontXcounts(corrected)
 
   adata.layers['ambient'] = anndata2ri.rpy2py(counts).T
   adata.X = adata.layers['ambient']
-  adata.write_h5ad("${meta.id}_ambient.h5ad")
+  adata.write_h5ad("${meta.id}.ambient.h5ad")
   """
 }
