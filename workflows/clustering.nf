@@ -58,7 +58,7 @@ process LEIDEN {
     tag "${meta.id}:${resolution}"
 
     container = "bigdatainbiomedicine/sc-rpy"
-    label "process_single"
+    label "process_medium"
 
     input:
     tuple val(meta), path(adata)

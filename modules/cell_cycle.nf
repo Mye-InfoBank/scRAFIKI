@@ -1,7 +1,7 @@
 process CELL_CYCLE {
     tag "$meta.id"
 
-    label "process_medium"
+    label "process_high"
 
     container = "bigdatainbiomedicine/sc-scib"
 

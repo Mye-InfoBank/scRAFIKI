@@ -3,7 +3,7 @@ process CELLTYPIST {
 
     container "bigdatainbiomedicine/sc-rpy"
 
-    label "process_medium"
+    label "process_high"
 
     input:
     tuple val(meta), path(adata)
