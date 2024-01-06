@@ -23,7 +23,7 @@ process DECONTX {
   adata = ad.read_h5ad("${adata}")
   sc_experiment = anndata2ri.py2rpy(adata)
 
-  corrected = celda.decontX(sc_experiment, batch="batch")
+  corrected = celda.decontX(sc_experiment, batch=adata.obs['batch'].tolist())
   counts = celda.decontXcounts(corrected)
 
   adata.layers['ambient'] = anndata2ri.rpy2py(counts).T
