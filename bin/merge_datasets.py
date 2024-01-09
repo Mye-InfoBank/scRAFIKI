@@ -2,6 +2,7 @@
 
 import argparse
 import anndata as ad
+import scanpy as sc
 
 columns_required = {
     "sex": False,
@@ -44,6 +45,10 @@ merged.obs_names_make_unique()
 # Make sure that there are no underscores in the gene names
 merged.var_names = merged.var_names.str.replace("_", "-")
 merged.var_names_make_unique()
+
+# Perform minimal filtering to prevent NaNs
+sc.pp.filter_cells(merged, min_genes=1)
+sc.pp.filter_genes(merged, min_cells=1)
 
 merged.obs["batch"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["batch"].astype(str)
 merged.obs["patient"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["patient"].astype(str)
