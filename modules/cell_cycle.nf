@@ -2,6 +2,8 @@ process CELL_CYCLE {
     tag "$meta.id"
 
     label "process_high"
+    label "process_high_memory"
+    errorStrategy 'retry'
 
     container = "bigdatainbiomedicine/sc-scib"
 

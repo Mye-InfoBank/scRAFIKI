@@ -4,6 +4,7 @@ process DECONTX {
   container "bigdatainbiomedicine/sc-rpy"
 
   label "process_medium"
+  label "process_high_memory"
 
   input:
     tuple val(meta), file(adata)
