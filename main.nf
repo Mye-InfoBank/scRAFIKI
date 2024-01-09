@@ -26,7 +26,7 @@ workflow {
 
     ch_preprocessed = PREPROCESSING.out
 
-    COUNTS(ch_preprocessed)
+    COUNTS(ch_preprocessed, params.normalization_method)
 
     CELLTYPIST(
         ch_preprocessed,
