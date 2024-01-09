@@ -2,7 +2,7 @@
 
 #Python packages
 import anndata as ad
-from scipy.sparse import csr_matrix
+from scipy.sparse import csc_matrix
 import argparse
 
 import anndata2ri
@@ -34,7 +34,7 @@ transformed_sce = as_sce(transformed)
 transformed_adata = anndata2ri.rpy2py(transformed_sce)
 
 # Add the normalized matrix to the anndata object
-adata.layers["normalized"] = csr_matrix(transformed_adata.X)
+adata.layers["normalized"] = csc_matrix(transformed_adata.X)
 adata.X = adata.layers["normalized"]
 
 # Write the anndata object to a file
