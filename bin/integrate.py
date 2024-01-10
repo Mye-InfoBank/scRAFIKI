@@ -5,10 +5,13 @@ import scib
 import scanpy as sc
 import argparse
 from threadpoolctl import threadpool_limits
+import torch
 
 # Disable warnings
 import warnings
 warnings.filterwarnings("ignore")
+
+torch.set_float32_matmul_precision('medium')
 
 methods = {
     "bbknn": scib.ig.bbknn,

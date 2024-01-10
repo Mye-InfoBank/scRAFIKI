@@ -12,3 +12,5 @@ RUN apt-get update && apt-get install -y git build-essential procps graphviz
 
 RUN pip install --no-cache-dir \
         git+https://github.com/Mye-InfoBank/scib.git#egg=scib[louvain,desc,bbknn,scanorama,scgen,scvi,trvaep,harmony]
+
+RUN pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
