@@ -1,3 +1,4 @@
+include { IDENTIFY_HVGS } from "../modules/identify_hvgs.nf"
 include { INTEGRATE } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
@@ -33,18 +34,25 @@ workflow INTEGRATION {
         ch_integration_methods = ch_integration_methods
             .filter{ it != "scvi" && it != "scanvi" }
 
-        INTEGRATE(
+        IDENTIFY_HVGS(
             ch_preprocessed,
+            params.integration_hvgs
+        )
+
+        ch_hvgs = IDENTIFY_HVGS.out
+
+        INTEGRATE(
+            ch_hvgs,
             ch_integration_methods
         )
 
         INTEGRATE_SCVI(
-            ch_preprocessed,
+            ch_hvgs,
             "scvi"
         )
 
         INTEGRATE_SCANVI(
-            ch_preprocessed,
+            ch_hvgs,
             INTEGRATE_SCVI.out.model
         )
 

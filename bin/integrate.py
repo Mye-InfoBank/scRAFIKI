@@ -44,17 +44,20 @@ adata = ad.read_h5ad(args.input)
 
 method = methods[args.method]
 
-if args.method == "scanvi":
-    if args.scvi_model is None:
-        adata = method(adata, "batch", "cell_type", save_model=True)
-    else:
-        adata = method(adata, "batch", "cell_type", scvi_model_path=args.scvi_model, save_model=True)
-elif args.method == "scgen":
-        adata = method(adata, "batch", "cell_type")
-elif args.method == "scvi":
-    adata = method(adata, "batch", save_model=True)
+kwargs = {}
+
+if args.method in ["scvi", "scanvi"]:
+    kwargs["save_model"] = True
+if args.method == "scanvi" and args.scvi_model is not None:
+    kwargs["scvi_model_path"] = args.scvi_model
+if args.method in ["harmony", "scanorama", "trvaep", "scgen", "scvi", "scanvi", "mnn", "bbknn"]:
+    hvgs = adata.var_names[adata.var["highly_variable"]].to_list()
+    kwargs["hvg"] = hvgs
+
+if args.method in ["scgen", "scanvi"]:
+    adata = method(adata, "batch", "cell_type", **kwargs)
 else:
-    adata = method(adata, "batch")
+    adata = method(adata, "batch", **kwargs)
 
 if "X_emb" not in adata.obsm:
     sc.pp.pca(adata)
