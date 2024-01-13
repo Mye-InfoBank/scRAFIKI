@@ -3,7 +3,7 @@
 import argparse
 import anndata as ad
 import scanpy as sc
-from scipy.sparse import csc_matrix
+from scipy.sparse import csr_matrix
 
 columns_required = {
     "sex": False,
@@ -51,8 +51,8 @@ merged.var_names_make_unique()
 sc.pp.filter_cells(merged, min_genes=1)
 sc.pp.filter_genes(merged, min_cells=1)
 
-# Convert to CSC matrix
-merged.X = csc_matrix(merged.X)
+# Convert to CSR matrix
+merged.X = csr_matrix(merged.X)
 
 merged.obs["batch"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["batch"].astype(str)
 merged.obs["patient"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["patient"].astype(str)
