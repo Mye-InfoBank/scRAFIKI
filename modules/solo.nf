@@ -47,8 +47,10 @@ process SOLO {
 
     adata = sc.read_h5ad("${adata}")
 
-    scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
-    scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
+    adata_hvg = adata[:, adata.var["highly_variable"]].copy()
+
+    scvi.model.SCANVI.setup_anndata(adata_hvg, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
+    scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata_hvg)
     solo = scvi.external.SOLO.from_scvi_model(scvi_model)
     solo.train()
     res = solo.predict()
