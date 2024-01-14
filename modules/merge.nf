@@ -39,8 +39,12 @@ process MERGE {
         res = float(resolution)
         leiden_key = f"leiden_{res:.2f}"
         majority_key = f"{leiden_key}_celltypist_majority"
+        entropy_key = f"{leiden_key}_entropy"
         adata.obs[integration_name + '_' + leiden_key] = integration_adata.obs[leiden_key].copy()
         adata.obs[integration_name + '_' + majority_key] = integration_adata.obs[majority_key].copy()
+
+        if entropy_key in integration_adata.obs.keys():
+          adata.obs[integration_name + '_' + entropy_key] = integration_adata.obs[entropy_key].copy()
 
       del integration_adata
 
