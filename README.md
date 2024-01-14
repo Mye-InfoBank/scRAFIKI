@@ -11,7 +11,7 @@ This pipeline is written in nextflow and based on the LUCA pipeline:
 ## Overview
 
 ![Metro map](./www/SIMBA.png)
-Created using [Tennessine](https://tennessine.co.uk/metro/fc8a8ba6ac25fca)
+Created using [Tennessine](https://tennessine.co.uk/metro/f51c720e6111045)
 
 ## Usage
 
