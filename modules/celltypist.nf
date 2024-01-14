@@ -4,6 +4,7 @@ process CELLTYPIST {
     container "bigdatainbiomedicine/sc-rpy"
 
     label "process_high"
+    label "process_high_memory"
 
     input:
     tuple val(meta), path(adata)
