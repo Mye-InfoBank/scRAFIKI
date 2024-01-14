@@ -53,6 +53,14 @@ if args.method == "scanvi" and args.scvi_model is not None:
 if args.method in ["harmony", "scanorama", "trvaep", "scgen", "scvi", "scanvi", "mnn", "bbknn"]:
     hvgs = adata.var_names[adata.var["highly_variable"]].to_list()
     kwargs["hvg"] = hvgs
+if args.method == "desc":
+    kwargs["ncores"] = args.cpus
+
+    # Check if GPU is available
+    if torch.cuda.is_available():
+        kwargs["use_gpu"] = True
+        # Select random GPU
+        kwargs["gpu_id"] = torch.cuda.current_device()
 
 if args.method in ["scgen", "scanvi"]:
     adata = method(adata, "batch", "cell_type", **kwargs)

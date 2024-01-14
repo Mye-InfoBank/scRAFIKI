@@ -16,7 +16,7 @@ integration_types = [
     "scgen": "full",
 ]
 
-gpu_integrations = ["desc", "scgen", "trvaep"]
+gpu_integrations = ["scgen"]
 
 /**
  * Integrate individual datasets into a single-cell atlas
