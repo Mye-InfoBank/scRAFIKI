@@ -1,7 +1,7 @@
 include { INTEGRATE } from "../modules/integrate.nf"
+include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
-
 
 integration_types = [
     "bbknn": "knn",
@@ -15,6 +15,8 @@ integration_types = [
     "trvaep": "embed",
     "scgen": "full",
 ]
+
+gpu_integrations = ["desc", "scgen", "trvaep"]
 
 /**
  * Integrate individual datasets into a single-cell atlas
@@ -32,10 +34,19 @@ workflow INTEGRATION {
     main:
         ch_integration_methods = ch_integration_methods
             .filter{ it != "scvi" && it != "scanvi" }
+            .branch{
+                gpu: it in gpu_integrations
+                cpu: it !in gpu_integrations
+            }
 
         INTEGRATE(
             ch_preprocessed,
-            ch_integration_methods
+            ch_integration_methods.cpu
+        )
+
+        INTEGRATE_GPU(
+            ch_preprocessed,
+            ch_integration_methods.gpu
         )
 
         INTEGRATE_SCVI(
@@ -49,6 +60,7 @@ workflow INTEGRATION {
         )
 
         ch_integrated = INTEGRATE.out.integrated
+            .mix(INTEGRATE_GPU.out.integrated)
             .mix(INTEGRATE_SCVI.out.integrated)
             .mix(INTEGRATE_SCANVI.out.integrated)
 
