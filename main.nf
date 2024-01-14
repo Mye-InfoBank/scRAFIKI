@@ -24,7 +24,8 @@ if (!params.celltypist_model) { exit 1, 'CellTypist model not specified!' }
 workflow {
     PREPROCESSING(ch_samplesheet)
 
-    ch_preprocessed = PREPROCESSING.out
+    ch_preprocessed = PREPROCESSING.out.simple
+    ch_hvgs = PREPROCESSING.out.hvgs
 
     COUNTS(ch_preprocessed, params.normalization_method)
 
@@ -34,7 +35,7 @@ workflow {
     )
 
     INTEGRATION(
-        ch_preprocessed,
+        ch_hvgs,
         Channel.from(params.integration_methods)
     )
 
@@ -47,7 +48,7 @@ workflow {
     }
 
     SOLO(
-        ch_preprocessed,
+        ch_hvgs,
         INTEGRATION.out.scanvi_model
     )
 
