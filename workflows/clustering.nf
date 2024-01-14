@@ -83,6 +83,52 @@ process LEIDEN {
     """
 }
 
+process ENTROPY {
+  tag "${meta.id}"
+
+  container "bigdatainbiomedicine/sc-rpy"
+  label "process_medium"
+
+  input:
+  tuple val(meta), val(resolution), path(adata)
+  
+  output:
+  tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.entropy.h5ad")
+  
+  script:
+  """
+  #!/opt/conda/bin/python
+
+  import anndata as ad
+  import anndata2ri
+  import rpy2.robjects as ro
+  rogue = ro.packages.importr('ROGUE')
+  _ = ro.packages.importr('tibble')
+
+  adata = ad.read_h5ad("$adata")
+  sce = anndata2ri.py2rpy(adata)
+  expression = ro.r("counts")(sce)
+
+  res = float("${resolution}")
+
+  label_col = f"leiden_{res:.2f}"
+  sample_col = "batch"
+
+  labels = anndata2ri.py2rpy(adata.obs[label_col])
+  samples = anndata2ri.py2rpy(adata.obs[sample_col])
+
+  result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI")
+  result = anndata2ri.rpy2py(result)
+  entropy_dict = result.to_dict()
+
+  adata.obs[f"{label_col}_entropy"] = adata.obs.apply(
+    lambda row: entropy_dict[row[label_col]][row[sample_col]], axis=1
+  )
+
+  adata.write_h5ad("${meta.id}.res_${resolution}.entropy.h5ad")
+  """
+}
+
 process CELLTYPIST_MAJORITY {
   tag "${meta.id}"
 
@@ -151,6 +197,7 @@ workflow CLUSTERING {
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out, ch_resolutions)
+        ENTROPY(LEIDEN.out)
         CELLTYPIST_MAJORITY(LEIDEN.out, ch_celltypist)
 
         MERGE_UMAP_LEIDEN(
