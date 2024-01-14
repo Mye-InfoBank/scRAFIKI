@@ -64,12 +64,17 @@ if args.method != "unintegrated":
             kwargs["gpu_id"] = torch.cuda.current_device()
 
     if args.method in ["scgen", "scanvi"]:
-        adata = method(adata, "batch", "cell_type", **kwargs)
+        adata_integrated = method(adata, "batch", "cell_type", **kwargs)
     else:
-        adata = method(adata, "batch", **kwargs)
+        adata_integrated = method(adata, "batch", **kwargs)
 
-if "X_emb" not in adata.obsm:
-    sc.pp.pca(adata)
-    adata.obsm["X_emb"] = adata.obsm["X_pca"]
+else:
+    adata_integrated = adata.copy()
+
+if "X_emb" not in adata_integrated.obsm:
+    sc.pp.pca(adata_integrated)
+    adata_integrated.obsm["X_emb"] = adata_integrated.obsm["X_pca"]
+
+adata.obsm["X_emb"] = adata_integrated.obsm["X_emb"]
 
 adata.write_h5ad(args.output)
