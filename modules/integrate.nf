@@ -3,8 +3,6 @@ process INTEGRATE {
   container "bigdatainbiomedicine/sc-scib"
 
   label "process_high"
-  label "process_high_memory"
-  errorStrategy 'retry'
 
   input:
   tuple val(meta), path(input)
