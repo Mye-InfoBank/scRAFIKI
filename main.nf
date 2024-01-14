@@ -36,7 +36,7 @@ workflow {
 
     INTEGRATION(
         ch_hvgs,
-        Channel.from(params.integration_methods)
+        Channel.from(params.integration_methods).mix(Channel.value("unintegrated"))
     )
 
     if (params.benchmark) {

@@ -14,6 +14,7 @@ integration_types = [
     "scvi": "embed",
     "trvaep": "embed",
     "scgen": "full",
+    "unintegrated": "embed"
 ]
 
 gpu_integrations = ["scgen"]
