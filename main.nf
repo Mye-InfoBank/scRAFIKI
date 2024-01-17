@@ -57,23 +57,21 @@ workflow {
         "human"
     )
 
-    ch_leiden_resolutions = Channel.from(params.leiden_resolutions)
-
     CLUSTERING(
         INTEGRATION.out.integrated,
-        ch_leiden_resolutions,
+        Channel.from(params.leiden_resolutions),
         CELLTYPIST.out
     )
 
     MERGE(
         ch_preprocessed,
-        CLUSTERING.out.map { meta, adata -> meta.integration }.collect(),
-        CLUSTERING.out.map { meta, adata -> adata }.collect(),
+        CLUSTERING.out.results.map { meta, adata -> meta.integration }.collect(),
+        CLUSTERING.out.results.map { meta, adata -> adata }.collect(),
         SOLO.out,
         COUNTS.out,
         CELLTYPIST.out,
         CELL_CYCLE.out,
-        ch_leiden_resolutions.collect()
+        CLUSTERING.out.keys.collect()
     )
 
 }

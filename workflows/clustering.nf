@@ -1,6 +1,7 @@
 include { NEIGHBORS } from "../modules/neighbors.nf"
 include { UMAP } from "../modules/umap.nf"
 include { LEIDEN } from "../modules/leiden.nf"
+include { SCSHC_CLUSTERING } from "../modules/sc_SHC.nf"
 include { ENTROPY } from "../modules/entropy.nf"
 include { CELLTYPIST_MAJORITY } from "../modules/celltypist.nf"
 include { MERGE_CLUSTERING } from "../modules/merge_clustering.nf"
@@ -16,19 +17,28 @@ workflow CLUSTERING {
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
-        ENTROPY(LEIDEN.out)
-        CELLTYPIST_MAJORITY(LEIDEN.out, ch_celltypist)
+        SCSHC_CLUSTERING(ch_adata)
 
-        ch_resolution = CELLTYPIST_MAJORITY.out.join(
+        ch_clusterings = LEIDEN.out.mix(
+            SCSHC_CLUSTERING.out
+        )
+
+        ENTROPY(ch_clusterings)
+        CELLTYPIST_MAJORITY(ch_clusterings, ch_celltypist)
+
+        ch_cluster_results = CELLTYPIST_MAJORITY.out.join(
             ENTROPY.out, by: [0, 1]
-        ) // meta, resolution, celltypist, entropy
+        ) // meta, clustering_key, celltypist, entropy
+
+        ch_clustering_keys = ch_cluster_results.map{ it[1] }.unique()
 
         MERGE_CLUSTERING(
             UMAP.out.join(
-                ch_resolution.groupTuple(by: 0), by: 0
+                ch_cluster_results.groupTuple(by: 0), by: 0
             )
         )
 
     emit:
-        MERGE_CLUSTERING.out
+        results = MERGE_CLUSTERING.out
+        keys = ch_clustering_keys
 }

@@ -26,14 +26,14 @@ process CELLTYPIST_MAJORITY {
     label "process_medium"
 
     input:
-    tuple val(meta), val(resolution), path(adata)
+    tuple val(meta), val(clustering_key), path(adata)
     tuple val(meta2), path(celltypist)
     
     output:
-    tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.majority.h5ad")
+    tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.majority.h5ad")
     
     script:
     """
-    celltypist_majority.py --input_clustering ${adata} --input_celltypist ${celltypist} --output ${meta.id}.res_${resolution}.majority.h5ad
+    celltypist_majority.py --input_clustering ${adata} --clustering_key ${clustering_key} --input_celltypist ${celltypist} --output ${meta.id}.${clustering_key}.majority.h5ad
     """
 }

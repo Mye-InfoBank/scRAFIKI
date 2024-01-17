@@ -8,9 +8,10 @@ process LEIDEN {
     tuple val(meta), path(adata), val(resolution)
 
     output:
-    tuple val(meta), val(resolution), path("*.h5ad")
+    tuple val(meta), val("${clustering_key}"), path("*.h5ad")
 
     script:
+    clustering_key = "leiden_${resolution}"
     """
     #!/opt/conda/bin/python
 
@@ -21,7 +22,7 @@ process LEIDEN {
     sc.settings.n_jobs = ${task.cpus}
 
     adata = sc.read_h5ad("${adata}")
-    sc.tl.leiden(adata, resolution=${resolution})
-    adata.write_h5ad("${meta.id}.res_${resolution}.leiden.h5ad")
+    sc.tl.leiden(adata, resolution=${resolution}, key_added="${clustering_key}")
+    adata.write_h5ad("${meta.id}.${clustering_key}.h5ad")
     """
 }

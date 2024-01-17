@@ -5,10 +5,10 @@ process ENTROPY {
   label "process_medium"
 
   input:
-  tuple val(meta), val(resolution), path(adata)
+  tuple val(meta), val(clustering_key), path(adata)
   
   output:
-  tuple val(meta), val(resolution), path("${meta.id}.res_${resolution}.entropy.h5ad")
+  tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.entropy.h5ad")
   
   script:
   """
@@ -25,9 +25,7 @@ process ENTROPY {
   sce = anndata2ri.py2rpy(adata)
   expression = ro.r("assay")(sce, "counts")
 
-  res = float("${resolution}")
-
-  label_col = "leiden"
+  label_col = "${clustering_key}"
   sample_col = "batch"
 
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
@@ -43,6 +41,6 @@ process ENTROPY {
     lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
   )
 
-  adata.write_h5ad("${meta.id}.res_${resolution}.entropy.h5ad")
+  adata.write_h5ad("${meta.id}.${clustering_key}.entropy.h5ad")
   """
 }

@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--input_clustering", type=str, help="input clustering h5ad file")
 parser.add_argument("--input_celltypist", type=str, help="input celltypist h5ad file")
-parser.add_argument("--cluster", type=str, help="cluster column name", default="leiden")
+parser.add_argument("--clustering_key", type=str, help="cluster column name", default="leiden")
 parser.add_argument("--min_prob", type=float, help="minimum probability", default=0)
 parser.add_argument("--output", type=str, help="output h5ad file")
 
@@ -18,7 +18,7 @@ adata = ad.read_h5ad(args.input_clustering)
 adata_celltypist = ad.read_h5ad(args.input_celltypist)
 
 predictions = adata_celltypist.obs["celltypist_prediction"]
-clustering = adata.obs[args.cluster]
+clustering = adata.obs[args.clustering_key]
 
 # The following section is based on https://github.com/Teichlab/celltypist/blob/777f8e92085492fcf61ff4a776c2a83600d7d1c0/celltypist/classifier.py#L444C10-L478C10
 
