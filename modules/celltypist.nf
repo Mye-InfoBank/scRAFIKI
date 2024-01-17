@@ -1,7 +1,7 @@
 process CELLTYPIST {
     tag "$meta.id"
 
-    container "bigdatainbiomedicine/sc-rpy"
+    container "bigdatainbiomedicine/sc-rpy:1.0"
 
     label "process_high"
     label "process_high_memory"

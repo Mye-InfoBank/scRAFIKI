@@ -1,6 +1,6 @@
 process INTEGRATE {
   tag "${method}"
-  container "bigdatainbiomedicine/sc-scib"
+  container "bigdatainbiomedicine/sc-scib:1.0"
 
   label "process_high"
 

@@ -1,6 +1,6 @@
 process MERGE {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-rpy"
+  container "bigdatainbiomedicine/sc-rpy:1.0"
 
   publishDir "${params.outdir}", mode: "${params.publish_mode}"
 

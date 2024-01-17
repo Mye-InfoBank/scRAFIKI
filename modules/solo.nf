@@ -4,7 +4,7 @@ nextflow.enable.dsl = 2
 
 process SOLO {
     tag "${meta.id}"
-    container "bigdatainbiomedicine/sc-scib"
+    container "bigdatainbiomedicine/sc-scib:1.0"
 
     label "process_medium"
 

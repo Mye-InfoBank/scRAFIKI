@@ -2,8 +2,8 @@ services:
   scib:
     build: 
       context: scib
-    image: bigdatainbiomedicine/sc-scib
+    image: bigdatainbiomedicine/sc-scib:1.0
   rpy:
     build: 
       context: rpy
-    image: bigdatainbiomedicine/sc-rpy
+    image: bigdatainbiomedicine/sc-rpy:1.0

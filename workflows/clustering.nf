@@ -1,7 +1,7 @@
 process NEIGHBORS {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.0"
     label "process_medium"
 
     input:
@@ -29,7 +29,7 @@ process NEIGHBORS {
 process UMAP {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.0"
     label "process_medium"
 
     input:
@@ -57,7 +57,7 @@ process UMAP {
 process LEIDEN {
     tag "${meta.id}:${resolution}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.0"
     label "process_medium"
 
     input:
@@ -86,7 +86,7 @@ process LEIDEN {
 process ENTROPY {
   tag "${meta.id}"
 
-  container "bigdatainbiomedicine/sc-rpy"
+  container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
 
   input:
@@ -136,7 +136,7 @@ process ENTROPY {
 process CELLTYPIST_MAJORITY {
   tag "${meta.id}"
 
-  container "bigdatainbiomedicine/sc-rpy"
+  container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
 
   input:
@@ -155,7 +155,7 @@ process CELLTYPIST_MAJORITY {
 process MERGE_UMAP_LEIDEN {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.0"
     label "process_medium"
 
 
