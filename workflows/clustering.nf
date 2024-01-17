@@ -2,6 +2,7 @@ include { NEIGHBORS } from "../modules/neighbors.nf"
 include { UMAP } from "../modules/umap.nf"
 include { LEIDEN } from "../modules/leiden.nf"
 include { SCSHC_CLUSTERING } from "../modules/sc_SHC.nf"
+include { SCSHC_CLUSTERING_QC } from "../modules/sc_SHC.nf"
 include { ENTROPY } from "../modules/entropy.nf"
 include { CELLTYPIST_MAJORITY } from "../modules/celltypist.nf"
 include { MERGE_CLUSTERING } from "../modules/merge_clustering.nf"
@@ -22,6 +23,8 @@ workflow CLUSTERING {
         ch_clusterings = LEIDEN.out.mix(
             SCSHC_CLUSTERING.out
         )
+
+        SCSHC_CLUSTERING_QC(ch_clusterings)
 
         ENTROPY(ch_clusterings)
         CELLTYPIST_MAJORITY(ch_clusterings, ch_celltypist)

@@ -8,7 +8,7 @@ process LEIDEN {
     tuple val(meta), path(adata), val(resolution)
 
     output:
-    tuple val(meta), val("${clustering_key}"), path("*.h5ad")
+    tuple val(meta), val("${clustering_key}"), path("${meta.id}.${clustering_key}.clustering.h5ad")
 
     script:
     clustering_key = "leiden_${resolution}"
@@ -23,6 +23,6 @@ process LEIDEN {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.leiden(adata, resolution=${resolution}, key_added="${clustering_key}")
-    adata.write_h5ad("${meta.id}.${clustering_key}.h5ad")
+    adata.write_h5ad("${meta.id}.${clustering_key}.clustering.h5ad")
     """
 }
