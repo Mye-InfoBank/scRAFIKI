@@ -57,11 +57,11 @@ workflow {
         "human"
     )
 
-    ch_resolutions = Channel.from(params.clustering_resolutions)
+    ch_leiden_resolutions = Channel.from(params.leiden_resolutions)
 
     CLUSTERING(
         INTEGRATION.out.integrated,
-        ch_resolutions,
+        ch_leiden_resolutions,
         CELLTYPIST.out
     )
 
@@ -73,7 +73,7 @@ workflow {
         COUNTS.out,
         CELLTYPIST.out,
         CELL_CYCLE.out,
-        ch_resolutions.collect()
+        ch_leiden_resolutions.collect()
     )
 
 }

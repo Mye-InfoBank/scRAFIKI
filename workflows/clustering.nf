@@ -9,13 +9,13 @@ include { MERGE_CLUSTERING } from "../modules/merge_clustering.nf"
 workflow CLUSTERING {
     take:
         ch_adata
-        ch_resolutions
+        ch_leiden_resolutions
         ch_celltypist
 
     main:
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
-        LEIDEN(NEIGHBORS.out, ch_resolutions)
+        LEIDEN(NEIGHBORS.out, ch_leiden_resolutions)
         ENTROPY(LEIDEN.out)
         CELLTYPIST_MAJORITY(LEIDEN.out, ch_celltypist)
 
