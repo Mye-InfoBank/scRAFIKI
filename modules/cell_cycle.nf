@@ -21,6 +21,7 @@ process CELL_CYCLE {
         import scanpy as sc
         import scib
 
+        print("Reading data")
         adata = sc.read_h5ad("${adata}")
 
         print("Preprocessing")
