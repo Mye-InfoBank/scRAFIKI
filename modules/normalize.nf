@@ -14,11 +14,15 @@ process NORMALIZE {
     tuple val(meta), path("normalized.h5ad")
 
     script:
-    if (normalization == "scTransform")
+    if (normalization == "raw")
+        """
+        ln -s ${adata} normalized.h5ad
+        """
+    else if (normalization == "scTransform")
         """
         sctransform.py --input ${adata} --output normalized.h5ad
         """
-    else if (normalization == "scanpy")
+    else if (normalization == "log_total")
         """
         #!/opt/conda/bin/python
 
@@ -31,10 +35,22 @@ process NORMALIZE {
 
         adata.write_h5ad("normalized.h5ad")
         """
+    else if (normalization == "pearson_residuals")
+        """
+        #!/opt/conda/bin/python
+
+        import scanpy as sc
+
+        adata = sc.read_h5ad("${adata}")
+
+        sc.experimental.pp.normalize_pearson_residuals(adata)
+
+        adata.write_h5ad("normalized.h5ad")
+        """
     else
         """
         echo "Unknown normalization method: ${normalization}"
-        echo "Valid options are: scTransform, scanpy"
+        echo "Valid options are: scTransform, log_total, pearson_residuals or raw"
         exit 1
         """
 }
