@@ -9,14 +9,8 @@ workflow COUNTS {
     main:
         DECONTX(ch_preprocessed)
 
-        ch_counts = DECONTX.out
-
-        if (params.normalize) {
-            NORMALIZE(ch_counts, normalization)
-
-            ch_counts = NORMALIZE.out
-        }
+        NORMALIZE(DECONTX.out, normalization)
 
     emit:
-        ch_counts
+        NORMALIZE.out
 }
