@@ -5,8 +5,7 @@ process LEIDEN {
     label "process_medium"
 
     input:
-    tuple val(meta), path(adata)
-    each resolution
+    tuple val(meta), path(adata), val(resolution)
 
     output:
     tuple val(meta), val(resolution), path("*.h5ad")

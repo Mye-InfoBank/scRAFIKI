@@ -15,7 +15,7 @@ workflow CLUSTERING {
     main:
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
-        LEIDEN(NEIGHBORS.out, ch_leiden_resolutions)
+        LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
         ENTROPY(LEIDEN.out)
         CELLTYPIST_MAJORITY(LEIDEN.out, ch_celltypist)
 
