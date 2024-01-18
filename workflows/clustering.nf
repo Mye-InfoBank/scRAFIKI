@@ -84,10 +84,11 @@ process LEIDEN {
 }
 
 process ENTROPY {
-  tag "${meta.id}"
+  tag "${meta.id}:${resolution}"
 
   container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
+  errorStrategy 'ignore'
 
   input:
   tuple val(meta), val(resolution), path(adata)
@@ -118,16 +119,24 @@ process ENTROPY {
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
   samples = anndata2ri.py2rpy(adata.obs[sample_col])
 
-  try:
-    result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI")
-    result = anndata2ri.rpy2py(result)
-    entropy_dict = result.to_dict()
+  smoothness = 0.5
 
-    adata.obs[f"entropy"] = adata.obs.apply(
-      lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
-    )
-  except:
-    print("Failed to compute entropy")
+  while not "entropy" in adata.obs.columns:
+    try:
+      result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI", span=smoothness)
+      result = anndata2ri.rpy2py(result)
+      entropy_dict = result.to_dict()
+
+      adata.obs["entropy"] = adata.obs.apply(
+        lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
+      )
+    except:
+      print(f"Failed to compute entropy for ${meta.id} at resolution ${resolution} with smoothness {smoothness}")
+      
+      if smoothness >= 1:
+        exit(1)
+      else:
+        smoothness += 0.1
 
   adata.write_h5ad("${meta.id}.res_${resolution}.entropy.h5ad")
   """
