@@ -7,3 +7,7 @@ services:
     build: 
       context: rpy
     image: bigdatainbiomedicine/sc-rpy:1.0
+  rapids:
+    build: 
+      context: rapids
+    image: bigdatainbiomedicine/sc-rapids:0.1
