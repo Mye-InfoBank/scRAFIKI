@@ -133,10 +133,11 @@ process ENTROPY {
     except:
       print(f"Failed to compute entropy for ${meta.id} at resolution ${resolution} with smoothness {smoothness}")
       
-      if smoothness >= 1:
-        exit(1)
+      if smoothness > 5:
+        print("Giving up")
+        break
       else:
-        smoothness += 0.1
+        smoothness = smoothness * 1.2
 
   adata.write_h5ad("${meta.id}.res_${resolution}.entropy.h5ad")
   """
