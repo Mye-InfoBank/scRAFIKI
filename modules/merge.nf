@@ -25,6 +25,7 @@ process MERGE {
 
   import anndata as ad
   import pandas as pd
+  from scipy.sparse import csc_matrix
 
   adata = ad.read_h5ad("${original_adata}")
 
@@ -44,7 +45,7 @@ process MERGE {
         adata.obs[integration_name + '_' + majority_key] = integration_adata.obs[majority_key].copy()
 
         if entropy_key in integration_adata.obs.keys():
-          adata.obs[integration_name + '_' + entropy_key] = integration_adata.obs[entropy_key].copy()
+          adata.obs[integration_name + '_' + entropy_key] = integration_adata.obs[entropy_key].astype('float32').copy()
 
       del integration_adata
 
@@ -58,18 +59,26 @@ process MERGE {
 
   celltypist_adata = ad.read_h5ad("$celltypist")
   adata.obs["celltypist_prediction"] = celltypist_adata.obs["celltypist_prediction"].values
-  adata.obs["celltypist_conf_score"] = celltypist_adata.obs["celltypist_conf_score"].values
+  adata.obs["celltypist_conf_score"] = celltypist_adata.obs["celltypist_conf_score"].astype('float32').values
   del celltypist_adata
 
   cell_cycle_adata = ad.read_h5ad("$cell_cycle")
-  adata.obs["S_score"] = cell_cycle_adata.obs["S_score"].values
-  adata.obs["G2M_score"] = cell_cycle_adata.obs["G2M_score"].values
+  adata.obs["S_score"] = cell_cycle_adata.obs["S_score"].astype('float32').values
+  adata.obs["G2M_score"] = cell_cycle_adata.obs["G2M_score"].astype('float32').values
   adata.obs["cycle_phase"] = cell_cycle_adata.obs["phase"].values
   del cell_cycle_adata
 
-  adata.obs["solo_doublet_score"] = solo_df["doublet"].values
-  adata.obs["solo_singlet_score"] = solo_df["singlet"].values
+  adata.obs["solo_doublet_score"] = solo_df["doublet"].astype('float32').values
+  adata.obs["solo_singlet_score"] = solo_df["singlet"].astype('float32').values
   adata.obs["solo_label"] = solo_df["label"].values
+
+  # Convert everything to float32 csc_matrix
+  for key in adata.layers.keys():
+    adata.layers[key] = csc_matrix(adata.layers[key]).astype('float32')
+  adata.X = csc_matrix(adata.X).astype('float32')
+  
+  for key in adata.obsm.keys():
+    adata.obsm[key] = adata.obsm[key].astype('float32')
 
   adata.write('merged.h5ad')
   """
