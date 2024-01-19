@@ -1,7 +1,7 @@
 process NEIGHBORS {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.0"
+    container = "bigdatainbiomedicine/sc-rapids:0.5"
     label "process_medium"
 
     input:
@@ -14,14 +14,12 @@ process NEIGHBORS {
     """
     #!/opt/conda/bin/python
 
-    import scanpy as sc
-    from threadpoolctl import threadpool_limits
+    import anndata as ad
+    import rapids_singlecell as rsc
 
-    threadpool_limits(${task.cpus})
-    sc.settings.n_jobs = ${task.cpus}
-
-    adata = sc.read_h5ad("${adata}")
-    sc.pp.neighbors(adata, use_rep="X_emb")
+    adata = ad.read_h5ad("${adata}")
+    rsc.utils.anndata_to_GPU(adata)
+    rsc.pp.neighbors(adata, use_rep="X_emb")
     adata.write_h5ad("${meta.id}.neighbors.h5ad")
     """
 }
@@ -88,7 +86,6 @@ process ENTROPY {
 
   container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
-  errorStrategy 'ignore'
 
   input:
   tuple val(meta), val(resolution), path(adata)

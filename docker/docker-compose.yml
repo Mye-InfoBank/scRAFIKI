@@ -10,4 +10,4 @@ services:
   rapids:
     build: 
       context: rapids
-    image: bigdatainbiomedicine/sc-rapids:0.1
+    image: bigdatainbiomedicine/sc-rapids:0.5
