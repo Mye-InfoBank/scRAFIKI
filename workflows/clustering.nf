@@ -15,11 +15,19 @@ process NEIGHBORS {
     #!/opt/conda/bin/python
 
     import anndata as ad
-    import rapids_singlecell as rsc
+    try:
+      import rapids_singlecell as sc
+      cuda = True
+    except:
+      import scanpy as sc
+      cuda = False
 
     adata = ad.read_h5ad("${adata}")
-    rsc.utils.anndata_to_GPU(adata)
-    rsc.pp.neighbors(adata, use_rep="X_emb")
+
+    if cuda:
+      sc.utils.anndata_to_GPU(adata)
+
+    sc.pp.neighbors(adata, use_rep="X_emb")
     adata.write_h5ad("${meta.id}.neighbors.h5ad")
     """
 }
@@ -27,7 +35,7 @@ process NEIGHBORS {
 process UMAP {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.0"
+    container = "bigdatainbiomedicine/sc-rapids:0.5"
     label "process_medium"
 
     input:
@@ -40,13 +48,19 @@ process UMAP {
     """
     #!/opt/conda/bin/python
 
-    import scanpy as sc
-    from threadpoolctl import threadpool_limits
-
-    threadpool_limits(${task.cpus})
-    sc.settings.n_jobs = ${task.cpus}
+    import anndata as ad
+    try:
+      import rapids_singlecell as sc
+      cuda = True
+    except:
+      import scanpy as sc
+      cuda = False
 
     adata = sc.read_h5ad("${adata}")
+
+    if cuda:
+      sc.utils.anndata_to_GPU(adata)
+
     sc.tl.umap(adata)
     adata.write_h5ad("${meta.id}.umap.h5ad")
     """
@@ -55,7 +69,7 @@ process UMAP {
 process LEIDEN {
     tag "${meta.id}:${resolution}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.0"
+    container = "bigdatainbiomedicine/sc-rapids:0.5"
     label "process_medium"
 
     input:
@@ -69,13 +83,19 @@ process LEIDEN {
     """
     #!/opt/conda/bin/python
 
-    import scanpy as sc
-    from threadpoolctl import threadpool_limits
-
-    threadpool_limits(${task.cpus})
-    sc.settings.n_jobs = ${task.cpus}
+    import anndata as ad
+    try:
+      import rapids_singlecell as sc
+      cuda = True
+    except:
+      import scanpy as sc
+      cuda = False
 
     adata = sc.read_h5ad("${adata}")
+
+    if cuda:
+      sc.utils.anndata_to_GPU(adata)
+
     sc.tl.leiden(adata, resolution=${resolution})
     adata.write_h5ad("${meta.id}.res_${resolution}.leiden.h5ad")
     """
