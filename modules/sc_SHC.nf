@@ -1,7 +1,7 @@
 process SCSHC_CLUSTERING {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.1"
     label "process_medium"
 
     input:
@@ -39,7 +39,7 @@ process SCSHC_CLUSTERING {
 process SCSHC_CLUSTERING_QC {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.1"
     label "process_medium"
 
     input:

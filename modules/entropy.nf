@@ -1,8 +1,10 @@
 process ENTROPY {
   tag "${meta.id}"
 
-  container "bigdatainbiomedicine/sc-rpy"
+  container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
+  errorStrategy 'retry'
+  maxRetries 7
 
   input:
   tuple val(meta), val(clustering_key), path(adata)

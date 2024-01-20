@@ -1,7 +1,7 @@
 process LEIDEN {
     tag "${meta.id}:${resolution}"
 
-    container = "bigdatainbiomedicine/sc-rpy"
+    container = "bigdatainbiomedicine/sc-rpy:1.0"
     label "process_medium"
 
     input:
