@@ -120,7 +120,7 @@ process ENTROPY {
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
   samples = anndata2ri.py2rpy(adata.obs[sample_col])
 
-  smoothness = 0.5 * (1.2 ** ${task.attempt})
+  smoothness = 0.5 * (1.2 ** (${task.attempt} - 1))
 
   result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI", span=smoothness)
   result = anndata2ri.rpy2py(result)
