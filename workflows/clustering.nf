@@ -88,7 +88,8 @@ process ENTROPY {
 
   container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
-  errorStrategy 'ignore'
+  errorStrategy 'retry'
+  maxRetries 7
 
   input:
   tuple val(meta), val(resolution), path(adata)
@@ -119,25 +120,15 @@ process ENTROPY {
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
   samples = anndata2ri.py2rpy(adata.obs[sample_col])
 
-  smoothness = 0.5
+  smoothness = 0.5 * (1.2 ** ${task.attempt})
 
-  while not "entropy" in adata.obs.columns:
-    try:
-      result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI", span=smoothness)
-      result = anndata2ri.rpy2py(result)
-      entropy_dict = result.to_dict()
+  result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI", span=smoothness)
+  result = anndata2ri.rpy2py(result)
+  entropy_dict = result.to_dict()
 
-      adata.obs["entropy"] = adata.obs.apply(
-        lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
-      )
-    except:
-      print(f"Failed to compute entropy for ${meta.id} at resolution ${resolution} with smoothness {smoothness}")
-      
-      if smoothness > 5:
-        print("Giving up")
-        break
-      else:
-        smoothness = smoothness * 1.2
+  adata.obs["entropy"] = adata.obs.apply(
+    lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
+  )
 
   adata.write_h5ad("${meta.id}.res_${resolution}.entropy.h5ad")
   """
