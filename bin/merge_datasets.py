@@ -32,7 +32,7 @@ for dataset in datasets:
                     f"Column {column} is required but not found in {dataset}"
                 )
             else:
-                dataset.obs[column] = "unknown"
+                dataset.obs[column] = "Unknown"
 
     # Subset columns
     dataset.obs = dataset.obs[columns_required.keys()]
@@ -57,9 +57,29 @@ merged.X = csr_matrix(merged.X)
 merged.obs["batch"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["batch"].astype(str)
 merged.obs["patient"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["patient"].astype(str)
 
+def to_Florent_case(s: str):
+    corrected = s.lower().strip()
+
+    if corrected in ["na", "nan", "null", "unknown"]:
+        return "Unknown"
+
+    corrected = s \
+        .replace(" ", "_") \
+        .replace("-", "_")
+
+    if corrected.endswith("s"):
+        corrected = corrected[:-1]
+
+    corrected = corrected.strip(" _")
+
+    if not corrected:
+        return "Unknown"
+
+    return corrected[0].upper() + corrected[1:]
+
 for column in columns_required.keys():
     # Convert first to string and then to category
-    merged.obs[column] = merged.obs[column].astype(str).astype("category")
+    merged.obs[column] = merged.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
 
 merged.layers["counts"] = merged.X.copy()
 
