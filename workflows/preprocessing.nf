@@ -2,6 +2,7 @@ include { check_samplesheet } from '../modules/check_samplesheet'
 
 include { FILTER } from "../modules/filter.nf"
 include { MERGE_DATASETS } from "../modules/merge_datasets.nf"
+include { COMPOSITION } from "../modules/composition.nf"
 include { IDENTIFY_HVGS } from "../modules/identify_hvgs.nf"
 
 workflow PREPROCESSING {
@@ -15,6 +16,8 @@ workflow PREPROCESSING {
 
         ch_preprocessed = MERGE_DATASETS.out
             .map{ adata -> [[id: "preprocessed"], adata] }
+
+        COMPOSITION(ch_preprocessed)
 
         IDENTIFY_HVGS(
             ch_preprocessed,
