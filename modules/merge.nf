@@ -38,6 +38,9 @@ process MERGE {
       adata.obsm['X_' + integration_name] = integration_adata.obsm['X_umap'].copy()
 
       for clustering_key in clustering_keys:
+        if clustering_key not in integration_adata.obs.columns:
+          continue
+
         majority_key = f"{clustering_key}_celltypist_majority"
         entropy_key = f"{clustering_key}_entropy"
         adata.obs[integration_name + '_' + clustering_key] = integration_adata.obs[clustering_key].copy()

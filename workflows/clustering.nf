@@ -18,11 +18,9 @@ workflow CLUSTERING {
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
-        SCSHC_CLUSTERING(ch_adata)
+        SCSHC_CLUSTERING(ch_adata.filter{ meta, adata -> meta.integration == "unintegrated" })
 
-        ch_clusterings = LEIDEN.out.mix(
-            SCSHC_CLUSTERING.out
-        )
+        ch_clusterings = LEIDEN.out.mix(SCSHC_CLUSTERING.out)
 
         SCSHC_CLUSTERING_QC(ch_clusterings)
 
@@ -36,7 +34,7 @@ workflow CLUSTERING {
         ch_clustering_keys = ch_cluster_results.map{ it[1] }.unique()
 
         MERGE_CLUSTERING(
-            UMAP.out.join(
+            UMAP.out.combine(
                 ch_cluster_results.groupTuple(by: 0), by: 0
             )
         )
