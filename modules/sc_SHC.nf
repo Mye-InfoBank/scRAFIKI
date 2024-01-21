@@ -2,7 +2,7 @@ process SCSHC_CLUSTERING {
     tag "${meta.id}"
 
     container = "bigdatainbiomedicine/sc-rpy:1.1"
-    label "process_medium"
+    label "process_high"
 
     input:
     tuple val(meta), path(adata)
@@ -40,14 +40,15 @@ process SCSHC_CLUSTERING_QC {
     tag "${meta.id}"
 
     container = "bigdatainbiomedicine/sc-rpy:1.1"
-    publishDir "${params.outdir}/composition", mode: "${params.publish_mode}", pattern: "*.png"
-    label "process_medium"
+    publishDir "${params.outdir}/clustering_qc", mode: "${params.publish_mode}", pattern: "*.png"
+    label "process_high"
 
     input:
     tuple val(meta), val(clustering_key), path(adata)
 
     output:
-    tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.clustering.qc.h5ad")
+    tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.clustering.qc.h5ad"), emit: adata
+    tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.qc.png"), emit: png, optional: true
 
     script:
     """
