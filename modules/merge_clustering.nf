@@ -6,7 +6,7 @@ process MERGE_CLUSTERING {
 
 
     input:
-    tuple val(meta), path(adata_umap), val(clustering_keys), path(adata_celltypist), path(adata_entropy)
+    tuple val(meta), path(adata_umap), val(clustering_keys), path(adata_celltypist), path(adata_entropy), path(adata_qc)
 
     output:
     tuple val(meta), path("*.h5ad")
@@ -24,15 +24,18 @@ process MERGE_CLUSTERING {
     clustering_keys = "${clustering_keys.join(" ")}".split(" ")
     celltypist_adatas = "${adata_celltypist}".split(" ")
     entropy_adatas = "${adata_entropy}".split(" ")
+    qc_adatas = "${adata_qc}".split(" ")
 
     adata_umap = sc.read_h5ad("${adata_umap}")
-    for clustering_key, celltypist_path, entropy_path in zip(clustering_keys, celltypist_adatas, entropy_adatas):
+    for clustering_key, celltypist_path, entropy_path, qc_path in zip(clustering_keys, celltypist_adatas, entropy_adatas, qc_adatas):
         tmp_adata = sc.read_h5ad(celltypist_path)
         adata_umap.obs[clustering_key] = tmp_adata.obs[clustering_key]
         adata_umap.obs[f"{clustering_key}_celltypist_majority"] = tmp_adata.obs["celltypist_majority"]
         tmp_adata = sc.read_h5ad(entropy_path)
         if "entropy" in tmp_adata.obs.columns:
             adata_umap.obs[f"{clustering_key}_entropy"] = tmp_adata.obs["entropy"]
+        tmp_adata = sc.read_h5ad(qc_path)
+        adata_umap.obs[f"{clustering_key}_qc"] = tmp_adata.obs["qc"]
 
     adata_umap.write_h5ad("${meta.id}.umap_leiden.h5ad")
     """

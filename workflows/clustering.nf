@@ -29,7 +29,9 @@ workflow CLUSTERING {
 
         ch_cluster_results = CELLTYPIST_MAJORITY.out.join(
             ENTROPY.out, by: [0, 1]
-        ) // meta, clustering_key, celltypist, entropy
+        ).join(
+            SCSHC_CLUSTERING_QC.out, by: [0, 1]
+        ) // meta, clustering_key, celltypist, entropy, qc
 
         ch_clustering_keys = ch_cluster_results.map{ it[1] }.unique()
 
