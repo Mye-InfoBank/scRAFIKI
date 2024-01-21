@@ -46,7 +46,7 @@ process MERGE {
         qc_key = f"{clustering_key}_qc"
         adata.obs[integration_name + '_' + clustering_key] = integration_adata.obs[clustering_key].copy()
         adata.obs[integration_name + '_' + majority_key] = integration_adata.obs[majority_key].copy()
-        adata.obs[integration_name + '_' + qc_key] = integration_adata.obs[qc_key].copy()
+        adata.obs[integration_name + '_' + qc_key] = integration_adata.obs[qc_key].astype('float32').copy()
 
         if entropy_key in integration_adata.obs.keys():
           adata.obs[integration_name + '_' + entropy_key] = integration_adata.obs[entropy_key].astype('float32').copy()
