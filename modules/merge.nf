@@ -29,8 +29,8 @@ process MERGE {
 
   counts_adata = ad.read_h5ad("$counts")
   for layer in counts_adata.layers.keys():
-    adata.layers[layer] = counts_adata.layers[layer]
-  adata.X = counts_adata.X
+    adata.layers[layer] = csc_matrix(counts_adata.layers[layer]).astype(np.float32)
+  adata.X = csc_matrix(counts_adata.X).astype(np.float32)
   del counts_adata
 
   obsm_paths = "${obsm}".split(' ')
@@ -38,13 +38,17 @@ process MERGE {
   for obsm_path in obsm_paths:
     array = np.load(obsm_path)
     name = os.path.basename(obsm_path).split('.')[0]
-    adata.obsm[name] = array
+    adata.obsm[name] = np.float32(array)
   
   obs_paths = "${obs}".split(' ')
 
   for obs_path in obs_paths:
     df = pd.read_pickle(obs_path)
     adata.obs = pd.concat([adata.obs, df], axis=1)
+  
+  for col in adata.obs.columns:
+    if adata.obs[col].dtype == np.float64:
+      adata.obs[col] = adata.obs[col].astype(np.float32)
 
   adata.write('merged.h5ad')
   """
