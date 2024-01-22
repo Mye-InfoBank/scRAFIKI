@@ -2,6 +2,7 @@ include { INTEGRATE } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
+include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
 
 integration_types = [
     "bbknn": "knn",
@@ -68,9 +69,11 @@ workflow INTEGRATION {
         ch_integrated_types = ch_integrated
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
+        EXTRACT_EMBEDDING(ch_integrated)
 
     emit:
         integrated = ch_integrated
         integrated_types = ch_integrated_types
         scanvi_model = INTEGRATE_SCANVI.out.model
+        obsm = EXTRACT_EMBEDDING.out
 }

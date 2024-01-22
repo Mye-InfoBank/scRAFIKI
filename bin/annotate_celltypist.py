@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--input", type=argparse.FileType("r"), help="input h5ad file")
-parser.add_argument("--output", type=argparse.FileType("w"), help="output h5ad file")
+parser.add_argument("--output", type=argparse.FileType("w"), help="output pickle file")
 parser.add_argument("--model", type=str, help="The celltypist model file to use")
 
 args = parser.parse_args()
@@ -36,12 +36,10 @@ predictions = celltypist.annotate(
 )
 predictions_adata = predictions.to_adata()
 
-adata.obs["celltypist_prediction"] = predictions_adata.obs.loc[
-    adata.obs.index, "predicted_labels"
+df_celltypist = predictions_adata.obs.loc[
+    adata.obs.index, ["predicted_labels", "conf_score"]
 ]
 
-adata.obs["celltypist_conf_score"] = predictions_adata.obs.loc[
-    adata.obs.index, "conf_score"
-]
+df_celltypist.columns = ["celltypist_prediction", "celltypist_confidence"]
 
-adata.write_h5ad(args.output.name)
+df_celltypist.to_pickle(args.output.name)

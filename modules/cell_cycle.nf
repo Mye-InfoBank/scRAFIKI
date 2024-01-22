@@ -12,7 +12,10 @@ process CELL_CYCLE {
         val(organism)
 
     output:
-        tuple val(meta), path("${meta.id}.cell_cycle.h5ad")
+        tuple val(meta), path("${meta.id}.cell_cycle.pkl")
+
+    when:
+        task.ext.when == null || task.ext.when
 
     script:
         """
@@ -35,6 +38,10 @@ process CELL_CYCLE {
         print("Cell cycle scoring")
         scib.pp.score_cell_cycle(adata, "${organism}")
 
-        adata.write_h5ad("${meta.id}.cell_cycle.h5ad")
+        df_cell_cycle = adata.obs[["G2M_score", "S_score", "phase"]]
+        df_cell_cycle.columns = ["G2M_score", "S_score", "cycle_phase"]
+
+        print("Saving results")
+        df_cell_cycle.to_pickle("${meta.id}.cell_cycle.pkl")
         """
 }

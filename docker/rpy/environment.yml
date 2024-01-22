@@ -1,4 +1,4 @@
-name: base
+name: single-cell
 channels:
 - bioconda
 - conda-forge
@@ -9,9 +9,11 @@ dependencies:
 - alsa-lib=1.2.10=hd590300_0
 - anndata=0.10.4=pyhd8ed1ab_0
 - anndata2ri=1.3.1=pyhdfd78af_0
+- anytree=2.8.0=pyh9f0ad1d_0
 - argcomplete=3.2.1=pyhd8ed1ab_0
 - arpack=3.8.0=nompi_h0baa96a_101
 - array-api-compat=1.4=pyhd8ed1ab_0
+- atk-1.0=2.38.0=hd4edc92_1
 - attr=2.5.1=h166bdaf_1
 - binutils_impl_linux-64=2.40=hf600244_0
 - bioconductor-beachmat=2.18.0=r43hf17093f_0
@@ -44,6 +46,7 @@ dependencies:
 - bioconductor-scaledmatrix=1.10.0=r43hdfd78af_0
 - bioconductor-scater=1.30.1=r43hdfd78af_0
 - bioconductor-scran=1.30.0=r43hf17093f_0
+- bioconductor-scry=1.14.0=r43hdfd78af_0
 - bioconductor-scuttle=1.12.0=r43hf17093f_0
 - bioconductor-singlecellexperiment=1.24.0=r43hdfd78af_0
 - bioconductor-singler=2.4.0=r43hf17093f_0
@@ -87,18 +90,23 @@ dependencies:
 - freetype=2.12.1=h267a509_2
 - fribidi=1.0.10=h36c2ea0_0
 - gcc_impl_linux-64=13.2.0=h338b0a0_3
+- gdk-pixbuf=2.42.10=h829c605_4
 - get-annotations=0.1.2=pyhd8ed1ab_0
 - get_version=3.5.5=pyhd8ed1ab_0
 - gettext=0.21.1=h27087fc_0
 - gfortran_impl_linux-64=13.2.0=h76e1118_3
+- giflib=5.2.1=h0b41bf4_3
 - git=2.43.0=pl5321h7bc287a_0
 - glib=2.78.3=hfc55251_0
 - glib-tools=2.78.3=hfc55251_0
 - glpk=5.0=h445213a_0
 - gmp=6.3.0=h59595ed_0
 - graphite2=1.3.13=h58526e2_1001
+- graphviz=9.0.0=h78e8752_1
 - gst-plugins-base=1.22.8=h8e1006c_1
 - gstreamer=1.22.8=h98fc4e7_1
+- gtk2=2.24.33=h7f000aa_3
+- gts=0.7.6=h977cf35_4
 - gxx_impl_linux-64=13.2.0=h338b0a0_3
 - h5py=3.10.0=nompi_py311hebc2b07_101
 - harfbuzz=8.3.0=h3d44ed6_0
@@ -141,6 +149,7 @@ dependencies:
 - libgcc-devel_linux-64=13.2.0=ha9c7c90_103
 - libgcc-ng=13.2.0=h807b86a_3
 - libgcrypt=1.10.3=hd590300_0
+- libgd=2.3.3=h119a65a_9
 - libgfortran-ng=13.2.0=h69a702a_3
 - libgfortran5=13.2.0=ha4646dd_3
 - libgit2=1.7.1=h76de150_1
@@ -161,6 +170,7 @@ dependencies:
 - libopus=1.3.1=h7f98852_1
 - libpng=1.6.39=h753d276_0
 - libpq=16.1=h33b98f1_7
+- librsvg=2.56.3=h98fae49_0
 - libsanitizer=13.2.0=h7e041cc_3
 - libsndfile=1.2.2=hc60ed4a_1
 - libsqlite=3.44.2=h2797004_0
@@ -171,6 +181,7 @@ dependencies:
 - libtiff=4.6.0=ha9c0a0a_2
 - libuuid=2.38.1=h0b41bf4_0
 - libvorbis=1.3.7=h9c3ff4c_0
+- libwebp=1.3.2=h658648e_1
 - libwebp-base=1.3.2=hd590300_0
 - libxcb=1.15=h0b41bf4_0
 - libxcrypt=4.4.36=hd590300_1
@@ -297,6 +308,7 @@ dependencies:
 - r-ggridges=0.5.5=r43hc72bb7e_0
 - r-gh=1.4.0=r43hc72bb7e_1
 - r-gitcreds=0.1.2=r43hc72bb7e_2
+- r-glmpca=0.2.0=r43hc72bb7e_2
 - r-globaloptions=0.1.2=r43ha770c72_2
 - r-globals=0.16.2=r43hc72bb7e_1
 - r-glue=1.7.0=r43h57805ef_0

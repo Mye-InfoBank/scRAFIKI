@@ -6,4 +6,4 @@ services:
   rpy:
     build: 
       context: rpy
-    image: bigdatainbiomedicine/sc-rpy:1.0
+    image: bigdatainbiomedicine/sc-rpy:1.1
