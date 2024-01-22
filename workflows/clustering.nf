@@ -20,28 +20,18 @@ workflow CLUSTERING {
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
         SCSHC_CLUSTERING(ch_adata.filter{ meta, adata -> meta.integration == "unintegrated" })
 
-        ch_clusterings = LEIDEN.out.mix(SCSHC_CLUSTERING.out)
+        ch_clustering_adatas = LEIDEN.out.adata.mix(SCSHC_CLUSTERING.out.adata)
+        ch_clustering_tables = LEIDEN.out.table.mix(SCSHC_CLUSTERING.out.table)
 
-        SCSHC_CLUSTERING_QC(ch_clusterings)
+        SCSHC_CLUSTERING_QC(ch_clustering_adatas)
+        ENTROPY(ch_clustering_adatas)
+        CELLTYPIST_MAJORITY(ch_clustering_tables, ch_celltypist)
 
-        ENTROPY(ch_clusterings)
-        CELLTYPIST_MAJORITY(ch_clusterings, ch_celltypist)
-
-        ch_cluster_results = CELLTYPIST_MAJORITY.out.join(
-            ENTROPY.out, by: [0, 1]
-        ).join(
-            SCSHC_CLUSTERING_QC.out.adata, by: [0, 1]
-        ) // meta, clustering_key, celltypist, entropy, qc
-
-        ch_clustering_keys = ch_cluster_results.map{ it[1] }.unique()
-
-        MERGE_CLUSTERING(
-            UMAP.out.combine(
-                ch_cluster_results.groupTuple(by: 0), by: 0
-            )
+        ch_clustering = ch_clustering_tables.mix(
+            SCSHC_CLUSTERING_QC.out.table, ENTROPY.out, CELLTYPIST_MAJORITY.out
         )
 
     emit:
-        results = MERGE_CLUSTERING.out
-        keys = ch_clustering_keys
+        obs = ch_clustering
+        obsm = UMAP.out
 }

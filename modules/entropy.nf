@@ -7,10 +7,13 @@ process ENTROPY {
   maxRetries 7
 
   input:
-  tuple val(meta), val(clustering_key), path(adata)
+  tuple val(meta), path(adata)
   
   output:
-  tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.entropy.h5ad")
+  tuple val(meta), path("${meta.id}.entropy.pkl")
+
+  when:
+  task.ext.when == null || task.ext.when
   
   script:
   """
@@ -27,7 +30,7 @@ process ENTROPY {
   sce = anndata2ri.py2rpy(adata)
   expression = ro.r("assay")(sce, "counts")
 
-  label_col = "${clustering_key}"
+  label_col = "${meta.id}"
   sample_col = "batch"
 
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
@@ -39,10 +42,10 @@ process ENTROPY {
   result = anndata2ri.rpy2py(result)
   entropy_dict = result.to_dict()
 
-  adata.obs["entropy"] = adata.obs.apply(
+  df_entropy = adata.obs.apply(
     lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
   )
 
-  adata.write_h5ad("${meta.id}.${clustering_key}.entropy.h5ad")
+  df_entropy.to_pickle("${meta.id}.entropy.pkl")
   """
 }

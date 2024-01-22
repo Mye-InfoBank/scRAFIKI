@@ -11,11 +11,14 @@ process CELLTYPIST {
     val(model)
     
     output:
-    tuple val(meta), path("${meta.id}.celltypist.h5ad")
+    tuple val(meta), path("${meta.id}.celltypist.pkl")
+
+    when:
+    task.ext.when == null || task.ext.when
     
     script:
     """
-    annotate_celltypist.py --input ${adata} --output ${meta.id}.celltypist.h5ad --model ${model}
+    annotate_celltypist.py --input ${adata} --output ${meta.id}.celltypist.pkl --model ${model}
     """
 }
 
@@ -26,14 +29,14 @@ process CELLTYPIST_MAJORITY {
     label "process_medium"
 
     input:
-    tuple val(meta), val(clustering_key), path(adata)
+    tuple val(meta), path(adata)
     tuple val(meta2), path(celltypist)
     
     output:
-    tuple val(meta), val(clustering_key), path("${meta.id}.${clustering_key}.majority.h5ad")
+    tuple val(meta), path("${meta.id}.majority.pkl")
     
     script:
     """
-    celltypist_majority.py --input_clustering ${adata} --clustering_key ${clustering_key} --input_celltypist ${celltypist} --output ${meta.id}.${clustering_key}.majority.h5ad
+    celltypist_majority.py --input_clustering ${adata} --clustering_key ${meta.id} --input_celltypist ${celltypist} --output ${meta.id}.majority.pkl
     """
 }

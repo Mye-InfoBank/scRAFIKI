@@ -85,4 +85,6 @@ for column in columns_required.keys():
 
 merged.layers["counts"] = merged.X.copy()
 
+print(merged)
+
 merged.write_h5ad(args.output)

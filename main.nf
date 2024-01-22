@@ -39,13 +39,11 @@ workflow {
         Channel.from(params.integration_methods).mix(Channel.value("unintegrated"))
     )
 
-    if (params.benchmark) {
-        BENCHMARKING(
-            ch_preprocessed,
-            INTEGRATION.out.integrated_types,
-            params.benchmark_hvgs
-        )
-    }
+    BENCHMARKING(
+        ch_preprocessed,
+        INTEGRATION.out.integrated_types,
+        params.benchmark_hvgs
+    )
 
     SOLO(
         ch_hvgs,
@@ -63,15 +61,19 @@ workflow {
         CELLTYPIST.out
     )
 
+    ch_obs = CLUSTERING.out.obs.mix(
+        SOLO.out, CELL_CYCLE.out, CELLTYPIST.out
+    )
+
+    ch_obsm = CLUSTERING.out.obsm.mix(
+        INTEGRATION.out.obsm
+    )
+
     MERGE(
         ch_preprocessed,
-        CLUSTERING.out.results.map { meta, adata -> meta.integration }.collect(),
-        CLUSTERING.out.results.map { meta, adata -> adata }.collect(),
-        SOLO.out,
         COUNTS.out,
-        CELLTYPIST.out,
-        CELL_CYCLE.out,
-        CLUSTERING.out.keys.collect()
-    )
+        ch_obsm.map{ meta, obsm -> obsm}.collect(),
+        ch_obs.map{ meta, obs -> obs}.collect()
+        )
 
 }

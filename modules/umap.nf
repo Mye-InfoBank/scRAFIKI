@@ -8,13 +8,14 @@ process UMAP {
     tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), path("*.h5ad")
+    tuple val(meta), path("X_${meta.integration}.npy")
 
     script:
     """
     #!/opt/conda/bin/python
 
     import scanpy as sc
+    import numpy as np
     from threadpoolctl import threadpool_limits
 
     threadpool_limits(${task.cpus})
@@ -22,6 +23,7 @@ process UMAP {
 
     adata = sc.read_h5ad("${adata}")
     sc.tl.umap(adata)
-    adata.write_h5ad("${meta.id}.umap.h5ad")
+    
+    np.save("X_${meta.integration}.npy", adata.obsm["X_umap"])
     """
 }
