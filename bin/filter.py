@@ -1,6 +1,7 @@
 #!/opt/conda/bin/python
 
 import scanpy as sc
+import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description="Filter dataset")
@@ -16,6 +17,21 @@ parser.add_argument("--max_pct_mito", help="Maximum percentage of mitochondrial 
 
 args = parser.parse_args()
 
+# Function borrowed from https://github.com/icbi-lab/luca/blob/5ffb0a4671e9c288b10e73de18d447ee176bef1d/lib/scanpy_helper_submodule/scanpy_helpers/util.py#L122C1-L135C21
+def aggregate_duplicate_var(adata, aggr_fun=np.mean):
+    retain_var = ~adata.var_names.duplicated(keep="first")
+    duplicated_var = adata.var_names[adata.var_names.duplicated()].unique()
+    if len(duplicated_var):
+        for var in duplicated_var:
+            mask = adata.var_names == var
+            var_aggr = aggr_fun(adata.X[:, mask], axis=1)[:, np.newaxis]
+            adata.X[:, mask] = np.repeat(var_aggr, np.sum(mask), axis=1)
+
+        adata_dedup = adata[:, retain_var].copy()
+        return adata_dedup
+    else:
+        return adata
+
 adata = sc.read_h5ad(args.input)
 adata.obs["dataset"] = args.id
 
@@ -23,6 +39,12 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
     adata.__dict__["_raw"].__dict__["_var"] = (
         adata.__dict__["_raw"].__dict__["_var"].rename(columns={"_index": "features"})
     )
+
+# Convert varnames to upper case
+adata.var_names = adata.var_names.str.upper()
+
+# Calculate mean of same-named genes
+adata = aggregate_duplicate_var(adata)
 
 if "mito" not in adata.var.columns:
     adata.var["mito"] = adata.var_names.str.lower().str.startswith("mt-")
@@ -68,7 +90,10 @@ if args.max_pct_mito:
     adata = adata[adata.obs["pct_counts_mito"] < args.max_pct_mito].copy()
     print(f"    After: {adata.shape[0]}")
 
-# Convert varnames to upper case
-adata.var_names = adata.var_names.str.upper()
+# Print all non-unique varnames
+non_unique_varnames = adata.var_names[adata.var_names.duplicated(keep=False)]
+
+if len(non_unique_varnames) > 0:
+    raise ValueError(f"Non-unique varnames found: {non_unique_varnames}")
 
 adata.write_h5ad(args.output)

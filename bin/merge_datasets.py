@@ -39,13 +39,9 @@ for dataset in datasets:
 
 merged = ad.concat(datasets, join="outer")
 
-# Make sure that there are no underscores in the cell names
+# Make sure that there are no underscores in the cell and gene names
 merged.obs_names = merged.obs_names.str.replace("_", "-")
-merged.obs_names_make_unique()
-
-# Make sure that there are no underscores in the gene names
 merged.var_names = merged.var_names.str.replace("_", "-")
-merged.var_names_make_unique()
 
 # Perform minimal filtering to prevent NaNs
 sc.pp.filter_cells(merged, min_genes=1)
