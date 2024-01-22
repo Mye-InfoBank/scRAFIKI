@@ -49,7 +49,9 @@ merged.var_names_make_unique()
 
 # Perform minimal filtering to prevent NaNs
 sc.pp.filter_cells(merged, min_genes=1)
-sc.pp.filter_genes(merged, min_cells=1)
+
+# Keep only genes that are present in at least 0.5% of cells
+sc.pp.filter_genes(merged, min_cells=0.005 * merged.shape[0])
 
 # Convert to CSR matrix
 merged.X = csr_matrix(merged.X)

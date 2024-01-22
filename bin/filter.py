@@ -68,4 +68,7 @@ if args.max_pct_mito:
     adata = adata[adata.obs["pct_counts_mito"] < args.max_pct_mito].copy()
     print(f"    After: {adata.shape[0]}")
 
+# Convert varnames to upper case
+adata.var_names = adata.var_names.str.upper()
+
 adata.write_h5ad(args.output)
