@@ -12,6 +12,9 @@ process BENCHMARK_INTEGRATIONS {
 
     output:
         path("${meta2.integration}.csv")
+    
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
         """
