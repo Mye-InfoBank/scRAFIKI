@@ -37,23 +37,30 @@ for dataset in datasets:
     # Subset columns
     dataset.obs = dataset.obs[columns_required.keys()]
 
-merged = ad.concat(datasets, join="outer")
+adata = ad.concat(datasets, join="outer")
 
 # Make sure that there are no underscores in the cell and gene names
-merged.obs_names = merged.obs_names.str.replace("_", "-")
-merged.var_names = merged.var_names.str.replace("_", "-")
+adata.obs_names = adata.obs_names.str.replace("_", "-")
+adata.var_names = adata.var_names.str.replace("_", "-")
+
+if "mito" not in adata.var.columns:
+    adata.var["mito"] = adata.var_names.str.lower().str.startswith("mt-")
+
+sc.pp.calculate_qc_metrics(
+    adata, qc_vars=("mito",), log1p=False, inplace=True, percent_top=None
+)
 
 # Perform minimal filtering to prevent NaNs
-sc.pp.filter_cells(merged, min_genes=1)
+sc.pp.filter_cells(adata, min_genes=1)
 
 # Keep only genes that are present in at least 0.5% of cells
-sc.pp.filter_genes(merged, min_cells=0.005 * merged.shape[0])
+sc.pp.filter_genes(adata, min_cells=0.005 * adata.shape[0])
 
 # Convert to CSR matrix
-merged.X = csr_matrix(merged.X)
+adata.X = csr_matrix(adata.X)
 
-merged.obs["batch"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["batch"].astype(str)
-merged.obs["patient"] = merged.obs["dataset"].astype(str) + "_" + merged.obs["patient"].astype(str)
+adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
+adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
 
 def to_Florent_case(s: str):
     corrected = s.lower().strip()
@@ -77,10 +84,10 @@ def to_Florent_case(s: str):
 
 for column in columns_required.keys():
     # Convert first to string and then to category
-    merged.obs[column] = merged.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
+    adata.obs[column] = adata.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
 
-merged.layers["counts"] = merged.X.copy()
+adata.layers["counts"] = adata.X.copy()
 
-print(merged)
+print(adata)
 
-merged.write_h5ad(args.output)
+adata.write_h5ad(args.output)
