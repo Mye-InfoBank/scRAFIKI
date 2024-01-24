@@ -19,7 +19,6 @@ include { CLUSTERING } from "./workflows/clustering.nf"
 include { BENCHMARKING } from "./workflows/benchmarking.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
-if (!params.celltypist_model) { exit 1, 'CellTypist model not specified!' }
 
 workflow {
     PREPROCESSING(ch_samplesheet)
@@ -31,7 +30,7 @@ workflow {
 
     CELLTYPIST(
         ch_preprocessed,
-        params.celltypist_model
+        params.celltypist_model ?: ""
     )
 
     INTEGRATION(
