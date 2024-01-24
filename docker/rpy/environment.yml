@@ -493,6 +493,7 @@ dependencies:
 - tzdata=2023d=h0c530f3_0
 - tzlocal=5.2=py311h38be061_0
 - umap-learn=0.5.5=py311h38be061_0
+- upsetplot=0.8.0=pyhd8ed1ab_0
 - urllib3=2.1.0=pyhd8ed1ab_0
 - wheel=0.42.0=pyhd8ed1ab_0
 - xcb-util=0.4.0=hd590300_1
