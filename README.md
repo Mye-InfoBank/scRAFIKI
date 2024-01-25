@@ -1,4 +1,4 @@
-# SIMBA - **S**ingle-cell **I**ntegration **M**ethods pipeline for **B**ig **A**tlases
+# 🦁 SIMBA - **S**ingle-cell **I**ntegration **M**ethods pipeline for **B**ig **A**tlases
 
 <img src="./www/SIMBA_sticker.png" width="250">
 
