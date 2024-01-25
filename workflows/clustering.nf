@@ -13,6 +13,7 @@ workflow CLUSTERING {
         ch_adata
         ch_leiden_resolutions
         ch_celltypist
+        ch_entropy_smoothness
 
     main:
         NEIGHBORS(ch_adata)
@@ -24,7 +25,7 @@ workflow CLUSTERING {
         ch_clustering_tables = LEIDEN.out.table.mix(SCSHC_CLUSTERING.out.table)
 
         SCSHC_CLUSTERING_QC(ch_clustering_adatas)
-        ENTROPY(ch_clustering_adatas)
+        ENTROPY(ch_clustering_adatas, ch_entropy_smoothness)
         CELLTYPIST_MAJORITY(ch_clustering_tables, ch_celltypist)
 
         ch_clustering = ch_clustering_tables.mix(

@@ -51,7 +51,8 @@ workflow {
     CLUSTERING(
         INTEGRATION.out.integrated,
         Channel.from(params.leiden_resolutions),
-        CELLTYPIST.out
+        CELLTYPIST.out,
+        Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obs = CLUSTERING.out.obs.mix(

@@ -3,11 +3,11 @@ process ENTROPY {
 
   container "bigdatainbiomedicine/sc-rpy:1.0"
   label "process_medium"
-  errorStrategy 'retry'
-  maxRetries 7
+  errorStrategy { task.attempt < 7 ? 'retry' : 'ignore'}
 
   input:
   tuple val(meta), path(adata)
+  val(initial_smoothness)
   
   output:
   tuple val(meta), path("${meta.id}.entropy.pkl")
@@ -36,7 +36,7 @@ process ENTROPY {
   labels = anndata2ri.py2rpy(adata.obs[label_col].astype(str))
   samples = anndata2ri.py2rpy(adata.obs[sample_col])
 
-  smoothness = 0.5 * (1.2 ** (${task.attempt} - 1))
+  smoothness = ${initial_smoothness} * (1.2 ** (${task.attempt} - 1))
 
   result = rogue.rogue(expression, labels=labels, samples=samples, platform="UMI", span=smoothness)
   result = anndata2ri.rpy2py(result)
