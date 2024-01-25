@@ -46,6 +46,9 @@ process ENTROPY {
     lambda row: entropy_dict.get(row[label_col], {}).get(row[sample_col], np.nan), axis=1
   )
 
+  # Rename the column to the name of the label column
+  df_entropy = df_entropy.rename(label_col + "_entropy")
+
   df_entropy.to_pickle("${meta.id}.entropy.pkl")
   """
 }
