@@ -3,6 +3,8 @@ include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
 include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
+include { BENCHMARKING } from "./benchmarking.nf"
+
 
 integration_types = [
     "bbknn": "knn",
@@ -31,7 +33,7 @@ workflow INTEGRATION {
     take:
         ch_preprocessed
         ch_integration_methods
-
+        benchmark_hvgs
 
     main:
         ch_integration_methods = ch_integration_methods
@@ -71,9 +73,14 @@ workflow INTEGRATION {
 
         EXTRACT_EMBEDDING(ch_integrated)
 
+        BENCHMARKING(
+            ch_preprocessed,
+            ch_integrated_types,
+            benchmark_hvgs
+        )
+
     emit:
         integrated = ch_integrated
-        integrated_types = ch_integrated_types
         scanvi_model = INTEGRATE_SCANVI.out.model
         obsm = EXTRACT_EMBEDDING.out
 }

@@ -16,7 +16,6 @@ include { PREPROCESSING } from "./workflows/preprocessing.nf"
 include { COUNTS } from "./workflows/counts.nf"
 include { INTEGRATION } from "./workflows/integration.nf"
 include { CLUSTERING } from "./workflows/clustering.nf"
-include { BENCHMARKING } from "./workflows/benchmarking.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
 
@@ -33,25 +32,20 @@ workflow {
         params.celltypist_model ?: ""
     )
 
-    INTEGRATION(
-        ch_hvgs,
-        Channel.from(params.integration_methods).mix(Channel.value("unintegrated"))
+    CELL_CYCLE(
+        ch_preprocessed,
+        "human"
     )
 
-    BENCHMARKING(
-        ch_preprocessed,
-        INTEGRATION.out.integrated_types,
-        params.benchmark_hvgs
+    INTEGRATION(
+        ch_hvgs,
+        Channel.from(params.integration_methods).mix(Channel.value("unintegrated")),
+        Channel.value(params.benchmark_hvgs)
     )
 
     SOLO(
         ch_hvgs,
         INTEGRATION.out.scanvi_model
-    )
-
-    CELL_CYCLE(
-        ch_preprocessed,
-        "human"
     )
 
     CLUSTERING(
