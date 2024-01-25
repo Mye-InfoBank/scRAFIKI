@@ -33,7 +33,7 @@ process SOLO {
     solo = scvi.external.SOLO.from_scvi_model(scvi_model)
     solo.train()
     res = solo.predict()
-    res["label"] = solo.predict(False)
+    res["doublet_label"] = solo.predict(False)
 
     res.to_pickle("${meta.id}.solo.pkl")
     """
