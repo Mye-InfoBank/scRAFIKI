@@ -1,5 +1,5 @@
 process COMPOSITION {
-    container "bigdatainbiomedicine/sc-rpy:1.1"
+    container "bigdatainbiomedicine/sc-rpy:1.0"
 
     publishDir "${params.outdir}/composition", mode: "${params.publish_mode}"
 
@@ -20,7 +20,6 @@ process COMPOSITION {
     import seaborn as sns
     import matplotlib.pyplot as plt
     import pandas as pd
-    import upsetplot
 
     sns.set_theme(style="whitegrid")
     sns.set_context("paper")
@@ -39,19 +38,5 @@ process COMPOSITION {
     
     for col in ["sex", "cell_type", "condition", "tissue"]:
         plot(adata.obs, col)
-
-    # Split into multiple adatas, based on dataset
-    datasets = adata.obs["dataset"].unique()
-    dataset_genes = {}
-    for dataset in datasets:
-        adata_dataset = adata[adata.obs["dataset"] == dataset].copy()
-        # Keep only genes with at least 1 count in at least 1 cell
-        sc.pp.filter_genes(adata_dataset, min_cells=1)
-        dataset_genes[dataset] = adata_dataset.var_names
-
-    plot_data = upsetplot.from_contents(dataset_genes)
-
-    upsetplot.plot(plot_data, sort_by="cardinality", show_counts=True, min_subset_size=10)
-    plt.savefig("upset:genes.png")
     """
 }
