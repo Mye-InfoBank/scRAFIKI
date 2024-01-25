@@ -9,7 +9,7 @@ process GENES_UPSET {
     path(adatas)
     
     output:
-    path("*.png")
+    path("*.png"), optional: true
 
     script:
     """
@@ -33,6 +33,9 @@ process GENES_UPSET {
             # Keep only genes with at least 1 count in at least 1 cell
             sc.pp.filter_genes(adata_dataset, min_cells=1)
             dataset_genes[dataset].update(adata_dataset.var_names)
+
+    if not len(dataset_genes) > 1:
+        exit()
 
     plot_data = upsetplot.from_contents(dataset_genes)
 
