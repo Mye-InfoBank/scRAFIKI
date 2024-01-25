@@ -50,6 +50,19 @@ process MERGE {
     if adata.obs[col].dtype == np.float64:
       adata.obs[col] = adata.obs[col].astype(np.float32)
 
+  integration_order = ["scanvi", "scvi", "scgen", "desc",
+                       "bbknn", "combat", "harmony", "mnn",
+                       "scanorama", "trvaep", "unintegrated"]
+
+  current_index = 1
+  for integration_method in integration_order:
+    integration_key = f"X_{integration_method}"
+    if integration_key in adata.obsm.keys():
+      target_key = f"X_{current_index}_{integration_method}"
+      adata.obsm[target_key] = adata.obsm[integration_key]
+      del adata.obsm[integration_key]
+      current_index += 1
+
   adata.write('merged.h5ad')
   """
 }
