@@ -7,3 +7,7 @@ services:
     build: 
       context: rpy
     image: bigdatainbiomedicine/sc-rpy:1.1
+  cellxgene:
+    build: 
+      context: cellxgene
+    image: bigdatainbiomedicine/sc-cellxgene:1.0
