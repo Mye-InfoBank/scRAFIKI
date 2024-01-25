@@ -55,6 +55,7 @@ dependencies:
 - bioconductor-summarizedexperiment=1.32.0=r43hdfd78af_0
 - bioconductor-xvector=0.42.0=r43ha9d7317_1
 - bioconductor-zlibbioc=1.48.0=r43ha9d7317_1
+- biothings_client=0.2.6=pyh7cba7a3_1
 - brotli=1.1.0=hd590300_1
 - brotli-bin=1.1.0=hd590300_1
 - brotli-python=1.1.0=py311hb755f60_1
@@ -196,6 +197,7 @@ dependencies:
 - matplotlib-base=3.8.2=py311h54ef318_0
 - mpg123=1.32.4=h59595ed_0
 - munkres=1.0.7=py_1
+- mygene=3.2.2=pyh5e36f6f_0
 - mysql-common=8.0.33=hf1915f5_6
 - mysql-libs=8.0.33=hca2cd23_6
 - natsort=8.4.0=pyhd8ed1ab_0

@@ -3,6 +3,7 @@
 import scanpy as sc
 import numpy as np
 import argparse
+import mygene
 
 parser = argparse.ArgumentParser(description="Filter dataset")
 parser.add_argument("--input", help="Input file", type=str)
@@ -39,6 +40,13 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
     adata.__dict__["_raw"].__dict__["_var"] = (
         adata.__dict__["_raw"].__dict__["_var"].rename(columns={"_index": "features"})
     )
+
+# Convert everything to gene symbols
+mg = mygene.MyGeneInfo()
+df_genes = mg.querymany(adata.var.index, scopes=["symbol", "entrezgene", "ensemblgene"], fields="symbol", species="human", as_dataframe=True) 
+mapping = df_genes["symbol"].dropna().to_dict()
+
+adata.var_names = adata.var.index.map(lambda x: mapping.get(x, x))
 
 # Convert varnames to upper case
 adata.var_names = adata.var_names.str.upper()
