@@ -42,6 +42,7 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
 
 # Convert varnames to upper case
 adata.var_names = adata.var_names.str.upper()
+adata.var_names = adata.var_names.str.replace("_", "-")
 
 # Calculate mean of same-named genes
 adata = aggregate_duplicate_var(adata)
