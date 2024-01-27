@@ -1,6 +1,6 @@
 process INTEGRATE_SCANVI {
   tag "${method}"
-  container "bigdatainbiomedicine/sc-scib:1.0"
+  container "bigdatainbiomedicine/sc-scib:1.1"
 
   label "process_high"
 
