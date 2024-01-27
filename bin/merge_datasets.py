@@ -4,7 +4,6 @@ import argparse
 import anndata as ad
 import scanpy as sc
 from scipy.sparse import csr_matrix
-from collections import Counter
 
 columns_required = {
     "sex": False,
@@ -48,7 +47,7 @@ adata.obs = adata.obs.drop(columns=["n_genes"])
 adata.obs_names = adata.obs_names.str.replace("_", "-")
 
 # Convert to CSR matrix
-adata.X = csr_matrix(adata.X).astype(int)
+adata.X = csr_matrix(adata.X)
 
 adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
 adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
