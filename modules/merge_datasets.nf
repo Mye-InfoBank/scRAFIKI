@@ -8,6 +8,9 @@ process MERGE_DATASETS {
   
   output:
   path("merged_datasets.h5ad")
+
+  when:
+  task.ext.when == null || task.ext.when
   
   script:
   """
