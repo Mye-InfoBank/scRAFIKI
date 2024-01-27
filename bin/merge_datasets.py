@@ -42,19 +42,13 @@ adata = ad.concat(datasets)
 
 # Perform minimal filtering to prevent NaNs
 sc.pp.filter_cells(adata, min_genes=1)
+adata.obs = adata.obs.drop(columns=["n_genes"])
 
 # Make sure that there are no underscores in the cell names
 adata.obs_names = adata.obs_names.str.replace("_", "-")
 
-if "mito" not in adata.var.columns:
-    adata.var["mito"] = adata.var_names.str.lower().str.startswith("mt-")
-
-sc.pp.calculate_qc_metrics(
-    adata, qc_vars=("mito",), log1p=False, inplace=True, percent_top=None
-)
-
 # Convert to CSR matrix
-adata.X = csr_matrix(adata.X)
+adata.X = csr_matrix(adata.X).astype(int)
 
 adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
 adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
