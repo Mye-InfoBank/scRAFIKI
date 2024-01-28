@@ -45,6 +45,7 @@ adata.obs = adata.obs.drop(columns=["n_genes"])
 
 # Make sure that there are no underscores in the cell names
 adata.obs_names = adata.obs_names.str.replace("_", "-")
+adata.obs_names_make_unique()
 
 # Convert to CSR matrix
 adata.X = csr_matrix(adata.X)
