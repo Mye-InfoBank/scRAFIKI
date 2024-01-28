@@ -2,22 +2,27 @@ name: nf-core CI
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
 on:
   push:
-    branches: [ "master", "dev" ]
-  pull_request:
-    branches: [ "master", "dev" ]
+    branches: [ master, dev ]
+  pull_request: [ master, dev ]
 
 jobs:
   test:
     name: Run pipeline with test data
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        NXF_VER:
+          - "23.04.0"
+          - "latest-everything"
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out pipeline code
+        uses: actions/checkout@v4
 
       - name: Install Nextflow
-        run: |
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
 
       - name: Run pipeline with test data
         run: cd example && ./run.sh
