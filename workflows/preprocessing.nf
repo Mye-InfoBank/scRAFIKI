@@ -24,8 +24,13 @@ workflow PREPROCESSING {
         GENES_UPSET(FILTER.out.map{ meta, adata -> adata }.collect())
         MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect())
 
-        ch_preprocessed = MERGE_DATASETS.out
+        ch_preprocessed = MERGE_DATASETS.out.adata
             .map{ adata -> [[id: "preprocessed"], adata] }
+
+        ch_batches = MERGE_DATASETS.out.batches
+            .splitText()
+            // Remove \n
+            .map{ batch -> batch.replace("\n", "") }
 
         COMPOSITION(ch_preprocessed)
 
@@ -37,4 +42,5 @@ workflow PREPROCESSING {
     emit:
         simple = ch_preprocessed
         hvgs = IDENTIFY_HVGS.out
+        batches = ch_batches
 }

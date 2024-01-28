@@ -62,6 +62,11 @@ def to_Florent_case(s: str):
         .replace(" ", "_") \
         .replace("-", "_")
 
+    corrected = "".join([c if c.isalnum() or c == "_" else "" for c in corrected])
+
+    # Make sure there is never more than one underscore
+    corrected = corrected.replace("__", "_")
+
     if corrected.endswith("s"):
         corrected = corrected[:-1]
 
@@ -75,6 +80,9 @@ def to_Florent_case(s: str):
 for column in columns_required.keys():
     # Convert first to string and then to category
     adata.obs[column] = adata.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
+
+with open("batches.txt", "w") as f:
+    f.write("\n".join(adata.obs["batch"].unique()))
 
 adata.layers["counts"] = adata.X.copy()
 

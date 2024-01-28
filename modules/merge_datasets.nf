@@ -7,7 +7,8 @@ process MERGE_DATASETS {
   path(adatas)
   
   output:
-  path("merged_datasets.h5ad")
+  path("merged_datasets.h5ad"), emit: adata
+  path("batches.txt"), emit: batches
 
   when:
   task.ext.when == null || task.ext.when
