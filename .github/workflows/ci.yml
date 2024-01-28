@@ -10,20 +10,12 @@ jobs:
   test:
     name: Run pipeline with test data
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        NXF_VER:
-          - "23.04.0"
-          - "latest-everything"
 
     steps:
-      - name: Check out pipeline code
-        uses: actions/checkout@v4
-
       - name: Install Nextflow
-        uses: nf-core/setup-nextflow@v1
-        with:
-          version: "${{ matrix.NXF_VER }}"
+        run: |
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
 
       - name: Run pipeline with test data
         run: cd example && ./run.sh
