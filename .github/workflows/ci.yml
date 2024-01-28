@@ -1,9 +1,10 @@
-name: nf-core CI
-# This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
+name: Test on minimal example
+
 on:
   push:
     branches: [ master, dev ]
-  pull_request: [ master, dev ]
+  pull_request: 
+    branches: [ master, dev ]
 
 jobs:
   test:
