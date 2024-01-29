@@ -19,7 +19,7 @@ df_celltypist = pd.read_pickle(args.input_celltypist)
 
 df_celltypist = df_celltypist.reindex(clustering.index)
 
-predictions = df_celltypist["celltypist_prediction"]
+predictions = df_celltypist["cell_type:celltypist"]
 
 majority_key = args.clustering_key + "_celltypist_majority"
 

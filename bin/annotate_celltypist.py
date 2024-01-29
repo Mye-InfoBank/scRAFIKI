@@ -40,6 +40,6 @@ df_celltypist = predictions_adata.obs.loc[
     adata.obs.index, ["predicted_labels", "conf_score"]
 ]
 
-df_celltypist.columns = ["celltypist_prediction", "celltypist_confidence"]
+df_celltypist.columns = ["cell_type:celltypist", "celltypist_confidence"]
 
 df_celltypist.to_pickle(args.output.name)
