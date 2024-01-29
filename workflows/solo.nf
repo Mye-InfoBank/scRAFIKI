@@ -1,5 +1,4 @@
 include { SOLO } from "../modules/solo.nf"
-include { MERGE_SOLO } from "../modules/solo.nf"
 
 workflow W_SOLO {
     take:
@@ -14,11 +13,6 @@ workflow W_SOLO {
             ch_batches
         )
 
-        MERGE_SOLO(
-            ch_hvgs,
-            SOLO.out.map{ meta, adata -> adata}.collect()
-        )
-
     emit:
-        MERGE_SOLO.out
+        SOLO.out
 }
