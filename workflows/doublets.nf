@@ -1,10 +1,10 @@
 include { SOLO } from "../modules/solo.nf"
-include { DEDUPLICATE_ADATA as DEDUPLICATE_INTEGRATIONS } from "../modules/deduplicate_adata.nf"
-include { DEDUPLICATE_ADATA as DEDUPLICATE_RAW } from "../modules/deduplicate_adata.nf"
+include { DEDOUBLET_ADATA as DEDOUBLET_INTEGRATIONS } from "../modules/dedoublet_adata.nf"
+include { DEDOUBLET_ADATA as DEDOUBLET_RAW } from "../modules/dedoublet_adata.nf"
 include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
 
 
-workflow DEDUPLICATION {
+workflow DOUBLETS {
     take:
         ch_hvgs
         ch_scanvi_model
@@ -19,21 +19,21 @@ workflow DEDUPLICATION {
             ch_batches
         )
 
-        DEDUPLICATE_INTEGRATIONS(
+        DEDOUBLET_INTEGRATIONS(
             ch_integrations,
             SOLO.out
         )
 
-        EXTRACT_EMBEDDING(DEDUPLICATE_INTEGRATIONS.out)
+        EXTRACT_EMBEDDING(DEDOUBLET_INTEGRATIONS.out)
 
-        DEDUPLICATE_RAW(
+        DEDOUBLET_RAW(
             ch_raw,
             SOLO.out
         )
 
     emit:
         solo = SOLO.out
-        integrations = DEDUPLICATE_INTEGRATIONS.out
-        raw = DEDUPLICATE_RAW.out
+        integrations = DEDOUBLET_INTEGRATIONS.out
+        raw = DEDOUBLET_RAW.out
         obsm = EXTRACT_EMBEDDING.out
 }

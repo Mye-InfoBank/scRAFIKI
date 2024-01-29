@@ -1,4 +1,4 @@
-process DEDUPLICATE_ADATA {
+process DEDOUBLET_ADATA {
     tag "${meta.id}"
     container "bigdatainbiomedicine/sc-rpy:1.0"
 
