@@ -32,10 +32,19 @@ process SOLO {
 
     results = []
 
+    batch_sizes = adata.obs["batch"].value_counts()
+
     batches = "${batches.join(" ")}".split(" ")
     for batch in batches:
+        # If only one cell is assigned to a minibatch, solo will crash
+        # https://discuss.pytorch.org/t/error-expected-more-than-1-value-per-channel-when-training/26274
+        batch_size = batch_sizes[batch]
+        default_minibatch_size = 128
+        minibatch_size_correction = -1 if batch_size % default_minibatch_size == 1 else 0
+
         solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch=batch)
-        solo.train()
+        solo.train(batch_size=default_minibatch_size + minibatch_size_correction)
+        
         batch_res = solo.predict()
         batch_res["doublet_label"] = solo.predict(False)
 
