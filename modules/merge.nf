@@ -28,6 +28,8 @@ process MERGE {
   adata = ad.read_h5ad("${original_adata}")
 
   counts_adata = ad.read_h5ad("$counts")
+  counts_adata = counts_adata[adata.obs_names, :]
+
   for layer in counts_adata.layers.keys():
     adata.layers[layer] = csc_matrix(counts_adata.layers[layer]).astype(np.float32)
   adata.X = csc_matrix(counts_adata.X).astype(np.float32)
@@ -44,8 +46,9 @@ process MERGE {
 
   for obs_path in obs_paths:
     df = pd.read_pickle(obs_path)
+    df = df.reindex(adata.obs_names)
     adata.obs = pd.concat([adata.obs, df], axis=1)
-  
+
   for col in adata.obs.columns:
     if adata.obs[col].dtype == np.float64:
       adata.obs[col] = adata.obs[col].astype(np.float32)

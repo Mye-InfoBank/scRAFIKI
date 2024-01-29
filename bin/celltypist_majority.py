@@ -17,6 +17,8 @@ args = parser.parse_args()
 clustering = pd.read_pickle(args.input_clustering)
 df_celltypist = pd.read_pickle(args.input_celltypist)
 
+df_celltypist = df_celltypist.reindex(clustering.index)
+
 predictions = df_celltypist["celltypist_prediction"]
 
 majority_key = args.clustering_key + "_celltypist_majority"

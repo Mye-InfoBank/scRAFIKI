@@ -19,6 +19,7 @@ process SOLO {
 
     import scvi
     import scanpy as sc
+    import pandas as pd
     from threadpoolctl import threadpool_limits
     threadpool_limits(${task.cpus})
 

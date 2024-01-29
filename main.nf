@@ -14,7 +14,7 @@ include { MERGE } from "./modules/merge.nf"
 include { PREPROCESSING } from "./workflows/preprocessing.nf"
 include { COUNTS } from "./workflows/counts.nf"
 include { INTEGRATION } from "./workflows/integration.nf"
-include { W_SOLO as SOLO } from "./workflows/solo.nf"
+include { DEDUPLICATION } from "./workflows/deduplication.nf"
 include { CLUSTERING } from "./workflows/clustering.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -44,29 +44,31 @@ workflow {
         Channel.value(params.benchmark_hvgs)
     )
 
-    SOLO(
+    DEDUPLICATION(
         ch_hvgs,
         INTEGRATION.out.scanvi_model,
+        INTEGRATION.out.integrated,
+        ch_preprocessed,
         ch_batches.collect()
     )
 
     CLUSTERING(
-        INTEGRATION.out.integrated,
+        DEDUPLICATION.out.integrations,
         Channel.from(params.leiden_resolutions),
         CELLTYPIST.out,
         Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        CELL_CYCLE.out, CELLTYPIST.out, SOLO.out
+        CELL_CYCLE.out, CELLTYPIST.out, DEDUPLICATION.out.solo
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(
-        INTEGRATION.out.obsm
+        DEDUPLICATION.out.obsm
     )
 
     MERGE (
-        ch_preprocessed,
+        DEDUPLICATION.out.raw,
         COUNTS.out,
         ch_obsm.map{ meta, obsm -> obsm}.collect(),
         ch_obs.map{ meta, obs -> obs}.collect()
