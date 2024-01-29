@@ -1,6 +1,6 @@
 process INTEGRATE_SCANVI {
   tag "${method}"
-  container "bigdatainbiomedicine/sc-scib:1.1"
+  container "bigdatainbiomedicine/sc-scib:1.2"
 
   label "process_high"
 
@@ -11,6 +11,7 @@ process INTEGRATE_SCANVI {
   output:
   tuple val(meta_out), path("${method}.h5ad"), emit: integrated
   tuple val(meta_out), path("model"), emit: model
+  tuple val(meta_out), path("scanvi_labels.pkl"), emit: labels
   
   script:
   method = "scanvi"

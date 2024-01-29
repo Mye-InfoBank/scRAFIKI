@@ -60,7 +60,7 @@ workflow {
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        CELL_CYCLE.out, CELLTYPIST.out, DOUBLETS.out.solo
+        CELL_CYCLE.out, CELLTYPIST.out, DOUBLETS.out.solo, INTEGRATION.out.scanvi_labels
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(

@@ -79,4 +79,5 @@ workflow INTEGRATION {
     emit:
         integrated = ch_integrated
         scanvi_model = INTEGRATE_SCANVI.out.model
+        scanvi_labels = INTEGRATE_SCANVI.out.labels
 }

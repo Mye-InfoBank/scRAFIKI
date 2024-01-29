@@ -54,6 +54,8 @@ if args.method != "unintegrated":
     if args.method in ["harmony", "scanorama", "trvaep", "scgen", "scvi", "scanvi", "mnn", "bbknn"]:
         hvgs = adata.var_names[adata.var["highly_variable"]].to_list()
         kwargs["hvg"] = hvgs
+    if args.method == "scanvi":
+        kwargs["labels_output"] = "scanvi_labels.pkl"
     if args.method == "desc":
         kwargs["ncores"] = args.cpus
 
