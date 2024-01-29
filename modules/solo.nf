@@ -3,7 +3,7 @@ nextflow.enable.dsl = 2
 
 
 process SOLO {
-    tag "${meta.id}"
+    tag "${new_meta.id}"
     container "bigdatainbiomedicine/sc-scib:1.0"
 
     label "process_medium"
@@ -11,11 +11,13 @@ process SOLO {
     input:
         tuple val(meta), path(adata)
         tuple val(meta2), path(scvi_model)
+        each batch
 
     output:
-        tuple val(meta), path("${meta.id}.solo.pkl")
+        tuple val(new_meta), path("${new_meta.id}.solo.pkl")
 
     script:
+    new_meta = meta + [id: "${meta.id}:${batch}", batch: batch]
     """
     #!/usr/bin/env python3
 
@@ -30,11 +32,11 @@ process SOLO {
 
     scvi.model.SCANVI.setup_anndata(adata_hvg, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
     scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata_hvg)
-    solo = scvi.external.SOLO.from_scvi_model(scvi_model)
+    solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
     solo.train()
     res = solo.predict()
     res["doublet_label"] = solo.predict(False)
 
-    res.to_pickle("${meta.id}.solo.pkl")
+    res.to_pickle("${new_meta.id}.solo.pkl")
     """
 }

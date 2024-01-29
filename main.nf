@@ -24,6 +24,7 @@ workflow {
 
     ch_preprocessed = PREPROCESSING.out.simple
     ch_hvgs = PREPROCESSING.out.hvgs
+    ch_batches = PREPROCESSING.out.batches
 
     COUNTS(ch_preprocessed, params.normalization_method)
 
@@ -45,7 +46,8 @@ workflow {
 
     SOLO(
         ch_hvgs,
-        INTEGRATION.out.scanvi_model
+        INTEGRATION.out.scanvi_model,
+        ch_batches.collect()
     )
 
     CLUSTERING(
@@ -56,18 +58,17 @@ workflow {
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        SOLO.out, CELL_CYCLE.out, CELLTYPIST.out
+        CELL_CYCLE.out, CELLTYPIST.out //, SOLO.out
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(
         INTEGRATION.out.obsm
     )
 
-    MERGE(
+    MERGE (
         ch_preprocessed,
         COUNTS.out,
         ch_obsm.map{ meta, obsm -> obsm}.collect(),
         ch_obs.map{ meta, obs -> obs}.collect()
-        )
-
+    )
 }
