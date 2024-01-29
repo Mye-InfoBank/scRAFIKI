@@ -1,16 +1,14 @@
-#!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
-
-
 process SOLO {
     tag "${meta.id}"
     container "bigdatainbiomedicine/sc-scib:1.0"
 
     label "process_medium"
+    label "process_high_memory"
 
     input:
         tuple val(meta), path(adata)
         tuple val(meta2), path(scvi_model)
+        val batches
 
     output:
         tuple val(meta), path("${meta.id}.solo.pkl")
@@ -21,6 +19,7 @@ process SOLO {
 
     import scvi
     import scanpy as sc
+    import pandas as pd
     from threadpoolctl import threadpool_limits
     threadpool_limits(${task.cpus})
 
@@ -30,11 +29,23 @@ process SOLO {
 
     scvi.model.SCANVI.setup_anndata(adata_hvg, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
     scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata_hvg)
-    solo = scvi.external.SOLO.from_scvi_model(scvi_model)
-    solo.train()
-    res = solo.predict()
-    res["doublet_label"] = solo.predict(False)
 
-    res.to_pickle("${meta.id}.solo.pkl")
+    results = []
+
+    batches = "${batches.join(" ")}".split(" ")
+    for batch in batches:
+        solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch=batch)
+        solo.train()
+        batch_res = solo.predict()
+        batch_res["doublet_label"] = solo.predict(False)
+
+        results.append(batch_res)
+    
+    solo_res = pd.concat(results)
+
+    # Reorder the cells to match the original adata
+    solo_res = solo_res.reindex(adata.obs_names)
+
+    solo_res.to_pickle("${meta.id}.solo.pkl")
     """
 }

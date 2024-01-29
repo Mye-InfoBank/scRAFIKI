@@ -7,7 +7,6 @@ nextflow.enable.dsl = 2
 
 // Modules
 include { CELLTYPIST } from "./modules/celltypist.nf"
-include { SOLO } from "./modules/solo.nf"
 include { CELL_CYCLE } from "./modules/cell_cycle.nf"
 include { MERGE } from "./modules/merge.nf"
 
@@ -15,6 +14,7 @@ include { MERGE } from "./modules/merge.nf"
 include { PREPROCESSING } from "./workflows/preprocessing.nf"
 include { COUNTS } from "./workflows/counts.nf"
 include { INTEGRATION } from "./workflows/integration.nf"
+include { DOUBLETS } from "./workflows/doublets.nf"
 include { CLUSTERING } from "./workflows/clustering.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -24,6 +24,7 @@ workflow {
 
     ch_preprocessed = PREPROCESSING.out.simple
     ch_hvgs = PREPROCESSING.out.hvgs
+    ch_batches = PREPROCESSING.out.batches
 
     COUNTS(ch_preprocessed, params.normalization_method)
 
@@ -43,31 +44,33 @@ workflow {
         Channel.value(params.benchmark_hvgs)
     )
 
-    SOLO(
+    DOUBLETS(
         ch_hvgs,
-        INTEGRATION.out.scanvi_model
+        INTEGRATION.out.scanvi_model,
+        INTEGRATION.out.integrated,
+        ch_preprocessed,
+        ch_batches.collect()
     )
 
     CLUSTERING(
-        INTEGRATION.out.integrated,
+        DOUBLETS.out.integrations,
         Channel.from(params.leiden_resolutions),
         CELLTYPIST.out,
         Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        SOLO.out, CELL_CYCLE.out, CELLTYPIST.out
+        CELL_CYCLE.out, CELLTYPIST.out, DOUBLETS.out.solo
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(
-        INTEGRATION.out.obsm
+        DOUBLETS.out.obsm
     )
 
-    MERGE(
-        ch_preprocessed,
+    MERGE (
+        DOUBLETS.out.raw,
         COUNTS.out,
         ch_obsm.map{ meta, obsm -> obsm}.collect(),
         ch_obs.map{ meta, obs -> obs}.collect()
-        )
-
+    )
 }
