@@ -1,7 +1,3 @@
-#!/usr/bin/env nextflow
-nextflow.enable.dsl = 2
-
-
 process SOLO {
     tag "${new_meta.id}"
     container "bigdatainbiomedicine/sc-scib:1.0"
@@ -17,7 +13,7 @@ process SOLO {
         tuple val(new_meta), path("${new_meta.id}.solo.pkl")
 
     script:
-    new_meta = meta + [id: "${meta.id}:${batch}", batch: batch]
+    new_meta = meta + [id: "${meta.id}-${batch}", batch: batch]
     """
     #!/usr/bin/env python3
 
@@ -38,5 +34,39 @@ process SOLO {
     res["doublet_label"] = solo.predict(False)
 
     res.to_pickle("${new_meta.id}.solo.pkl")
+    """
+}
+
+process MERGE_SOLO {
+    tag "${meta.id}"
+    container "bigdatainbiomedicine/sc-scib:1.0"
+
+    label "process_medium"
+
+    input:
+        tuple val(meta), path(adata)
+        path(solo_results)
+
+    output:
+        tuple val(meta), path("solo.pkl")
+
+    script:
+    """
+    #!/usr/bin/env python3
+
+    import pandas as pd
+    import anndata as ad
+
+    adata = ad.read_h5ad("${adata}")
+
+    solo_paths = "${solo_results}".split(" ")
+    solo_results = [pd.read_pickle(path) for path in solo_paths]
+
+    solo_results = pd.concat(solo_results)
+
+    # Reorder the cells to match the original adata
+    solo_results = solo_results.reindex(adata.obs_names)
+
+    solo_results.to_pickle("solo.pkl")
     """
 }

@@ -7,7 +7,6 @@ nextflow.enable.dsl = 2
 
 // Modules
 include { CELLTYPIST } from "./modules/celltypist.nf"
-include { SOLO } from "./modules/solo.nf"
 include { CELL_CYCLE } from "./modules/cell_cycle.nf"
 include { MERGE } from "./modules/merge.nf"
 
@@ -15,6 +14,7 @@ include { MERGE } from "./modules/merge.nf"
 include { PREPROCESSING } from "./workflows/preprocessing.nf"
 include { COUNTS } from "./workflows/counts.nf"
 include { INTEGRATION } from "./workflows/integration.nf"
+include { W_SOLO as SOLO } from "./workflows/solo.nf"
 include { CLUSTERING } from "./workflows/clustering.nf"
 
 if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
@@ -58,7 +58,7 @@ workflow {
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        CELL_CYCLE.out, CELLTYPIST.out //, SOLO.out
+        CELL_CYCLE.out, CELLTYPIST.out, SOLO.out
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(
