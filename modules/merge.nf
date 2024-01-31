@@ -26,6 +26,8 @@ process MERGE {
   from scipy.sparse import csc_matrix
 
   adata = ad.read_h5ad("${original_adata}")
+  adata.obsm = {}
+  adata.layers = {}
 
   counts_adata = ad.read_h5ad("$counts")
   counts_adata = counts_adata[adata.obs_names, :]
