@@ -33,6 +33,7 @@ def aggregate_duplicate_var(adata, aggr_fun=np.mean):
     else:
         return adata
 
+print("Reading input")
 adata = sc.read_h5ad(args.input)
 adata.obs["dataset"] = args.id
 
@@ -42,6 +43,7 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
     )
 
 if args.no_symbols:
+    print("Converting varnames to gene symbols")
     import mygene
     mg = mygene.MyGeneInfo()
     df_genes = mg.querymany(adata.var.index, scopes=["symbol", "entrezgene", "ensemblgene"], fields="symbol", species="human", as_dataframe=True) 
@@ -53,9 +55,11 @@ if args.no_symbols:
 adata.var_names = adata.var_names.str.upper()
 adata.var_names = adata.var_names.str.replace("_", "-")
 
+print("Aggregating duplicate varnames")
 # Calculate mean of same-named genes
 adata = aggregate_duplicate_var(adata)
 
+print("Calculating QC metrics")
 if "mito" not in adata.var.columns:
     adata.var["mito"] = adata.var_names.str.lower().str.startswith("mt-")
 
@@ -106,4 +110,5 @@ non_unique_varnames = adata.var_names[adata.var_names.duplicated(keep=False)]
 if len(non_unique_varnames) > 0:
     raise ValueError(f"Non-unique varnames found: {non_unique_varnames}")
 
+print("Writing output")
 adata.write_h5ad(args.output)
