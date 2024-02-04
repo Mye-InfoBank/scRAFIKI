@@ -57,15 +57,28 @@ workflow INTEGRATION {
             "scvi"
         )
 
-        INTEGRATE_SCANVI(
-            ch_preprocessed,
-            INTEGRATE_SCVI.out.model
-        )
+        if (params.scanvi_labels && params.scanvi_model && params.scanvi_integrated ) {
+            meta = [id: "scanvi", integration: "scanvi"]
+
+            ch_scanvi_labels = Channel.value([meta, file(params.scanvi_labels)])
+            ch_scanvi_model = Channel.value([meta, file(params.scanvi_model)])
+            ch_scanvi_integrated = Channel.value([meta, file(params.scanvi_integrated)])
+
+        } else {
+            INTEGRATE_SCANVI(
+                ch_preprocessed,
+                INTEGRATE_SCVI.out.model
+            )
+
+            ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
+            ch_scanvi_model = INTEGRATE_SCANVI.out.model
+            ch_scanvi_integrated = INTEGRATE_SCANVI.out.integrated
+        }
 
         ch_integrated = INTEGRATE.out.integrated
             .mix(INTEGRATE_GPU.out.integrated)
             .mix(INTEGRATE_SCVI.out.integrated)
-            .mix(INTEGRATE_SCANVI.out.integrated)
+            .mix(ch_scanvi_integrated)
 
         ch_integrated_types = ch_integrated
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
@@ -78,6 +91,6 @@ workflow INTEGRATION {
 
     emit:
         integrated = ch_integrated
-        scanvi_model = INTEGRATE_SCANVI.out.model
-        scanvi_labels = INTEGRATE_SCANVI.out.labels
+        scanvi_model = ch_scanvi_model
+        scanvi_labels = ch_scanvi_labels
 }
