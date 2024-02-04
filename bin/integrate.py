@@ -40,8 +40,10 @@ args = parser.parse_args()
 threadpool_limits(args.cpus)
 sc.settings.n_jobs = args.cpus
 
+print("Reading data")
 adata = ad.read_h5ad(args.input)
 
+print("Integrating data")
 if args.method != "unintegrated":
     method = methods[args.method]
 
@@ -73,10 +75,13 @@ if args.method != "unintegrated":
 else:
     adata_integrated = adata.copy()
 
+print("Integration done")
+
 if "X_emb" not in adata_integrated.obsm:
     sc.pp.pca(adata_integrated)
     adata_integrated.obsm["X_emb"] = adata_integrated.obsm["X_pca"]
 
 adata.obsm["X_emb"] = adata_integrated.obsm["X_emb"]
 
+print("Saving integrated data")
 adata.write_h5ad(args.output)
