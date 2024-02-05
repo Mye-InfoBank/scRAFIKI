@@ -62,7 +62,7 @@ workflow INTEGRATION {
 
             ch_scanvi_labels = Channel.value([meta, file(params.scanvi_labels)])
             ch_scanvi_model = Channel.value([meta, file(params.scanvi_model)])
-            ch_scanvi_integrated = Channel.value([meta, file(params.scanvi_integrated)])
+            ch_scanvi_integrated = params.scanvi_integrated ? Channel.value([meta, file(params.scanvi_integrated)]) : Channel.empty()
 
         } else {
             INTEGRATE_SCANVI(
