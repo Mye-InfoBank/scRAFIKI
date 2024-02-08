@@ -25,7 +25,7 @@ workflow PREPROCESSING {
         GENES_UPSET(FILTER.out.map{ meta, adata -> adata }.collect())
         MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect())
 
-        ch_preprocessed = MERGE_DATASETS.out.adata
+        ch_preprocessed = MERGE_DATASETS.out.inner
             .map{ adata -> [[id: "preprocessed"], adata] }
 
         ch_batches = MERGE_DATASETS.out.batches

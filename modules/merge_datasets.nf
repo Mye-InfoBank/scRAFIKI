@@ -7,7 +7,8 @@ process MERGE_DATASETS {
   path(adatas)
   
   output:
-  path("merged_datasets.h5ad"), emit: adata
+  path("datasets.inner.h5ad"), emit: inner
+  path("datasets.outer.h5ad"), emit: outer
   path("batches.txt"), emit: batches
 
   when:
@@ -15,6 +16,6 @@ process MERGE_DATASETS {
   
   script:
   """
-  merge_datasets.py --input ${adatas} --output merged_datasets.h5ad
+  merge_datasets.py --input ${adatas} --output_inner datasets.inner.h5ad --output_outer datasets.outer.h5ad
   """
 }
