@@ -8,6 +8,7 @@ nextflow.enable.dsl = 2
 // Modules
 include { CELLTYPIST } from "./modules/celltypist.nf"
 include { CELL_CYCLE } from "./modules/cell_cycle.nf"
+include { CELL_QC    } from "./modules/cell_qc.nf"
 include { MERGE } from "./modules/merge.nf"
 
 // Workflows
@@ -38,6 +39,8 @@ workflow {
         "human"
     )
 
+    CELL_QC(ch_preprocessed)
+
     INTEGRATION(
         ch_hvgs,
         Channel.from(params.integration_methods).mix(Channel.value("unintegrated")),
@@ -60,7 +63,11 @@ workflow {
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
-        CELL_CYCLE.out, CELLTYPIST.out, DOUBLETS.out.solo, INTEGRATION.out.scanvi_labels
+        CELL_CYCLE.out,
+        CELLTYPIST.out,
+        DOUBLETS.out.solo,
+        INTEGRATION.out.scanvi_labels,
+        CELL_QC.out
     )
 
     ch_obsm = CLUSTERING.out.obsm.mix(
