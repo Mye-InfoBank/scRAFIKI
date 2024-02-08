@@ -5,6 +5,7 @@ include { FILTER } from "../modules/filter.nf"
 include { GENES_UPSET } from "../modules/genes_upset.nf"
 include { MERGE_DATASETS } from "../modules/merge_datasets.nf"
 include { COMPOSITION } from "../modules/composition.nf"
+include { DISTRIBUTION } from "../modules/distribution.nf"
 include { IDENTIFY_HVGS } from "../modules/identify_hvgs.nf"
 
 workflow PREPROCESSING {
@@ -33,6 +34,7 @@ workflow PREPROCESSING {
             .map{ batch -> batch.replace("\n", "") }
 
         COMPOSITION(ch_preprocessed)
+        DISTRIBUTION(ch_preprocessed)
 
         IDENTIFY_HVGS(
             ch_preprocessed,
