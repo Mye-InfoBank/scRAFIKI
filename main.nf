@@ -23,23 +23,24 @@ if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exi
 workflow {
     PREPROCESSING(ch_samplesheet)
 
-    ch_preprocessed = PREPROCESSING.out.simple
+    ch_adata_inner = PREPROCESSING.out.inner
+    ch_adata_outer = PREPROCESSING.out.outer
     ch_hvgs = PREPROCESSING.out.hvgs
     ch_batches = PREPROCESSING.out.batches
 
-    COUNTS(ch_preprocessed, params.normalization_method)
+    COUNTS(ch_adata_outer, params.normalization_method)
 
     CELLTYPIST(
-        ch_preprocessed,
+        ch_adata_inner,
         params.celltypist_model ?: ""
     )
 
     CELL_CYCLE(
-        ch_preprocessed,
+        ch_adata_inner,
         "human"
     )
 
-    CELL_QC(ch_preprocessed)
+    CELL_QC(ch_adata_inner)
 
     INTEGRATION(
         ch_hvgs,
@@ -51,7 +52,7 @@ workflow {
         ch_hvgs,
         INTEGRATION.out.scanvi_model,
         INTEGRATION.out.integrated,
-        ch_preprocessed,
+        ch_adata_inner,
         ch_batches.collect()
     )
 
