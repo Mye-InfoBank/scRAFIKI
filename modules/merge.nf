@@ -14,6 +14,7 @@ process MERGE {
   
   output:
     file "merged.h5ad"
+    file "metadata.pkl"
   
   script:
   """
@@ -69,5 +70,6 @@ process MERGE {
       current_index += 1
 
   adata.write('merged.h5ad')
+  adata.obs.to_pickle('metadata.pkl')
   """
 }
