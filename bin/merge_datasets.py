@@ -40,15 +40,15 @@ for dataset in datasets:
     dataset.obs = dataset.obs[columns_required.keys()]
 
 adata = ad.concat(datasets)
-adata_outer = ad.concat(datasets, join='outer', fill_value=np.nan)
-
-# Filter genes
-sc.pp.filter_genes(adata_outer, min_cells=0.005 * adata_outer.shape[0])
+adata_outer = ad.concat(datasets, join='outer')
 
 # Perform minimal filtering to prevent NaNs
 cell_mask, _ = sc.pp.filter_cells(adata, min_genes=1, inplace=False)
 adata = adata[cell_mask, :]
-adata_outer = adata[cell_mask, :]
+adata_outer = adata_outer[cell_mask, :]
+
+# Filter genes
+sc.pp.filter_genes(adata_outer, min_cells=0.005 * adata_outer.shape[0])
 
 # Make sure that there are no underscores in the cell names
 adata.obs_names = adata.obs_names.str.replace("_", "-")
