@@ -31,9 +31,10 @@ gpu_integrations = ["scgen"]
  */
 workflow INTEGRATION {
     take:
-        ch_preprocessed
+        ch_adata_core
+        ch_hvgs
         ch_integration_methods
-        ch_adata_transfer
+        ch_adata_extended
         benchmark_hvgs
 
     main:
@@ -45,22 +46,26 @@ workflow INTEGRATION {
             }
 
         INTEGRATE(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             ch_integration_methods.cpu
         )
 
         INTEGRATE_GPU(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             ch_integration_methods.gpu
         )
 
         INTEGRATE_SCVI(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             "scvi"
         )
 
         INTEGRATE_SCANVI(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             INTEGRATE_SCVI.out.model
         )
 
@@ -69,7 +74,7 @@ workflow INTEGRATION {
         ch_scanvi_integrated = INTEGRATE_SCANVI.out.integrated
 
         INTEGRATE_SCARCHES(
-            ch_adata_transfer,
+            ch_adata_extended,
             ch_scanvi_integrated.join(ch_scanvi_model)
         )
 
@@ -82,7 +87,7 @@ workflow INTEGRATION {
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
         BENCHMARKING(
-            ch_preprocessed,
+            ch_adata_core,
             ch_integrated_types,
             benchmark_hvgs
         )

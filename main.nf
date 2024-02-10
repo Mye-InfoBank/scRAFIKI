@@ -26,7 +26,7 @@ workflow {
     ch_adata_integration = PREPROCESSING.out.integration
     ch_adata_intersection = PREPROCESSING.out.intersection
     ch_adata_counts = PREPROCESSING.out.counts
-    ch_transfer = PREPROCESSING.out.transfer
+    ch_adata_transfer = PREPROCESSING.out.transfer
     ch_hvgs = PREPROCESSING.out.hvgs
 
     COUNTS(ch_adata_counts, params.normalization_method)
@@ -44,13 +44,15 @@ workflow {
     CELL_QC(ch_adata_intersection)
 
     INTEGRATION(
+        ch_adata_integration,
         ch_hvgs,
         Channel.from(params.integration_methods).mix(Channel.value("unintegrated")),
-        ch_transfer,
+        ch_adata_transfer,
         Channel.value(params.benchmark_hvgs)
     )
 
     DOUBLETS(
+        ch_adata_intersection,
         ch_hvgs,
         INTEGRATION.out.scanvi_model,
         INTEGRATION.out.integrated,
@@ -67,7 +69,6 @@ workflow {
     ch_obs = CLUSTERING.out.obs.mix(
         CELL_CYCLE.out,
         CELLTYPIST.out,
-        DOUBLETS.out.solo,
         INTEGRATION.out.scanvi_labels,
         CELL_QC.out
     )

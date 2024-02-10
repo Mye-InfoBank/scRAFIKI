@@ -6,7 +6,7 @@ process DEDOUBLET_ADATA {
 
     input:
         tuple val(meta), path(adata)
-        tuple val(meta2), path(solo)
+        tuple val(meta2), path(solo_annotations)
     
     output:
         tuple val(meta), path("${meta.id}.dedup.h5ad")
@@ -19,10 +19,13 @@ process DEDOUBLET_ADATA {
     import anndata as ad
 
     adata = ad.read_h5ad("${adata}")
-    solo = pd.read_pickle("${solo}")
+    solo_paths = "${solo_annotations.join(" ")}".split(" ")
+
+    solo_annotation = pd.concat([pd.read_pickle(path) for path in solo_paths])
+    solo_annotation = solo_annotation.reindex(adata.obs_names)
 
     # Keep only cells with "singlet" in the "doublet_label" column
-    adata = adata[solo["doublet_label"] == "singlet", :]
+    adata = adata[solo_annotation["doublet_label"] == "singlet", :]
 
     # Save the AnnData object
     adata.write_h5ad("${meta.id}.dedup.h5ad")
