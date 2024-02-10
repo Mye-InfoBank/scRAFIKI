@@ -9,6 +9,7 @@ parser.add_argument("--input", help="Input file", type=str)
 parser.add_argument("--id", help="Dataset ID", type=str)
 parser.add_argument("--output", help="Output file", type=str)
 parser.add_argument("--no-symbols", help="Convert varnames to gene symbols", action="store_true")
+parser.add_argument("--transfer", help="Apply transfer leanring on dataset", action="store_true")
 
 parser.add_argument("--min_genes", help="Minimum number of genes", type=int, required=False)
 parser.add_argument("--max_genes", help="Maximum number of genes", type=int, required=False)
@@ -36,6 +37,7 @@ def aggregate_duplicate_var(adata, aggr_fun=np.mean):
 print("Reading input")
 adata = sc.read_h5ad(args.input)
 adata.obs["dataset"] = args.id
+adata.obs["transfer"] = args.transfer
 
 if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"]:
     adata.__dict__["_raw"].__dict__["_var"] = (

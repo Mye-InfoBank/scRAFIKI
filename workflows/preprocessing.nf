@@ -36,8 +36,8 @@ workflow PREPROCESSING {
             // Remove \n
             .map{ batch -> batch.replace("\n", "") }
 
-        COMPOSITION(ch_adata_inner)
-        DISTRIBUTION(ch_adata_inner)
+        COMPOSITION(ch_adata_outer)
+        DISTRIBUTION(ch_adata_outer)
 
         IDENTIFY_HVGS(
             ch_adata_inner,

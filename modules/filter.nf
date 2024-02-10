@@ -16,8 +16,9 @@ process FILTER {
   min_genes = meta.min_genes ? "--min_genes ${meta.min_genes}" : ""
   max_genes = meta.max_genes ? "--max_genes ${meta.max_genes}" : ""
   max_pct_mito = meta.max_pct_mito ? "--max_pct_mito ${meta.max_pct_mito}" : ""
-  no_symbols = meta.no_symbols ? "--no-symbols" : ""
+  no_symbols = meta.no_symbols.toLowerCase() == "true" ? "--no-symbols" : ""
+  transfer = meta.transfer.toLowerCase() == "true" ? "--transfer" : ""
   """
-  filter.py --input ${input} --id ${meta.id} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.filtered.h5ad
+  filter.py --input ${input} --id ${meta.id} ${transfer} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.filtered.h5ad
   """
 }
