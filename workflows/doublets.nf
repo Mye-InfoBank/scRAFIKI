@@ -1,6 +1,6 @@
 include { SOLO } from "../modules/solo.nf"
 include { DEDOUBLET_ADATA as DEDOUBLET_INTEGRATIONS } from "../modules/dedoublet_adata.nf"
-include { DEDOUBLET_ADATA as DEDOUBLET_RAW } from "../modules/dedoublet_adata.nf"
+include { DEDOUBLET_ADATA as DEDOUBLET_COUNTS } from "../modules/dedoublet_adata.nf"
 include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
 
 
@@ -26,7 +26,7 @@ workflow DOUBLETS {
 
         EXTRACT_EMBEDDING(DEDOUBLET_INTEGRATIONS.out)
 
-        DEDOUBLET_RAW(
+        DEDOUBLET_COUNTS(
             ch_raw,
             SOLO.out
         )
@@ -34,6 +34,6 @@ workflow DOUBLETS {
     emit:
         solo = SOLO.out
         integrations = DEDOUBLET_INTEGRATIONS.out
-        raw = DEDOUBLET_RAW.out
+        counts = DEDOUBLET_COUNTS.out
         obsm = EXTRACT_EMBEDDING.out
 }
