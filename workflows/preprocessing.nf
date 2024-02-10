@@ -39,6 +39,9 @@ workflow PREPROCESSING {
             // Remove \n
             .map{ batch -> batch.replace("\n", "") }
 
+        ch_transfer = MERGE_DATASETS.out.transfer.flatten()
+            .map{ adata -> [[id: adata.simpleName], adata]}
+
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
@@ -51,6 +54,7 @@ workflow PREPROCESSING {
         integration = ch_adata_integration
         intersection = ch_adata_intersection
         counts = ch_adata_counts
+        transfer = ch_transfer
         hvgs = IDENTIFY_HVGS.out
         batches = ch_batches
 }
