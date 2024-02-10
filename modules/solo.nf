@@ -8,6 +8,7 @@ process SOLO {
     input:
         tuple val(meta), path(adata)
         tuple val(meta2), path(scvi_model)
+        val(batch)
 
     output:
         tuple val(meta), path("${meta.id}.solo.pkl")
@@ -27,31 +28,21 @@ process SOLO {
     scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
     scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
 
-    results = []
+    solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
 
-    for batch in adata.obs["batch"].unique():
-        solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch=batch)
+    minibatch_size = 128
+    worked = False
+    while not worked and minibatch_size > 100:
+        try:
+            solo.train(batch_size=minibatch_size)
+            worked = True
+        except ValueError:
+            print("Minibatch size did not work, trying again with smaller minibatch size")
+            minibatch_size -= 1
+            pass
 
-        minibatch_size = 128
-        worked = False
-        while not worked and minibatch_size > 100:
-            try:
-                solo.train(batch_size=minibatch_size)
-                worked = True
-            except ValueError:
-                print("Minibatch size did not work, trying again with smaller minibatch size")
-                minibatch_size -= 1
-                pass
-
-        batch_res = solo.predict()
-        batch_res["doublet_label"] = solo.predict(False)
-
-        results.append(batch_res)
-    
-    solo_res = pd.concat(results)
-
-    # Reorder the cells to match the original adata
-    solo_res = solo_res.reindex(adata.obs_names)
+    solo_res = solo.predict()
+    solo_res["doublet_label"] = solo.predict(False)
 
     solo_res.to_pickle("${meta.id}.solo.pkl")
     """

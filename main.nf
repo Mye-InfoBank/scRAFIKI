@@ -54,7 +54,7 @@ workflow {
     DOUBLETS(
         ch_adata_intersection,
         ch_hvgs,
-        INTEGRATION.out.scanvi_model,
+        INTEGRATION.out.model,
         INTEGRATION.out.integrated,
         COUNTS.out
     )

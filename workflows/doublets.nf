@@ -19,13 +19,14 @@ workflow DOUBLETS {
             ch_hvgs
         )
 
-        ch_batches = PREPARE_SOLO.out
-            .map{ meta, batches -> batches }.flatten()
-            .map{ batch -> [[id: batch.simpleName], batch]}
+        ch_batches = PREPARE_SOLO.out.batches
+            .splitText().flatten()
+            .map{ batch -> batch.replace("\n", "") }
 
         SOLO(
-            ch_batches,
-            ch_scanvi_model.collect()
+            PREPARE_SOLO.out.adata.collect(),
+            ch_scanvi_model.collect(),
+            ch_batches
         )
 
         ch_solo_annotations = SOLO.out

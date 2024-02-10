@@ -10,7 +10,8 @@ process PREPARE_SOLO {
     tuple val(meta2), path(hvgs)
     
     output:
-    tuple val(meta), path("*.batch.h5ad")
+    tuple val(meta), path("${meta.id}.hvg.h5ad"), emit: adata
+    tuple val(meta), path("batches.txt"), emit: batches
     
     script:
     """
@@ -24,8 +25,9 @@ process PREPARE_SOLO {
 
     adata_hvg = adata[:, df_hvgs[df_hvgs["highly_variable"]].index]
 
-    for batch in adata_hvg.obs["batch"].unique():
-        adata_batch = adata_hvg[adata_hvg.obs["batch"] == batch]
-        adata_batch.write_h5ad(f"{batch}.batch.h5ad")
+    with open("batches.txt", "w") as f:
+        f.write("\\n".join(adata_hvg.obs["batch"].unique()))
+    
+    adata_hvg.write_h5ad("${meta.id}.hvg.h5ad")
     """
 }
