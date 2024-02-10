@@ -3,6 +3,10 @@ services:
     build: 
       context: scib
     image: bigdatainbiomedicine/sc-scib:1.2
+  scarches:
+    build: 
+      context: scarches
+    image: bigdatainbiomedicine/sc-scarches:1.0
   rpy:
     build: 
       context: rpy

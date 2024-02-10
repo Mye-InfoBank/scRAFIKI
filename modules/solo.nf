@@ -8,7 +8,6 @@ process SOLO {
     input:
         tuple val(meta), path(adata)
         tuple val(meta2), path(scvi_model)
-        val batches
 
     output:
         tuple val(meta), path("${meta.id}.solo.pkl")
@@ -32,8 +31,7 @@ process SOLO {
 
     results = []
 
-    batches = "${batches.join(" ")}".split(" ")
-    for batch in batches:
+    for batch in adata_hvg.obs["batch"].unique():
         solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch=batch)
 
         minibatch_size = 128

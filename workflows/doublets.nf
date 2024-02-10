@@ -10,13 +10,11 @@ workflow DOUBLETS {
         ch_scanvi_model
         ch_integrations
         ch_raw
-        ch_batches
     
     main:
         SOLO(
             ch_hvgs,
-            ch_scanvi_model,
-            ch_batches
+            ch_scanvi_model
         )
 
         DEDOUBLET_INTEGRATIONS(

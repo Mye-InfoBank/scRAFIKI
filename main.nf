@@ -26,8 +26,8 @@ workflow {
     ch_adata_integration = PREPROCESSING.out.integration
     ch_adata_intersection = PREPROCESSING.out.intersection
     ch_adata_counts = PREPROCESSING.out.counts
+    ch_transfer = PREPROCESSING.out.transfer
     ch_hvgs = PREPROCESSING.out.hvgs
-    ch_batches = PREPROCESSING.out.batches
 
     COUNTS(ch_adata_counts, params.normalization_method)
 
@@ -46,6 +46,7 @@ workflow {
     INTEGRATION(
         ch_hvgs,
         Channel.from(params.integration_methods).mix(Channel.value("unintegrated")),
+        ch_transfer,
         Channel.value(params.benchmark_hvgs)
     )
 
@@ -53,8 +54,7 @@ workflow {
         ch_hvgs,
         INTEGRATION.out.scanvi_model,
         INTEGRATION.out.integrated,
-        COUNTS.out,
-        ch_batches.collect()
+        COUNTS.out
     )
 
     CLUSTERING(

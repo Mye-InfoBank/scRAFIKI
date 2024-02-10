@@ -4,6 +4,8 @@ process INTEGRATE_SCANVI {
 
   label "process_high"
 
+  publishDir "${params.outdir}", mode: "${params.publish_mode}", pattern: "model"
+
   input:
   tuple val(meta), path(input)
   tuple val(meta2), path(scvi_model, stageAs: "scvi_model")

@@ -10,14 +10,13 @@ process MERGE_DATASETS {
   path("datasets.integration.h5ad"), emit: integration
   path("datasets.counts.h5ad"), emit: counts
   path("datasets.intersection.h5ad"), emit: intersection
-  path("*.transfer.h5ad"), emit: transfer, optional: true
-  path("core_batches.txt"), emit: batches
+  path("datasets.transfer.h5ad"), emit: transfer, optional: true
 
   when:
   task.ext.when == null || task.ext.when
   
   script:
   """
-  merge_datasets.py --input ${adatas} --output_batches core_batches.txt --suffix_transfer .transfer.h5ad --output_intersection datasets.intersection.h5ad --output_integration datasets.integration.h5ad --output_counts datasets.counts.h5ad
+  merge_datasets.py --input ${adatas} --output_transfer datasets.transfer.h5ad --output_intersection datasets.intersection.h5ad --output_integration datasets.integration.h5ad --output_counts datasets.counts.h5ad
   """
 }

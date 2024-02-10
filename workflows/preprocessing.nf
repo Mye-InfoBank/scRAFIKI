@@ -34,11 +34,6 @@ workflow PREPROCESSING {
         ch_adata_counts = MERGE_DATASETS.out.counts
             .map{ adata -> [[id: "counts"], adata] }
 
-        ch_batches = MERGE_DATASETS.out.batches
-            .splitText()
-            // Remove \n
-            .map{ batch -> batch.replace("\n", "") }
-
         ch_transfer = MERGE_DATASETS.out.transfer.flatten()
             .map{ adata -> [[id: adata.simpleName], adata]}
 
@@ -56,5 +51,4 @@ workflow PREPROCESSING {
         counts = ch_adata_counts
         transfer = ch_transfer
         hvgs = IDENTIFY_HVGS.out
-        batches = ch_batches
 }
