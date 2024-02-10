@@ -52,7 +52,7 @@ workflow {
         ch_hvgs,
         INTEGRATION.out.scanvi_model,
         INTEGRATION.out.integrated,
-        ch_adata_inner,
+        COUNTS.out,
         ch_batches.collect()
     )
 
@@ -76,8 +76,7 @@ workflow {
     )
 
     MERGE (
-        DOUBLETS.out.raw,
-        COUNTS.out,
+        DOUBLETS.out.counts,
         ch_obsm.map{ meta, obsm -> obsm}.collect(),
         ch_obs.map{ meta, obs -> obs}.collect()
     )
