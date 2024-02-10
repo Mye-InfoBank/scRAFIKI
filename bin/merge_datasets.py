@@ -20,9 +20,10 @@ columns_required = {
 parser = argparse.ArgumentParser(description="Merge datasets")
 parser.add_argument("--input", help="Input file", type=str, nargs="+")
 parser.add_argument("--output_batches", help="Output file, batches", type=str)
-parser.add_argument("--output_inner", help="Output file, inner join", type=str)
-parser.add_argument("--suffix_transfer", help="Output file suffix, inner join for transfer learning", type=str)
-parser.add_argument("--output_outer", help="Output file, outer join", type=str)
+parser.add_argument("--output_integration", help="Output file containing only cells which do not require transfer learning", type=str)
+parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str)
+parser.add_argument("--suffix_transfer", help="Output file suffix, cells for transfer learning", type=str)
+parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
 
 args = parser.parse_args()
 
@@ -114,5 +115,6 @@ for dataset in adata_transfer.obs["dataset"].unique():
     adata_transfer_dataset.write_h5ad(dataset + args.suffix_transfer)
 
 adata_notransfer = adata[~adata.obs["transfer"]]
-adata_notransfer.write_h5ad(args.output_inner)
-adata_outer.write_h5ad(args.output_outer)
+adata_notransfer.write_h5ad(args.output_integration)
+adata.write_h5ad(args.output_intersection)
+adata_outer.write_h5ad(args.output_counts)

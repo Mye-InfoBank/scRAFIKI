@@ -7,8 +7,9 @@ process MERGE_DATASETS {
   path(adatas)
   
   output:
-  path("datasets.inner.h5ad"), emit: inner
-  path("datasets.outer.h5ad"), emit: outer
+  path("datasets.integration.h5ad"), emit: integration
+  path("datasets.counts.h5ad"), emit: counts
+  path("datasets.intersection.h5ad"), emit: intersection
   path("*.transfer.h5ad"), emit: transfer, optional: true
   path("core_batches.txt"), emit: batches
 
@@ -17,6 +18,6 @@ process MERGE_DATASETS {
   
   script:
   """
-  merge_datasets.py --input ${adatas} --output_batches core_batches.txt --suffix_transfer .transfer.h5ad --output_inner datasets.inner.h5ad --output_outer datasets.outer.h5ad
+  merge_datasets.py --input ${adatas} --output_batches core_batches.txt --suffix_transfer .transfer.h5ad --output_intersection datasets.intersection.h5ad --output_integration datasets.integration.h5ad --output_counts datasets.counts.h5ad
   """
 }

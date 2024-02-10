@@ -1,4 +1,5 @@
 process CELL_QC {
+  tag "$meta.id"
   container "bigdatainbiomedicine/sc-rpy:1.0"
 
   label "process_medium"
