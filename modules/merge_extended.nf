@@ -10,7 +10,7 @@ process MERGE_EXTENDED {
     tuple val(meta2), path(core)
     
     output:
-    tuple val(meta), path("${meta.id}.h5ad")
+    tuple val(meta), path("${meta.id}.merged.h5ad")
 
     script:
     """
@@ -23,6 +23,6 @@ process MERGE_EXTENDED {
 
     adata_extended = ad.concat([adata_core, adata_extension])
 
-    adata_extended.write_h5ad("${meta.id}.h5ad")
+    adata_extended.write_h5ad("${meta.id}.merged.h5ad")
     """
 }
