@@ -94,6 +94,6 @@ workflow INTEGRATION {
 
     emit:
         integrated = ch_integrated
-        model = INTEGRATE_SCARCHES.out.model.ifEmpty(ch_scanvi_model.collect())
+        model = params.has_extended ? INTEGRATE_SCARCHES.out.model : ch_scanvi_model
         scanvi_labels = ch_scanvi_labels
 }

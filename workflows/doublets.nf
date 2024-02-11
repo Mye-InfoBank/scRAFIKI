@@ -31,7 +31,7 @@ workflow DOUBLETS {
 
         ch_solo_annotations = SOLO.out
             .map{ meta, annotation -> annotation }.collect()
-            .map{ annotations -> [[id: "solo"], annotaitons]}
+            .map{ annotations -> [[id: "solo"], annotations]}
 
         DEDOUBLET_INTEGRATIONS(
             ch_integrations,

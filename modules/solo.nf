@@ -11,9 +11,10 @@ process SOLO {
         val(batch)
 
     output:
-        tuple val(meta), path("${meta.id}.solo.pkl")
+        tuple val(new_meta), path("${new_meta.id}.solo.pkl")
 
     script:
+    new_meta = [id: "${batch}"]
     """
     #!/usr/bin/env python3
 
@@ -44,6 +45,6 @@ process SOLO {
     solo_res = solo.predict()
     solo_res["doublet_label"] = solo.predict(False)
 
-    solo_res.to_pickle("${meta.id}.solo.pkl")
+    solo_res.to_pickle("${new_meta.id}.solo.pkl")
     """
 }
