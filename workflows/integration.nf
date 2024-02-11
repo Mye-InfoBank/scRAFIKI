@@ -76,7 +76,8 @@ workflow INTEGRATION {
 
         INTEGRATE_SCARCHES(
             ch_adata_extended,
-            ch_scanvi_integrated.join(ch_scanvi_model)
+            ch_scanvi_integrated.join(ch_scanvi_model),
+            ch_hvgs
         )
 
         MERGE_EXTENDED(

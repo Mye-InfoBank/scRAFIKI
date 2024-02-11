@@ -7,6 +7,7 @@ process INTEGRATE_SCARCHES {
   input:
   tuple val(meta), path(query)
   tuple val(meta2), path(reference), path(scanvi_model, stageAs: "scanvi_model")
+  tuple val(meta3), path(hvgs)
   
   output:
   tuple val(meta_out), path("${method}.h5ad"), emit: integrated
@@ -21,6 +22,7 @@ process INTEGRATE_SCARCHES {
 
   import scarches as sca
   import anndata as ad
+  import pandas as pd
 
   reference_model_path = "${scanvi_model}"
   surgery_model_path = "${model}"
@@ -29,6 +31,9 @@ process INTEGRATE_SCARCHES {
 
   adata_reference = ad.read_h5ad(reference_path)
   adata_query = ad.read_h5ad(query_path)
+  df_hvgs = pd.read_pickle("${hvgs}")
+
+  adata_query = adata_query[:, df_hvgs[df_hvgs["highly_variable"]].index.to_list()].copy()
   adata_output = adata_query.copy()
 
   sca.models.SCANVI.prepare_query_anndata(
