@@ -29,6 +29,7 @@ process INTEGRATE_SCARCHES {
 
   adata_reference = ad.read_h5ad(reference_path)
   adata_query = ad.read_h5ad(query_path)
+  adata_output = adata_query.copy()
 
   sca.models.SCANVI.prepare_query_anndata(
       adata=adata_query, reference_model=reference_model_path
@@ -51,7 +52,7 @@ process INTEGRATE_SCARCHES {
   surgery_model.train(max_epochs=surgery_epochs, **early_stopping_kwargs_surgery)
   surgery_model.save(surgery_model_path, overwrite=True)
 
-  adata_query.obsm["X_emb"] = surgery_model.get_latent_representation(adata_query)
-  adata_query.write_h5ad("${method}.h5ad")
+  adata_output.obsm["X_emb"] = surgery_model.get_latent_representation(adata_output)
+  adata_output.write_h5ad("${method}.h5ad")
   """
 }
