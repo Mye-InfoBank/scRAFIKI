@@ -3,6 +3,7 @@ include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
 include { INTEGRATE_SCARCHES } from "../modules/integrate_scarches.nf"
+include { MERGE_EXTENDED } from "../modules/merge_extended.nf"
 include { BENCHMARKING } from "./benchmarking.nf"
 
 
@@ -78,10 +79,16 @@ workflow INTEGRATION {
             ch_scanvi_integrated.join(ch_scanvi_model)
         )
 
+        MERGE_EXTENDED(
+            ch_scanvi_integrated,
+            INTEGRATE_SCARCHES.out.integrated
+        )
+
         ch_integrated = INTEGRATE.out.integrated
             .mix(INTEGRATE_GPU.out.integrated)
             .mix(INTEGRATE_SCVI.out.integrated)
             .mix(ch_scanvi_integrated)
+            .mix(MERGE_EXTENDED.out)
 
         ch_integrated_types = ch_integrated
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
