@@ -8,14 +8,14 @@ process UMAP {
     tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), path("X_${meta.integration}.npy")
+    tuple val(meta), path("X_${meta.integration}.pkl")
 
     script:
     """
     #!/opt/conda/bin/python
 
     import scanpy as sc
-    import numpy as np
+    import pandas as pd
     from threadpoolctl import threadpool_limits
 
     threadpool_limits(${task.cpus})
@@ -24,6 +24,7 @@ process UMAP {
     adata = sc.read_h5ad("${adata}")
     sc.tl.umap(adata)
     
-    np.save("X_${meta.integration}.npy", adata.obsm["X_umap"])
+    df = pd.DataFrame(adata.obsm["X_umap"], index=adata.obs_names)
+    df.to_pickle("X_${meta.integration}.pkl")
     """
 }

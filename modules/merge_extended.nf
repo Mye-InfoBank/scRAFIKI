@@ -6,14 +6,13 @@ process MERGE_EXTENDED {
     label "process_medium"
 
     input:
-    tuple val(meta), path(core)
-    tuple val(meta2), path(extension)
+    tuple val(meta), path(extension)
+    tuple val(meta2), path(core)
     
     output:
-    tuple val(new_meta), path("${new_meta.id}.h5ad")
+    tuple val(meta), path("${meta.id}.h5ad")
 
     script:
-    new_meta = [id: "extended"]
     """
     #!/opt/conda/bin/python
 
@@ -24,6 +23,6 @@ process MERGE_EXTENDED {
 
     adata_extended = ad.concat([adata_core, adata_extension])
 
-    adata_extended.write_h5ad("${new_meta.id}.h5ad")
+    adata_extended.write_h5ad("${meta.id}.h5ad")
     """
 }

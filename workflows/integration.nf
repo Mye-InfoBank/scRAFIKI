@@ -80,8 +80,8 @@ workflow INTEGRATION {
         )
 
         MERGE_EXTENDED(
-            ch_scanvi_integrated,
-            INTEGRATE_SCARCHES.out.integrated
+            INTEGRATE_SCARCHES.out.integrated,
+            ch_scanvi_integrated
         )
 
         ch_integrated = INTEGRATE.out.integrated

@@ -36,9 +36,10 @@ process MERGE {
   obsm_paths = "${obsm}".split(' ')
 
   for obsm_path in obsm_paths:
-    array = np.load(obsm_path)
+    df = pd.read_pickle(obsm_path)
+    df = df.reindex(adata.obs_names)
     name = os.path.basename(obsm_path).split('.')[0]
-    adata.obsm[name] = np.float32(array)
+    adata.obsm[name] = np.float32(df.to_numpy())
   
   obs_paths = "${obs}".split(' ')
 
@@ -51,7 +52,7 @@ process MERGE {
     if adata.obs[col].dtype == np.float64:
       adata.obs[col] = adata.obs[col].astype(np.float32)
 
-  integration_order = ["scanvi", "scvi", "scgen", "desc",
+  integration_order = ["scarches", "scanvi", "scvi", "scgen", "desc",
                        "bbknn", "combat", "harmony", "mnn",
                        "scanorama", "trvaep", "unintegrated"]
 
