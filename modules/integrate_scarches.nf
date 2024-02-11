@@ -10,7 +10,7 @@ process INTEGRATE_SCARCHES {
   tuple val(meta3), path(hvgs)
   
   output:
-  tuple val(meta_out), path("${method}.h5ad"), emit: integrated
+  tuple val(meta_out), path("${method}.integrated.h5ad"), emit: integrated
   tuple val(meta_out), path("${model}"), emit: model
   
   script:
@@ -57,7 +57,7 @@ process INTEGRATE_SCARCHES {
   surgery_model.train(max_epochs=surgery_epochs, **early_stopping_kwargs_surgery)
   surgery_model.save(surgery_model_path, overwrite=True)
 
-  adata_output.obsm["X_emb"] = surgery_model.get_latent_representation(adata_output)
-  adata_output.write_h5ad("${method}.h5ad")
+  adata_output.obsm["X_emb"] = surgery_model.get_latent_representation()
+  adata_output.write_h5ad("${method}.integrated.h5ad")
   """
 }
