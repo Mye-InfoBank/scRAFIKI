@@ -2,6 +2,8 @@ include { INTEGRATE } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
+include { INTEGRATE_SCARCHES } from "../modules/integrate_scarches.nf"
+include { MERGE_EXTENDED } from "../modules/merge_extended.nf"
 include { BENCHMARKING } from "./benchmarking.nf"
 
 
@@ -30,8 +32,10 @@ gpu_integrations = ["scgen"]
  */
 workflow INTEGRATION {
     take:
-        ch_preprocessed
+        ch_adata_core
+        ch_hvgs
         ch_integration_methods
+        ch_adata_extended
         benchmark_hvgs
 
     main:
@@ -43,54 +47,61 @@ workflow INTEGRATION {
             }
 
         INTEGRATE(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             ch_integration_methods.cpu
         )
 
         INTEGRATE_GPU(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             ch_integration_methods.gpu
         )
 
         INTEGRATE_SCVI(
-            ch_preprocessed,
+            ch_adata_core,
+            ch_hvgs,
             "scvi"
         )
 
-        if (params.scanvi_labels && params.scanvi_model && params.scanvi_integrated ) {
-            meta = [id: "scanvi", integration: "scanvi"]
+        INTEGRATE_SCANVI(
+            ch_adata_core,
+            ch_hvgs,
+            INTEGRATE_SCVI.out.model
+        )
 
-            ch_scanvi_labels = Channel.value([meta, file(params.scanvi_labels)])
-            ch_scanvi_model = Channel.value([meta, file(params.scanvi_model)])
-            ch_scanvi_integrated = params.scanvi_integrated ? Channel.value([meta, file(params.scanvi_integrated)]) : Channel.empty()
+        ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
+        ch_scanvi_model = INTEGRATE_SCANVI.out.model
+        ch_scanvi_integrated = INTEGRATE_SCANVI.out.integrated
 
-        } else {
-            INTEGRATE_SCANVI(
-                ch_preprocessed,
-                INTEGRATE_SCVI.out.model
-            )
+        INTEGRATE_SCARCHES(
+            ch_adata_extended,
+            ch_scanvi_integrated.join(ch_scanvi_model),
+            ch_hvgs
+        )
 
-            ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
-            ch_scanvi_model = INTEGRATE_SCANVI.out.model
-            ch_scanvi_integrated = INTEGRATE_SCANVI.out.integrated
-        }
+        MERGE_EXTENDED(
+            INTEGRATE_SCARCHES.out.integrated,
+            ch_scanvi_integrated
+        )
 
         ch_integrated = INTEGRATE.out.integrated
             .mix(INTEGRATE_GPU.out.integrated)
             .mix(INTEGRATE_SCVI.out.integrated)
             .mix(ch_scanvi_integrated)
+            .mix(MERGE_EXTENDED.out)
 
         ch_integrated_types = ch_integrated
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
 
         BENCHMARKING(
-            ch_preprocessed,
+            ch_adata_core,
             ch_integrated_types,
             benchmark_hvgs
         )
 
     emit:
         integrated = ch_integrated
-        scanvi_model = ch_scanvi_model
+        model = params.has_extended ? INTEGRATE_SCARCHES.out.model : ch_scanvi_model
         scanvi_labels = ch_scanvi_labels
 }

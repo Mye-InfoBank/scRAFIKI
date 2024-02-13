@@ -10,7 +10,7 @@ process IDENTIFY_HVGS {
     val(n_hvgs)
     
     output:
-    tuple val(meta), path("${meta.id}.hvgs.h5ad")
+    tuple val(meta), path("${meta.id}.hvgs.pkl")
     
     script:
     """
@@ -24,6 +24,6 @@ process IDENTIFY_HVGS {
                                 flavor="seurat_v3",
                                 batch_key="batch")
 
-    adata.write_h5ad("${meta.id}.hvgs.h5ad")
+    adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
     """
 }

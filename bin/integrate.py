@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import anndata as ad
+import pandas as pd
 import scib
 import scanpy as sc
 import argparse
@@ -31,6 +32,7 @@ methods = {
 parser = argparse.ArgumentParser(description='Integrate data')
 parser.add_argument('--input', help='Input file', type=str)
 parser.add_argument('--output', help='Output file', type=str)
+parser.add_argument('--hvgs', help='Pickle containing highly variable genes', type=str)
 parser.add_argument('--method', help='Integration method', type=str, choices=list(methods.keys()) + ["unintegrated"])
 parser.add_argument('--scvi_model', help='scvi model', type=str)
 parser.add_argument('--cpus', help='Number of cpus', type=int, default=1)
@@ -42,6 +44,7 @@ sc.settings.n_jobs = args.cpus
 
 print("Reading data")
 adata = ad.read_h5ad(args.input)
+df_hvgs = pd.read_pickle(args.hvgs)
 
 print("Integrating data")
 if args.method != "unintegrated":
@@ -54,8 +57,8 @@ if args.method != "unintegrated":
     if args.method == "scanvi" and args.scvi_model is not None:
         kwargs["scvi_model_path"] = args.scvi_model
     if args.method in ["harmony", "scanorama", "trvaep", "scgen", "scvi", "scanvi", "mnn", "bbknn"]:
-        hvgs = adata.var_names[adata.var["highly_variable"]].to_list()
-        kwargs["hvg"] = hvgs
+        hvg_list = df_hvgs[df_hvgs["highly_variable"]].index.to_list()
+        kwargs["hvg"] = hvg_list
     if args.method == "scanvi":
         kwargs["labels_output"] = "scanvi_labels.pkl"
     if args.method == "desc":

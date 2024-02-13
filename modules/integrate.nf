@@ -6,6 +6,7 @@ process INTEGRATE {
 
   input:
   tuple val(meta), path(input)
+  tuple val(meta2), path(hvgs)
   val(method)
   
   output:
@@ -15,6 +16,6 @@ process INTEGRATE {
   script:
   meta_out = ["id": "${method}", "integration": "${method}"]
   """
-  integrate.py --input ${input} --method ${method} --output ${method}.h5ad --cpus ${task.cpus}
+  integrate.py --input ${input} --hvgs ${hvgs} --method ${method} --output ${method}.h5ad --cpus ${task.cpus}
   """
 }

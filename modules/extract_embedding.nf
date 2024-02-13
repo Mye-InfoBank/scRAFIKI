@@ -8,20 +8,21 @@ process EXTRACT_EMBEDDING {
   tuple val(meta), path(input)
   
   output:
-  tuple val(meta), path("${meta.integration}.npy")
+  tuple val(meta), path("${meta.integration}.pkl")
   
   script:
   """
   #!/opt/conda/bin/python
 
   import anndata as ad
-  import numpy as np
+  import pandas as pd
 
   adata = ad.read_h5ad("${input}")
 
   ar = adata.obsm["X_emb"]
 
-  np.save("${meta.integration}.npy", ar)
+  df = pd.DataFrame(ar, index=adata.obs_names)
+  df.to_pickle("${meta.integration}.pkl")
   """
 
 }

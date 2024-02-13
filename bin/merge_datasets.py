@@ -14,12 +14,15 @@ columns_required = {
     "patient": True,
     "tissue": True,
     "dataset": True,
+    "transfer": True
 }
 
 parser = argparse.ArgumentParser(description="Merge datasets")
 parser.add_argument("--input", help="Input file", type=str, nargs="+")
-parser.add_argument("--output_inner", help="Output file, inner join", type=str)
-parser.add_argument("--output_outer", help="Output file, outer join", type=str)
+parser.add_argument("--output_integration", help="Output file containing only cells which do not require transfer learning", type=str)
+parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str)
+parser.add_argument("--output_transfer", help="Output file containing all cells which require transfer learning", type=str)
+parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
 
 args = parser.parse_args()
 
@@ -42,22 +45,26 @@ for dataset in datasets:
 adata = ad.concat(datasets)
 adata_outer = ad.concat(datasets, join='outer')
 
-# Perform minimal filtering to prevent NaNs
-cell_mask, _ = sc.pp.filter_cells(adata, min_genes=1, inplace=False)
-adata = adata[cell_mask, :]
-adata_outer = adata_outer[cell_mask, :]
-
-# Filter genes
-sc.pp.filter_genes(adata_outer, min_cells=0.005 * adata_outer.shape[0])
+# Convert to CSR matrix
+adata.X = csr_matrix(adata.X)
+adata_outer.X = csr_matrix(adata_outer.X)
 
 # Make sure that there are no underscores in the cell names
 adata.obs_names = adata.obs_names.str.replace("_", "-")
 adata.obs_names_make_unique()
 adata_outer.obs_names = adata.obs_names
 
-# Convert to CSR matrix
-adata.X = csr_matrix(adata.X)
-adata_outer.X = csr_matrix(adata_outer.X)
+# Filter genes with no counts in core atlas
+gene_mask, _ = sc.pp.filter_genes(adata[~adata.obs["transfer"]], min_cells=1, inplace=False)
+adata = adata[:, gene_mask]
+
+# Filter cells with no counts
+cell_mask, _ = sc.pp.filter_cells(adata, min_genes=1, inplace=False)
+adata = adata[cell_mask, :]
+adata_outer = adata_outer[cell_mask, :]
+
+# Filter genes with too few occurrences in outer join
+sc.pp.filter_genes(adata_outer, min_cells=0.005 * adata_outer.shape[0])
 
 adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
 adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
@@ -88,16 +95,22 @@ def to_Florent_case(s: str):
     return corrected[0].upper() + corrected[1:]
 
 for column in columns_required.keys():
+    if column == "transfer":
+        continue
     # Convert first to string and then to category
     adata.obs[column] = adata.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
 
 adata_outer.obs = adata.obs
 
-with open("batches.txt", "w") as f:
-    f.write("\n".join(adata.obs["batch"].unique()))
-
 adata.layers["counts"] = adata.X
 adata_outer.layers["counts"] = adata_outer.X
 
-adata.write_h5ad(args.output_inner)
-adata_outer.write_h5ad(args.output_outer)
+if any(adata.obs["transfer"]):
+    adata_transfer = adata[adata.obs["transfer"]]
+    adata_transfer.write_h5ad(args.output_transfer)
+
+adata_notransfer = adata[~adata.obs["transfer"]]
+adata_notransfer.write_h5ad(args.output_integration)
+
+adata.write_h5ad(args.output_intersection)
+adata_outer.write_h5ad(args.output_counts)
