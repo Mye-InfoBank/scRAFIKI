@@ -37,7 +37,7 @@ process INTEGRATE_SCARCHES {
   adata_query = adata_query[:, df_hvgs[df_hvgs["highly_variable"]].index.to_list()].copy()
   adata_output = adata_query.copy()
 
-  if ${has_celltypes}:
+  if ${has_celltypes ? "True" : "False"}:
     known_cell_types = adata_reference.obs["cell_type"].unique()
     adata_query.obs["cell_type"] = adata_query.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
 
