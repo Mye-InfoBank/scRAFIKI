@@ -64,32 +64,41 @@ workflow INTEGRATION {
             "scvi"
         )
 
-        INTEGRATE_SCANVI(
-            ch_adata_core,
-            ch_hvgs,
-            INTEGRATE_SCVI.out.model
-        )
+        ch_integrated = INTEGRATE.out.integrated
+            .mix(INTEGRATE_GPU.out.integrated)
+            .mix(INTEGRATE_SCVI.out.integrated)
 
-        ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
-        ch_scanvi_model = INTEGRATE_SCANVI.out.model
-        ch_scanvi_integrated = INTEGRATE_SCANVI.out.integrated
+        if (params.has_celltypes) {
+            INTEGRATE_SCANVI(
+                ch_adata_core,
+                ch_hvgs,
+                INTEGRATE_SCVI.out.model
+            )
+
+            ch_integrated = ch_integrated.mix(INTEGRATE_SCANVI.out.integrated)
+
+            ch_arches_basemodel = INTEGRATE_SCANVI.out.model
+            ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
+            ch_core_integrated = INTEGRATE_SCANVI.out.integrated
+        } else {
+            ch_arches_basemodel = INTEGRATE_SCVI.out.model
+            ch_scanvi_labels = Channel.empty()
+            ch_core_integrated = INTEGRATE_SCVI.out.integrated
+        }
 
         INTEGRATE_SCARCHES(
             ch_adata_extended,
-            ch_scanvi_integrated.join(ch_scanvi_model),
+            ch_core_integrated.join(ch_arches_basemodel),
+            params.has_celltypes,
             ch_hvgs
         )
 
         MERGE_EXTENDED(
             INTEGRATE_SCARCHES.out.integrated,
-            ch_scanvi_integrated
+            ch_core_integrated
         )
 
-        ch_integrated = INTEGRATE.out.integrated
-            .mix(INTEGRATE_GPU.out.integrated)
-            .mix(INTEGRATE_SCVI.out.integrated)
-            .mix(ch_scanvi_integrated)
-            .mix(MERGE_EXTENDED.out)
+        ch_integrated = ch_integrated.mix(MERGE_EXTENDED.out)
 
         ch_integrated_types = ch_integrated
             .map{ meta, adata -> [meta, adata, integration_types[meta.integration]] }
@@ -102,6 +111,6 @@ workflow INTEGRATION {
 
     emit:
         integrated = ch_integrated
-        model = params.has_extended ? INTEGRATE_SCARCHES.out.model : ch_scanvi_model
+        model = params.has_extended ? INTEGRATE_SCARCHES.out.model : ch_arches_basemodel
         scanvi_labels = ch_scanvi_labels
 }
