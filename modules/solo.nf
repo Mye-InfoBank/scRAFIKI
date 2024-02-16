@@ -8,6 +8,7 @@ process SOLO {
     input:
         tuple val(meta), path(adata)
         tuple val(meta2), path(scvi_model)
+        val(has_celltypes)
         val(batch)
 
     output:
@@ -26,8 +27,12 @@ process SOLO {
 
     adata = sc.read_h5ad("${adata}")
 
-    scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
-    scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
+    if ${has_celltypes ? "True" : "False"}:
+        scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
+        scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
+    else:
+        scvi.model.SCVI.setup_anndata(adata, batch_key="batch")
+        scvi_model = scvi.model.SCVI.load("${scvi_model}", adata=adata)
 
     solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
 
