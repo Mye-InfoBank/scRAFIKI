@@ -53,6 +53,7 @@ workflow {
 
     DOUBLETS(
         ch_adata_intersection,
+        ch_adata_integration,
         ch_hvgs,
         INTEGRATION.out.model,
         INTEGRATION.out.integrated,

@@ -36,6 +36,9 @@ process INTEGRATE_SCARCHES {
   adata_query = adata_query[:, df_hvgs[df_hvgs["highly_variable"]].index.to_list()].copy()
   adata_output = adata_query.copy()
 
+  known_cell_types = adata_reference.obs["cell_type"].unique()
+  adata_query.obs["cell_type"] = adata_query.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
+
   sca.models.SCANVI.prepare_query_anndata(
       adata=adata_query, reference_model=reference_model_path
   )
@@ -46,7 +49,7 @@ process INTEGRATE_SCARCHES {
       freeze_dropout=True,
   )
 
-  surgery_epochs = 500
+  surgery_epochs = 100
   early_stopping_kwargs_surgery = {
       "early_stopping_monitor": "elbo_train",
       "early_stopping_patience": 10,
