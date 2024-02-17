@@ -6,7 +6,7 @@ process INTEGRATE_SCARCHES {
 
   input:
   tuple val(meta), path(query)
-  tuple val(meta2), path(reference), path(scanvi_model, stageAs: "scanvi_model")
+  tuple val(meta2), path(reference), path(base_model, stageAs: "base_model")
   val(has_celltypes)
   tuple val(meta3), path(hvgs)
   
@@ -25,7 +25,7 @@ process INTEGRATE_SCARCHES {
   import anndata as ad
   import pandas as pd
 
-  reference_model_path = "${scanvi_model}"
+  reference_model_path = "${base_model}"
   surgery_model_path = "${model}"
   reference_path = "${reference}"
   query_path = "${query}"
