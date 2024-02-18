@@ -6,7 +6,8 @@ process INTEGRATE_SCARCHES {
 
   input:
   tuple val(meta), path(query)
-  tuple val(meta2), path(reference), path(scanvi_model, stageAs: "scanvi_model")
+  tuple val(meta2), path(reference), path(base_model, stageAs: "base_model")
+  val(has_celltypes)
   tuple val(meta3), path(hvgs)
   
   output:
@@ -24,7 +25,7 @@ process INTEGRATE_SCARCHES {
   import anndata as ad
   import pandas as pd
 
-  reference_model_path = "${scanvi_model}"
+  reference_model_path = "${base_model}"
   surgery_model_path = "${model}"
   reference_path = "${reference}"
   query_path = "${query}"
@@ -36,18 +37,29 @@ process INTEGRATE_SCARCHES {
   adata_query = adata_query[:, df_hvgs[df_hvgs["highly_variable"]].index.to_list()].copy()
   adata_output = adata_query.copy()
 
-  known_cell_types = adata_reference.obs["cell_type"].unique()
-  adata_query.obs["cell_type"] = adata_query.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
+  if ${has_celltypes ? "True" : "False"}:
+    known_cell_types = adata_reference.obs["cell_type"].unique()
+    adata_query.obs["cell_type"] = adata_query.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
 
-  sca.models.SCANVI.prepare_query_anndata(
-      adata=adata_query, reference_model=reference_model_path
-  )
+    sca.models.SCANVI.prepare_query_anndata(
+        adata=adata_query, reference_model=reference_model_path
+    )
 
-  surgery_model = sca.models.SCANVI.load_query_data(
-      adata_query,
-      reference_model_path,
-      freeze_dropout=True,
-  )
+    surgery_model = sca.models.SCANVI.load_query_data(
+        adata_query,
+        reference_model_path,
+        freeze_dropout=True,
+    )
+  else:
+    sca.models.SCVI.prepare_query_anndata(
+        adata=adata_query, reference_model=reference_model_path
+    )
+
+    surgery_model = sca.models.SCVI.load_query_data(
+        adata_query,
+        reference_model_path,
+        freeze_dropout=True,
+    )
 
   surgery_epochs = 100
   early_stopping_kwargs_surgery = {

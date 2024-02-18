@@ -28,6 +28,7 @@ workflow DOUBLETS {
         SOLO(
             PREPARE_SOLO.out.adata.collect(),
             ch_scanvi_model.collect(),
+            params.has_celltypes,
             ch_batches
         )
 
