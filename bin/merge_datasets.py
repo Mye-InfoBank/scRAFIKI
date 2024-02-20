@@ -23,12 +23,18 @@ parser.add_argument("--output_integration", help="Output file containing only ce
 parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str)
 parser.add_argument("--output_transfer", help="Output file containing all cells which require transfer learning", type=str)
 parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
+parser.add_argument("--min_cells", help='Minimum number of cells to keep a gene', type=int, required=False, default=50)
 
 args = parser.parse_args()
 
 datasets = [ad.read_h5ad(f) for f in args.input]
 
-for dataset in datasets:
+for file_name, dataset in zip(args.input, datasets):
+    # Make sure dataset is not empty
+    if dataset.shape[0] == 0 or dataset.shape[1] == 0:
+        raise ValueError(
+            f'Dataset is empty: {file_name}'
+        )
     # Make sure all required columns are present
     for column, required in columns_required.items():
         if column not in dataset.obs.columns:
@@ -64,7 +70,7 @@ adata = adata[cell_mask, :]
 adata_outer = adata_outer[cell_mask, :]
 
 # Filter genes with too few occurrences in outer join
-sc.pp.filter_genes(adata_outer, min_cells=0.005 * adata_outer.shape[0])
+sc.pp.filter_genes(adata_outer, min_cells=args.min_cells)
 
 adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
 adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
