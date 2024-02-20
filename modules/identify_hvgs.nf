@@ -19,10 +19,21 @@ process IDENTIFY_HVGS {
     import scanpy as sc
 
     adata = sc.read_h5ad("${adata}")
-    sc.pp.highly_variable_genes(adata,
-                                n_top_genes=${n_hvgs},
-                                flavor="seurat_v3",
-                                batch_key="batch")
+
+    span = 0.3 # default
+    worked = False
+
+    while not worked and span <= 1:
+        try:
+            sc.pp.highly_variable_genes(adata,
+                                        n_top_genes=10000,
+                                        flavor="seurat_v3",
+                                        span=span,
+                                        batch_key="batch")
+            worked = True
+        except:
+            span += 0.1
+            print(f"Increased span to {span}")
 
     adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
     """
