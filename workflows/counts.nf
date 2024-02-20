@@ -1,4 +1,5 @@
 include { DECONTX } from "../modules/decontX.nf"
+include { CELLBENDER } from "../modules/cellbender.nf"
 include { NORMALIZE } from "../modules/normalize.nf"
 
 workflow COUNTS {
@@ -11,6 +12,7 @@ workflow COUNTS {
             DECONTX(ch_preprocessed)
             ch_counts = DECONTX.out
         } else {
+            CELLBENDER(ch_preprocessed)
             ch_counts = ch_preprocessed
         }
 
