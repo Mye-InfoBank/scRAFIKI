@@ -56,6 +56,7 @@ if args.no_symbols:
 # Convert varnames to upper case
 adata.var_names = adata.var_names.str.upper()
 adata.var_names = adata.var_names.str.replace("_", "-")
+adata.var_names = adata.var_names.str.replace(".", "-")
 
 print("Aggregating duplicate varnames")
 # Calculate mean of same-named genes
