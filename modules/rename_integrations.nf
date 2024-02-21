@@ -10,8 +10,7 @@ process RENAME_INTEGRATIONS {
     tuple val(meta), path(adata)
   
   output:
-    file "merged.h5ad"
-    file "metadata.pkl"
+    tuple val(meta), path("atlas.h5ad")
   
   script:
   """

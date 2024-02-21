@@ -12,8 +12,8 @@ process MERGE {
     path(obs)
   
   output:
-    file "merged.h5ad"
-    file "metadata.pkl"
+    tuple val(meta), file("merged.h5ad"), emit: adata
+    tuple val(meta), file("metadata.pkl"), emit: metadata
   
   script:
   """

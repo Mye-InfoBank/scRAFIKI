@@ -85,5 +85,5 @@ workflow {
         ch_obs.map{ meta, obs -> obs}.collect()
     )
 
-    RENAME_INTEGRATIONS(MERGE.out)
+    RENAME_INTEGRATIONS(MERGE.out.adata)
 }
