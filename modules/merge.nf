@@ -7,7 +7,7 @@ process MERGE {
   label "process_high_memory"
 
   input:
-    tuple val(meta), path(counts)
+    tuple val(meta), path(base, stageAs: 'base.h5ad')
     path(obsm)
     path(obs)
   
@@ -25,7 +25,7 @@ process MERGE {
   import os
   from scipy.sparse import csc_matrix
 
-  adata = ad.read_h5ad("${counts}")
+  adata = ad.read_h5ad("${base}")
   adata.obsm = {}
 
   for layer in adata.layers.keys():
