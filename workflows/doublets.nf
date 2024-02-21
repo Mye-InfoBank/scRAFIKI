@@ -41,7 +41,7 @@ workflow DOUBLETS {
             ch_solo_annotations
         )
 
-        EXTRACT_EMBEDDING(DEDOUBLET_INTEGRATIONS.out)
+        EXTRACT_EMBEDDING(DEDOUBLET_INTEGRATIONS.out, "X_emb")
 
         DEDOUBLET_COUNTS(
             ch_raw,

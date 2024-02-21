@@ -64,7 +64,8 @@ workflow {
         DOUBLETS.out.integrations,
         Channel.from(params.leiden_resolutions),
         CELLTYPIST.out,
-        Channel.value(params.entropy_initial_smoothness)
+        Channel.value(params.entropy_initial_smoothness),
+        Channel.value("X_emb")
     )
 
     ch_obs = CLUSTERING.out.obs.mix(

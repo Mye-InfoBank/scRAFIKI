@@ -8,7 +8,7 @@ process UMAP {
     tuple val(meta), path(adata)
 
     output:
-    tuple val(meta), path("X_${meta.integration}.pkl")
+    tuple val(meta), path("X_${meta.id}.pkl")
 
     script:
     """
@@ -25,6 +25,6 @@ process UMAP {
     sc.tl.umap(adata)
     
     df = pd.DataFrame(adata.obsm["X_umap"], index=adata.obs_names)
-    df.to_pickle("X_${meta.integration}.pkl")
+    df.to_pickle("X_${meta.id}.pkl")
     """
 }

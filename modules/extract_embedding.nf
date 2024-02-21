@@ -6,6 +6,7 @@ process EXTRACT_EMBEDDING {
 
   input:
   tuple val(meta), path(input)
+  val(embedding)
   
   output:
   tuple val(meta), path("${meta.integration}.pkl")
@@ -19,7 +20,7 @@ process EXTRACT_EMBEDDING {
 
   adata = ad.read_h5ad("${input}")
 
-  ar = adata.obsm["X_emb"]
+  ar = adata.obsm["${embedding}"]
 
   df = pd.DataFrame(ar, index=adata.obs_names)
   df.to_pickle("${meta.integration}.pkl")
