@@ -14,10 +14,9 @@ workflow CLUSTERING {
         ch_leiden_resolutions
         ch_celltypist
         ch_entropy_smoothness
-        embedding
 
     main:
-        NEIGHBORS(ch_adata, embedding)
+        NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
         SCSHC_CLUSTERING(ch_adata.filter{ meta, adata -> meta.integration == "unintegrated" })

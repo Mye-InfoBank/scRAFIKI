@@ -10,6 +10,7 @@ include { CELLTYPIST } from "./modules/celltypist.nf"
 include { CELL_CYCLE } from "./modules/cell_cycle.nf"
 include { CELL_QC    } from "./modules/cell_qc.nf"
 include { MERGE } from "./modules/merge.nf"
+include { RENAME_INTEGRATIONS } from "./modules/rename_integrations.nf"
 
 // Workflows
 include { PREPROCESSING } from "./workflows/preprocessing.nf"
@@ -64,8 +65,7 @@ workflow {
         DOUBLETS.out.integrations,
         Channel.from(params.leiden_resolutions),
         CELLTYPIST.out,
-        Channel.value(params.entropy_initial_smoothness),
-        Channel.value("X_emb")
+        Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
@@ -84,4 +84,6 @@ workflow {
         ch_obsm.map{ meta, obsm -> obsm}.collect(),
         ch_obs.map{ meta, obs -> obs}.collect()
     )
+
+    RENAME_INTEGRATIONS(MERGE.out)
 }

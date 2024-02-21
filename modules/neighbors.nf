@@ -6,7 +6,6 @@ process NEIGHBORS {
 
     input:
     tuple val(meta), path(adata)
-    val(embedding)
 
     output:
     tuple val(meta), path("*.h5ad")
@@ -22,7 +21,7 @@ process NEIGHBORS {
     sc.settings.n_jobs = ${task.cpus}
 
     adata = sc.read_h5ad("${adata}")
-    sc.pp.neighbors(adata, use_rep="${embedding}")
+    sc.pp.neighbors(adata, use_rep="X_emb")
     adata.write_h5ad("${meta.id}.neighbors.h5ad")
     """
 }

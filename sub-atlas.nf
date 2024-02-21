@@ -1,13 +1,16 @@
+include { CLEAN_ADATA } from './modules/clean_adata.nf'
 include { SPLIT_CATEGORIES } from './modules/split_categories.nf'
 include { CLUSTERING } from './workflows/clustering.nf'
-include { EXTRACT_EMBEDDING } from './modules/extract_embedding.nf'
 include { MERGE } from './modules/merge.nf'
 
-ch_adata = Channel.fromPath(params.input)
+ch_adata_input = Channel.fromPath(params.input)
     .map{ adata -> [[id: 'input'], adata]}
 ch_categories = Channel.fromPath(params.category_annotation)
 
 workflow {
+    CLEAN_ADATA(ch_adata_input, params.integration)
+    ch_adata = CLEAN_ADATA.out.adata
+
     SPLIT_CATEGORIES(ch_adata, ch_categories, params.category)
 
     ch_categoric_adata = SPLIT_CATEGORIES.out
@@ -19,17 +22,12 @@ workflow {
         ch_categoric_adata,
         Channel.from(params.leiden_resolutions),
         Channel.empty(),
-        Channel.value(params.entropy_initial_smoothness),
-        Channel.value(params.integration.split("_")[1])
-    )
-
-    EXTRACT_EMBEDDING(
-        ch_adata,
-        "X_" + params.integration
+        Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obsm = CLUSTERING.out.obsm
-        .mix(EXTRACT_EMBEDDING.out)
+        .mix(CLEAN_ADATA.out.embedding)
+        .mix(CLEAN_ADATA.out.umap)
         .map{ meta, obsm -> obsm}
         .collect()
 
