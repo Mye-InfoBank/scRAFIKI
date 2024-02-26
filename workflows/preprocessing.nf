@@ -26,7 +26,8 @@ workflow PREPROCESSING {
         MERGE_DATASETS(
             FILTER.out.flatMap{ meta, adata -> adata }.collect(),
             params.min_cells,
-            params.custom_metadata
+            params.custom_metadata,
+            params.custom_hvgs
         )
 
         ch_adata_integration = MERGE_DATASETS.out.integration

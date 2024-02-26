@@ -25,6 +25,7 @@ parser.add_argument("--output_transfer", help="Output file containing all cells 
 parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
 parser.add_argument("--min_cells", help='Minimum number of cells to keep a gene', type=int, required=False, default=50)
 parser.add_argument("--custom_metadata", help="Additional metadata columns to include", type=str, nargs="*")
+parser.add_argument("--custom_genes", help="Additional genes to include", type=str, nargs="*")
 
 args = parser.parse_args()
 
@@ -54,6 +55,13 @@ for file_name, dataset in zip(args.input, datasets):
 
 adata = ad.concat(datasets)
 adata_outer = ad.concat(datasets, join='outer')
+
+additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_names]
+
+# Add custom genes from outer join to the intersection
+if additional_genes:
+    adata_additional = adata_outer[adata.obs_names, additional_genes]
+    adata = ad.concat([adata, adata_additional], join="outer", axis=1)
 
 # Convert to CSR matrix
 adata.X = csr_matrix(adata.X)
