@@ -8,6 +8,7 @@ process IDENTIFY_HVGS {
     input:
     tuple val(meta), path(adata)
     val(n_hvgs)
+    val(custom_hvgs)
     
     output:
     tuple val(meta), path("${meta.id}.hvgs.pkl")
@@ -34,6 +35,12 @@ process IDENTIFY_HVGS {
         except:
             span += 0.1
             print(f"Increased span to {span}")
+    
+    custom_hvgs = "${custom_hvgs}".split(" ")
+    custom_hvgs = [x.upper().replace("_", "-").replace(".", "-") for x in custom_hvgs]
+
+    # Set "highly_variable" to True for custom HVGs
+    adata.var.loc[custom_hvgs, "highly_variable"] = True
 
     adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
     """
