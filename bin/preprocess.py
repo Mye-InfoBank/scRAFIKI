@@ -66,7 +66,7 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
 # Make sure adata.X contains raw counts
 max_diff = np.abs(adata.X - np.round(adata.X)).max()
 if max_diff > 1e-3:
-    problems.append(f"adata.X contains does not contain raw counts. Max diff: {max_diff}")
+    problems.append(f"adata.X does not contain raw counts. Max diff: {max_diff}")
 
 # Make sure dataset is not empty
 if adata.shape[0] == 0 or adata.shape[1] == 0:
