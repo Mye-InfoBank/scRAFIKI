@@ -45,7 +45,7 @@ for file_name, dataset in zip(args.input, datasets):
         if column not in dataset.obs.columns:
             if required:
                 raise ValueError(
-                    f"Column {column} is required but not found in {dataset}"
+                    f"Column {column} is required but not found in {file_name}"
                 )
             else:
                 dataset.obs[column] = "Unknown"

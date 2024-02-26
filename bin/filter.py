@@ -44,6 +44,10 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
         adata.__dict__["_raw"].__dict__["_var"].rename(columns={"_index": "features"})
     )
 
+# Make sure adata.X contains raw counts
+difference_to_closest_int = np.abs(adata.X - np.round(adata.X)).max()
+assert difference_to_closest_int < 1e-3, f"adata.X does not contain raw counts, largest difference to whole number: {difference_to_closest_int}"
+
 if args.no_symbols:
     print("Converting varnames to gene symbols")
     import mygene
