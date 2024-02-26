@@ -3,13 +3,27 @@
 import scanpy as sc
 import numpy as np
 import argparse
+from scipy.sparse import csr_matrix
+
+columns_required = {
+    "sex": False,
+    "batch": True,
+    "cell_type": False,
+    "condition": False,
+    "patient": True,
+    "tissue": True,
+    "dataset": True,
+    "transfer": True
+}
 
 parser = argparse.ArgumentParser(description="Filter dataset")
 parser.add_argument("--input", help="Input file", type=str)
 parser.add_argument("--id", help="Dataset ID", type=str)
 parser.add_argument("--output", help="Output file", type=str)
+parser.add_argument("--problems", help="Problems file", type=str)
 parser.add_argument("--no-symbols", help="Convert varnames to gene symbols", action="store_true")
 parser.add_argument("--transfer", help="Apply transfer leanring on dataset", action="store_true")
+parser.add_argument("--custom_metadata", help="Additional metadata columns to include", type=str, nargs="*")
 
 parser.add_argument("--min_genes", help="Minimum number of genes", type=int, required=False)
 parser.add_argument("--max_genes", help="Maximum number of genes", type=int, required=False)
@@ -18,6 +32,8 @@ parser.add_argument("--max_counts", help="Maximum number of counts", type=int, r
 parser.add_argument("--max_pct_mito", help="Maximum percentage of mitochondrial counts", type=float, required=False)
 
 args = parser.parse_args()
+
+problems = []
 
 # Function borrowed from https://github.com/icbi-lab/luca/blob/5ffb0a4671e9c288b10e73de18d447ee176bef1d/lib/scanpy_helper_submodule/scanpy_helpers/util.py#L122C1-L135C21
 def aggregate_duplicate_var(adata, aggr_fun=np.mean):
@@ -33,6 +49,9 @@ def aggregate_duplicate_var(adata, aggr_fun=np.mean):
         return adata_dedup
     else:
         return adata
+    
+columns_additional = {column: False for column in args.custom_metadata}
+columns_considered = {**columns_required, **columns_additional}
 
 print("Reading input")
 adata = sc.read_h5ad(args.input)
@@ -45,8 +64,53 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
     )
 
 # Make sure adata.X contains raw counts
-difference_to_closest_int = np.abs(adata.X - np.round(adata.X)).max()
-assert difference_to_closest_int < 1e-3, f"adata.X does not contain raw counts, largest difference to whole number: {difference_to_closest_int}"
+max_diff = np.abs(adata.X - np.round(adata.X)).max()
+if max_diff > 1e-3:
+    problems.append(f"adata.X contains does not contain raw counts. Max diff: {max_diff}")
+
+# Make sure dataset is not empty
+if adata.shape[0] == 0 or adata.shape[1] == 0:
+    problems.append(f"Dataset is empty.")
+
+# Make sure all required columns are present
+for column, required in columns_considered.items():
+    if column not in adata.obs.columns:
+        if required:
+            problems.append(f"Column {column} is required but not found.")
+        else:
+            adata.obs[column] = "Unknown"
+
+if not args.no_symbols:
+    # Make sure there are no ensembl gene ids or entrez gene ids in varnames
+    if adata.var_names.str.match(r'ENS[A-Z]+[0-9]{11}').any():
+        problems.append("varnames contain ensembl gene ids")
+    if adata.var_names.str.match(r"d+").any():
+        problems.append("varnames contain entrez gene ids (or just numbers)")
+
+# Make sure there are no duplicate obs names
+if adata.obs_names.duplicated().any():
+    problems.append("Duplicate obs names found")
+
+# Make sure there are no duplicate var names
+if adata.var_names.duplicated().any():
+    problems.append("Duplicate var names found")
+
+# Terminate if there are any problems
+if problems:
+    with open(args.problems, "w") as f:
+        f.write("\n".join(problems))
+    print("Problems found. Terminating.")
+    exit(0)
+
+# Subset columns
+adata.obs = adata.obs[columns_considered.keys()]
+
+# Prepare obs names
+adata.obs_names = args.id + "_" + adata.obs_names
+adata.obs_names = adata.obs_names.str.replace("_", "-")
+
+# Convert to CSR matrix
+adata.X = csr_matrix(adata.X)
 
 if args.no_symbols:
     print("Converting varnames to gene symbols")

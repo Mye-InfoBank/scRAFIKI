@@ -12,7 +12,7 @@ process INTEGRATE {
   output:
   tuple val(meta_out), path("${method}.h5ad"), emit: integrated
   tuple val(meta_out), path("model"), emit: model, optional: true
-  
+
   script:
   meta_out = ["id": "${method}", "integration": "${method}"]
   """
