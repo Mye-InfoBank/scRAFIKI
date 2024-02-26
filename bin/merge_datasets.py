@@ -61,7 +61,9 @@ additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_
 # Add custom genes from outer join to the intersection
 if additional_genes:
     adata_additional = adata_outer[adata.obs_names, additional_genes]
-    adata = ad.concat([adata, adata_additional], join="outer", axis=1)
+    adata_concatenated = ad.concat([adata, adata_additional], join="outer", axis=1)
+    adata_concatenated.obs, adata_concatenated.obsm = adata.obs, adata.obsm
+    adata = adata_concatenated
 
 # Convert to CSR matrix
 adata.X = csr_matrix(adata.X)
