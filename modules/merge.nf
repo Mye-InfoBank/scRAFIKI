@@ -27,7 +27,6 @@ process MERGE {
 
   adata = ad.read_h5ad("${counts}")
   adata.obsm = {}
-  adata.layers = {}
 
   for layer in adata.layers.keys():
     adata.layers[layer] = csc_matrix(adata.layers[layer]).astype(np.float32)
