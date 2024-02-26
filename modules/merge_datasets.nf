@@ -6,6 +6,7 @@ process MERGE_DATASETS {
   input:
   path(adatas)
   val(min_cells)
+  val(custom_metadata)
   
   output:
   path("datasets.integration.h5ad"), emit: integration
@@ -18,6 +19,6 @@ process MERGE_DATASETS {
   
   script:
   """
-  merge_datasets.py --input ${adatas} --min_cells ${min_cells} --output_transfer datasets.transfer.h5ad --output_intersection datasets.intersection.h5ad --output_integration datasets.integration.h5ad --output_counts datasets.counts.h5ad
+  merge_datasets.py --input ${adatas} --custom_metadata ${custom_metadata} --min_cells ${min_cells} --output_transfer datasets.transfer.h5ad --output_intersection datasets.intersection.h5ad --output_integration datasets.integration.h5ad --output_counts datasets.counts.h5ad
   """
 }
