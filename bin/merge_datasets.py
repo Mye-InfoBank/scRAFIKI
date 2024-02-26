@@ -24,8 +24,13 @@ parser.add_argument("--output_intersection", help="Output file containing all ce
 parser.add_argument("--output_transfer", help="Output file containing all cells which require transfer learning", type=str)
 parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
 parser.add_argument("--min_cells", help='Minimum number of cells to keep a gene', type=int, required=False, default=50)
+parser.add_argument("--custom_metadata", help="Additional metadata columns to include", type=str, nargs="*")
+parser.add_argument("--custom_genes", help="Additional genes to include", type=str, nargs="*")
 
 args = parser.parse_args()
+
+columns_additional = {column: False for column in args.custom_metadata}
+columns_considered = {**columns_required, **columns_additional}
 
 datasets = [ad.read_h5ad(f) for f in args.input]
 
@@ -36,7 +41,7 @@ for file_name, dataset in zip(args.input, datasets):
             f'Dataset is empty: {file_name}'
         )
     # Make sure all required columns are present
-    for column, required in columns_required.items():
+    for column, required in columns_considered.items():
         if column not in dataset.obs.columns:
             if required:
                 raise ValueError(
@@ -46,10 +51,19 @@ for file_name, dataset in zip(args.input, datasets):
                 dataset.obs[column] = "Unknown"
 
     # Subset columns
-    dataset.obs = dataset.obs[columns_required.keys()]
+    dataset.obs = dataset.obs[columns_considered.keys()]
 
 adata = ad.concat(datasets)
 adata_outer = ad.concat(datasets, join='outer')
+
+additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_names]
+
+# Add custom genes from outer join to the intersection
+if additional_genes:
+    adata_additional = adata_outer[adata.obs_names, additional_genes]
+    adata_concatenated = ad.concat([adata, adata_additional], join="outer", axis=1)
+    adata_concatenated.obs, adata_concatenated.obsm = adata.obs, adata.obsm
+    adata = adata_concatenated
 
 # Convert to CSR matrix
 adata.X = csr_matrix(adata.X)
@@ -100,7 +114,7 @@ def to_Florent_case(s: str):
 
     return corrected[0].upper() + corrected[1:]
 
-for column in columns_required.keys():
+for column in columns_considered.keys():
     if column == "transfer":
         continue
     # Convert first to string and then to category

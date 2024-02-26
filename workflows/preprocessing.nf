@@ -23,7 +23,12 @@ workflow PREPROCESSING {
 
         FILTER(ch_samples.h5ad.map{ meta, adata, format -> [meta, adata]}.mix(RDS_TO_H5AD.out))
         GENES_UPSET(FILTER.out.map{ meta, adata -> adata }.collect())
-        MERGE_DATASETS(FILTER.out.flatMap{ meta, adata -> adata }.collect(), params.min_cells)
+        MERGE_DATASETS(
+            FILTER.out.flatMap{ meta, adata -> adata }.collect(),
+            params.min_cells,
+            params.custom_metadata,
+            params.custom_hvgs
+        )
 
         ch_adata_integration = MERGE_DATASETS.out.integration
             .map{ adata -> [[id: "integration"], adata] }
@@ -42,7 +47,8 @@ workflow PREPROCESSING {
 
         IDENTIFY_HVGS(
             ch_adata_integration,
-            params.integration_hvgs
+            params.integration_hvgs,
+            params.custom_hvgs
         )
 
     emit:
