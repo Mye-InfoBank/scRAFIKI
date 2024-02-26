@@ -36,11 +36,13 @@ process IDENTIFY_HVGS {
             span += 0.1
             print(f"Increased span to {span}")
     
-    custom_hvgs = "${custom_hvgs}".split(" ")
+    custom_hvgs = "${custom_hvgs.join(" ")}".split(" ")
     custom_hvgs = [x.upper().replace("_", "-").replace(".", "-") for x in custom_hvgs]
+    custom_hvgs = [x for x in custom_hvgs if x in adata.var_names]
 
-    # Set "highly_variable" to True for custom HVGs
-    adata.var.loc[custom_hvgs, "highly_variable"] = True
+    if len(custom_hvgs) > 0:
+        # Set "highly_variable" to True for custom HVGs
+        adata.var.loc[custom_hvgs, "highly_variable"] = True
 
     adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
     """
