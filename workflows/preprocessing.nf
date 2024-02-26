@@ -1,7 +1,7 @@
 include { check_samplesheet } from '../modules/check_samplesheet'
 
 include { RDS_TO_H5AD } from "../modules/rds_to_h5ad.nf"
-include { FILTER } from "../modules/filter.nf"
+include { PREPROCESS } from "../modules/preprocess.nf"
 include { GENES_UPSET } from "../modules/genes_upset.nf"
 include { MERGE_DATASETS } from "../modules/merge_datasets.nf"
 include { COMPOSITION } from "../modules/composition.nf"
@@ -21,10 +21,10 @@ workflow PREPROCESSING {
         
         RDS_TO_H5AD(ch_samples.rds.map{ meta, rds, format -> [meta, rds]})
 
-        FILTER(ch_samples.h5ad.map{ meta, adata, format -> [meta, adata]}.mix(RDS_TO_H5AD.out))
-        GENES_UPSET(FILTER.out.map{ meta, adata -> adata }.collect())
+        PREPROCESS(ch_samples.h5ad.map{ meta, adata, format -> [meta, adata]}.mix(RDS_TO_H5AD.out))
+        GENES_UPSET(PREPROCESS.out.map{ meta, adata -> adata }.collect())
         MERGE_DATASETS(
-            FILTER.out.flatMap{ meta, adata -> adata }.collect(),
+            PREPROCESS.out.flatMap{ meta, adata -> adata }.collect(),
             params.min_cells,
             params.custom_metadata,
             params.custom_hvgs

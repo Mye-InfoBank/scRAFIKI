@@ -1,4 +1,4 @@
-process FILTER {
+process PREPROCESS {
   tag "${meta.id}"
   container "bigdatainbiomedicine/sc-rpy:1.2"
 
@@ -8,7 +8,7 @@ process FILTER {
   tuple val(meta), path(input)
   
   output:
-  tuple val(meta), path("${meta.id}.filtered.h5ad")
+  tuple val(meta), path("${meta.id}.preprocessed.h5ad")
   
   script:
   min_counts = meta.min_counts ? "--min_counts ${meta.min_counts}" : ""
@@ -19,6 +19,6 @@ process FILTER {
   no_symbols = meta.no_symbols && meta.no_symbols.toLowerCase() == "true" ? "--no-symbols" : ""
   transfer = meta.transfer && meta.transfer.toLowerCase() == "true" ? "--transfer" : ""
   """
-  filter.py --input ${input} --id ${meta.id} ${transfer} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.filtered.h5ad
+  preprocess.py --input ${input} --id ${meta.id} ${transfer} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.preprocessed.h5ad
   """
 }
