@@ -64,7 +64,8 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
     )
 
 # Make sure adata.X contains raw counts
-max_diff = np.abs(adata.X - np.round(adata.X)).max()
+x_account_means = adata.X * 6 # Account for averaging of duplicate genes (2 or 3 duplicates)
+max_diff = np.abs(x_account_means - np.round(x_account_means)).max()
 if max_diff > 1e-3:
     problems.append(f"adata.X does not contain raw counts. Max diff: {max_diff}")
 
