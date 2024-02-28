@@ -110,6 +110,9 @@ adata.obs = adata.obs[columns_considered.keys()]
 adata.obs_names = args.id + "_" + adata.obs_names
 adata.obs_names = adata.obs_names.str.replace("_", "-")
 
+adata.layers = {}
+adata.obsm = {}
+
 # Convert to CSR matrix
 adata.X = csr_matrix(adata.X)
 

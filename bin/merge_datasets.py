@@ -24,7 +24,7 @@ datasets = [ad.read_h5ad(f) for f in args.input]
 adata = ad.concat(datasets)
 adata_outer = ad.concat(datasets, join='outer')
 
-additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_names]
+additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_names and gene in adata_outer.var_names]
 
 # Add custom genes from outer join to the intersection
 if additional_genes:
