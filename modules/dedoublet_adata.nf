@@ -25,7 +25,7 @@ process DEDOUBLET_ADATA {
     solo_annotation = solo_annotation.reindex(adata.obs_names)
 
     # Keep only cells with "singlet" in the "doublet_label" column
-    adata = adata[solo_annotation["doublet_label"] == "singlet", :]
+    adata = adata[~solo_annotation["doublet_label"] == "doublet", :]
 
     # Save the AnnData object
     adata.write_h5ad("${meta.id}.dedup.h5ad")
