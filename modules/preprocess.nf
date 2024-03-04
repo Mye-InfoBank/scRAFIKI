@@ -20,7 +20,8 @@ process PREPROCESS {
   max_pct_mito = meta.max_pct_mito ? "--max_pct_mito ${meta.max_pct_mito}" : ""
   no_symbols = meta.no_symbols && meta.no_symbols.toLowerCase() == "true" ? "--no-symbols" : ""
   transfer = meta.transfer && meta.transfer.toLowerCase() == "true" ? "--transfer" : ""
+  sure_raw = meta.sure_raw && meta.sure_raw.toLowerCase() == "true" ? "--sure_raw" : ""
   """
-  preprocess.py --input ${input} --custom_metadata ${custom_metadata.join(" ")} --id ${meta.id} ${transfer} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.preprocessed.h5ad --problems ${meta.id}.problems.txt
+  preprocess.py --input ${input} --custom_metadata ${custom_metadata.join(" ")} --id ${meta.id} ${sure_raw} ${transfer} ${no_symbols} ${min_counts} ${max_counts} ${min_genes} ${max_genes} ${max_pct_mito} --output ${meta.id}.preprocessed.h5ad --problems ${meta.id}.problems.txt
   """
 }
