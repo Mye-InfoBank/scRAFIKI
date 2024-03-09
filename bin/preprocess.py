@@ -23,6 +23,7 @@ parser.add_argument("--output", help="Output file", type=str)
 parser.add_argument("--problems", help="Problems file", type=str)
 parser.add_argument("--no-symbols", help="Convert varnames to gene symbols", action="store_true")
 parser.add_argument("--transfer", help="Apply transfer leanring on dataset", action="store_true")
+parser.add_argument("--sure_raw", help="Skip check for raw counts", action="store_true")
 parser.add_argument("--custom_metadata", help="Additional metadata columns to include", type=str, nargs="*")
 
 parser.add_argument("--min_genes", help="Minimum number of genes", type=int, required=False)
@@ -66,7 +67,7 @@ if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"
 # Make sure adata.X contains raw counts
 x_account_means = adata.X * 6 # Account for averaging of duplicate genes (2 or 3 duplicates)
 max_diff = np.abs(x_account_means - np.round(x_account_means)).max()
-if max_diff > 1e-3:
+if max_diff > 1e-3 and not args.sure_raw:
     problems.append(f"adata.X does not contain raw counts. Max diff: {max_diff}")
 
 # Make sure dataset is not empty
