@@ -8,7 +8,7 @@ process EXTRACT_EMBEDDING {
   tuple val(meta), path(input)
   
   output:
-  tuple val(meta), path("${meta.integration}.pkl")
+  tuple val(meta), path("${meta.id}.pkl")
   
   script:
   """
@@ -22,7 +22,6 @@ process EXTRACT_EMBEDDING {
   ar = adata.obsm["X_emb"]
 
   df = pd.DataFrame(ar, index=adata.obs_names)
-  df.to_pickle("${meta.integration}.pkl")
+  df.to_pickle("${meta.id}.pkl")
   """
-
 }
