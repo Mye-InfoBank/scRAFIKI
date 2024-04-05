@@ -1,13 +1,13 @@
-include { CLEAN_ADATA } from './modules/clean_adata.nf'
-include { SPLIT_CATEGORIES } from './modules/split_categories.nf'
-include { CLUSTERING } from './workflows/clustering.nf'
-include { MERGE } from './modules/merge.nf'
+include { CLEAN_ADATA      } from '../modules/clean_adata.nf'
+include { SPLIT_CATEGORIES } from '../modules/split_categories.nf'
+include { CLUSTERING       } from '../subworkflows/clustering.nf'
+include { MERGE            } from '../modules/merge.nf'
 
-ch_adata_input = Channel.fromPath(params.input)
-    .map{ adata -> [[id: 'input'], adata]}
-ch_categories = params.category_annotation ? Channel.fromPath(params.category_annotation) : []
+workflow SUB {
+    ch_adata_input = Channel.fromPath(params.input)
+        .map{ adata -> [[id: 'input'], adata]}
+    ch_categories = params.category_annotation ? Channel.fromPath(params.category_annotation) : []
 
-workflow {
     CLEAN_ADATA(ch_adata_input, params.integration)
     ch_adata = CLEAN_ADATA.out.adata
 
@@ -35,9 +35,8 @@ workflow {
         .map{ meta, obs -> obs}
         .collect()
 
-    MERGE(
-        ch_adata,
-        ch_obsm,
-        ch_obs
-    )
+    emit:
+        adata = ch_adata
+        obsm = ch_obsm
+        obs = ch_obs
 }
