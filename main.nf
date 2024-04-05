@@ -25,7 +25,7 @@ workflow {
         SUB()
         subworkflow = SUB.out
     } else {
-        error "Invalid mode: ${params.mode}. Must be one of 'build', 'extend', or 'sub'"
+        error "Invalid mode: ${params.mode}. Please enable one of the following profiles: 'build', 'extend', or 'sub'"
     }
 
 
