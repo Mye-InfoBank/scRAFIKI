@@ -47,6 +47,9 @@ workflow PREPROCESSING {
         ch_adata_union = MERGE_DATASETS.out.union
             .map{ adata -> [[id: "union"], adata] }
 
+        ch_adata_transfer = MERGE_DATASETS.out.transfer
+            .map{ adata -> [[id: "transfer"], adata] }
+
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
@@ -59,5 +62,6 @@ workflow PREPROCESSING {
     emit:
         intersection = ch_adata_intersection
         union        = ch_adata_union
+        transfer     = ch_adata_transfer
         hvgs         = IDENTIFY_HVGS.out
 }
