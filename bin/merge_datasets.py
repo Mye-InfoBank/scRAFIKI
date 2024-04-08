@@ -90,6 +90,10 @@ adata_union.layers["counts"] = adata_union.X
 
 if args.base:
     adata_transfer = adata_intersection[~adata_intersection.obs.index.isin(adata_base.obs.index)]
+
+    known_celltypes = adata_base.obs["cell_type"].unique()
+    adata_transfer.obs["cell_type"] = adata_transfer.obs["cell_type"].map(lambda x: x if x in known_celltypes else "Unknown")
+
     adata_transfer.write_h5ad(args.output_transfer)
 
 adata_intersection.write_h5ad(args.output_intersection)
