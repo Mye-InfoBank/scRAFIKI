@@ -32,41 +32,31 @@ workflow PREPROCESSING {
         COLLECT_PROBLEMS(PREPROCESS.out.problems.map{ meta, problems -> problems}.collect())
         STOP_IF_PROBLEMS(COLLECT_PROBLEMS.out)
 
-        adatas = PREPROCESS.out.adata.map{ meta, adata -> adata }.collect()
-
-        GENES_UPSET(adatas)
+        GENES_UPSET(PREPROCESS.out.adata.mix(ch_base).map{ meta, adata -> adata }.collect())
 
         MERGE_DATASETS(
-            adatas,
+            PREPROCESS.out.adata.map{ meta, adata -> adata }.collect(),
             params.min_cells,
             params.custom_hvgs
         )
-
-        ch_adata_integration = MERGE_DATASETS.out.integration
-            .map{ adata -> [[id: "integration"], adata] }
         
         ch_adata_intersection = MERGE_DATASETS.out.intersection
             .map{ adata -> [[id: "intersection"], adata] }
 
-        ch_adata_counts = MERGE_DATASETS.out.counts
-            .map{ adata -> [[id: "counts"], adata] }
-
-        ch_transfer = MERGE_DATASETS.out.transfer.flatten()
-            .map{ adata -> [[id: adata.simpleName], adata]}
+        ch_adata_union = MERGE_DATASETS.out.union
+            .map{ adata -> [[id: "union"], adata] }
 
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
         IDENTIFY_HVGS(
-            ch_adata_integration,
+            ch_adata_intersection,
             params.integration_hvgs,
             params.custom_hvgs
         )
 
     emit:
-        integration = ch_adata_integration
         intersection = ch_adata_intersection
-        counts = ch_adata_counts
-        transfer = ch_transfer
-        hvgs = IDENTIFY_HVGS.out
+        union        = ch_adata_union
+        hvgs         = IDENTIFY_HVGS.out
 }

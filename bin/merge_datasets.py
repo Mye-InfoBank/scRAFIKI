@@ -4,16 +4,11 @@ import argparse
 import anndata as ad
 import scanpy as sc
 from scipy.sparse import csr_matrix
-import numpy as np
-
-
 
 parser = argparse.ArgumentParser(description="Merge datasets")
 parser.add_argument("--input", help="Input file", type=str, nargs="+")
-parser.add_argument("--output_integration", help="Output file containing only cells which do not require transfer learning", type=str)
 parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str)
-parser.add_argument("--output_transfer", help="Output file containing all cells which require transfer learning", type=str)
-parser.add_argument("--output_counts", help="Output file, outer join of cells and genes", type=str)
+parser.add_argument("--output_union", help="Output file, outer join of cells and genes", type=str)
 parser.add_argument("--min_cells", help='Minimum number of cells to keep a gene', type=int, required=False, default=50)
 parser.add_argument("--custom_genes", help="Additional genes to include", type=str, nargs="*")
 
@@ -21,36 +16,32 @@ args = parser.parse_args()
 
 datasets = [ad.read_h5ad(f) for f in args.input]
 
-adata = ad.concat(datasets)
-adata_outer = ad.concat(datasets, join='outer')
+adata_intersection = ad.concat(datasets)
+adata_union = ad.concat(datasets, join='outer')
 
-additional_genes = [gene for gene in args.custom_genes if gene not in adata.var_names and gene in adata_outer.var_names]
+additional_genes = [gene for gene in args.custom_genes if gene not in adata_intersection.var_names and gene in adata_union.var_names]
 
 # Add custom genes from outer join to the intersection
 if additional_genes:
-    adata_additional = adata_outer[adata.obs_names, additional_genes]
-    adata_concatenated = ad.concat([adata, adata_additional], join="outer", axis=1)
-    adata_concatenated.obs, adata_concatenated.obsm = adata.obs, adata.obsm
-    adata = adata_concatenated
+    adata_additional = adata_union[adata_intersection.obs_names, additional_genes]
+    adata_concatenated = ad.concat([adata_intersection, adata_additional], join="outer", axis=1)
+    adata_concatenated.obs, adata_concatenated.obsm = adata_intersection.obs, adata_intersection.obsm
+    adata_intersection = adata_concatenated
 
 # Convert to CSR matrix
-adata.X = csr_matrix(adata.X)
-adata_outer.X = csr_matrix(adata_outer.X)
-
-# Filter genes with no counts in core atlas
-gene_mask, _ = sc.pp.filter_genes(adata[~adata.obs["transfer"]], min_cells=1, inplace=False)
-adata = adata[:, gene_mask]
+adata_intersection.X = csr_matrix(adata_intersection.X)
+adata_union.X = csr_matrix(adata_union.X)
 
 # Filter cells with no counts
-cell_mask, _ = sc.pp.filter_cells(adata, min_genes=1, inplace=False)
-adata = adata[cell_mask, :]
-adata_outer = adata_outer[cell_mask, :]
+cell_mask, _ = sc.pp.filter_cells(adata_intersection, min_genes=1, inplace=False)
+adata_intersection = adata_intersection[cell_mask, :]
+adata_union = adata_union[cell_mask, :]
 
 # Filter genes with too few occurrences in outer join
-sc.pp.filter_genes(adata_outer, min_cells=args.min_cells)
+sc.pp.filter_genes(adata_union, min_cells=args.min_cells)
 
-adata.obs["batch"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["batch"].astype(str)
-adata.obs["patient"] = adata.obs["dataset"].astype(str) + "_" + adata.obs["patient"].astype(str)
+adata_intersection.obs["batch"] = adata_intersection.obs["dataset"].astype(str) + "_" + adata_intersection.obs["batch"].astype(str)
+adata_intersection.obs["patient"] = adata_intersection.obs["dataset"].astype(str) + "_" + adata_intersection.obs["patient"].astype(str)
 
 def to_Florent_case(s: str):
     corrected = s.lower().strip()
@@ -77,25 +68,16 @@ def to_Florent_case(s: str):
 
     return corrected[0].upper() + corrected[1:]
 
-for column in adata.obs.columns:
-    if column == "transfer":
-        continue
-    if not adata.obs[column].dtype.name == "category" and not adata.obs[column].dtype.name == "object":
+for column in adata_intersection.obs.columns:
+    if not adata_intersection.obs[column].dtype.name == "category" and not adata_intersection.obs[column].dtype.name == "object":
         continue
     # Convert first to string and then to category
-    adata.obs[column] = adata.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
+    adata_intersection.obs[column] = adata_intersection.obs[column].astype(str).fillna("Unknown").apply(to_Florent_case).astype("category")
 
-adata_outer.obs = adata.obs
+adata_union.obs = adata_intersection.obs
 
-adata.layers["counts"] = adata.X
-adata_outer.layers["counts"] = adata_outer.X
+adata_intersection.layers["counts"] = adata_intersection.X
+adata_union.layers["counts"] = adata_union.X
 
-if any(adata.obs["transfer"]):
-    adata_transfer = adata[adata.obs["transfer"]]
-    adata_transfer.write_h5ad(args.output_transfer)
-
-adata_notransfer = adata[~adata.obs["transfer"]]
-adata_notransfer.write_h5ad(args.output_integration)
-
-adata.write_h5ad(args.output_intersection)
-adata_outer.write_h5ad(args.output_counts)
+adata_intersection.write_h5ad(args.output_intersection)
+adata_union.write_h5ad(args.output_union)

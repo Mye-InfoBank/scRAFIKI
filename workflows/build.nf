@@ -17,15 +17,13 @@ workflow BUILD {
 
     ch_samplesheet = file(params.samplesheet) 
 
-    PREPROCESSING(ch_samplesheet, [])
+    PREPROCESSING(ch_samplesheet, Channel.empty())
 
-    ch_adata_integration = PREPROCESSING.out.integration
     ch_adata_intersection = PREPROCESSING.out.intersection
-    ch_adata_counts = PREPROCESSING.out.counts
-    ch_adata_transfer = PREPROCESSING.out.transfer
+    ch_adata_union = PREPROCESSING.out.union
     ch_hvgs = PREPROCESSING.out.hvgs
 
-    COUNTS(ch_adata_counts, params.normalization_method)
+    COUNTS(ch_adata_union, params.normalization_method)
 
     CELLTYPIST(
         ch_adata_intersection,
@@ -40,16 +38,14 @@ workflow BUILD {
     CELL_QC(ch_adata_intersection)
 
     INTEGRATION(
-        ch_adata_integration,
+        ch_adata_intersection,
         ch_hvgs,
         Channel.from(params.integration_methods).mix(Channel.value("unintegrated")),
-        ch_adata_transfer,
         Channel.value(params.benchmark_hvgs)
     )
 
     DOUBLETS(
         ch_adata_intersection,
-        ch_adata_integration,
         ch_hvgs,
         INTEGRATION.out.model,
         INTEGRATION.out.integrated,

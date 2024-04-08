@@ -7,7 +7,6 @@ process PREPARE_SOLO {
 
     input:
     tuple val(meta), path(adata)
-    tuple val(meta2), path(adata_core)
     tuple val(meta3), path(hvgs)
     
     output:
@@ -22,11 +21,7 @@ process PREPARE_SOLO {
     import pandas as pd
 
     adata = ad.read_h5ad("${adata}")
-    adata_core = ad.read_h5ad("${adata_core}")
     df_hvgs = pd.read_pickle("${hvgs}")
-
-    known_cell_types = adata_core.obs["cell_type"].unique()
-    adata.obs["cell_type"] = adata.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
 
     adata_hvg = adata[:, df_hvgs[df_hvgs["highly_variable"]].index]
 

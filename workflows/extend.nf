@@ -15,6 +15,12 @@ workflow EXTEND {
 
     ch_base = Channel.value(file(params.base)).map{ base -> [[id: "base"], base]}
 
+    if (!params.model) {
+        exit 1, 'Model not specified!'
+    }
+
+    ch_model = Channel.value(file(params.model)).map{ model -> [[id: "model"], model]}
+
     PREPROCESSING(ch_samplesheet, ch_base)
 
     ch_adata = Channel.empty()

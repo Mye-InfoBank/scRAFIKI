@@ -8,7 +8,6 @@ include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
 workflow DOUBLETS {
     take:
         ch_adata
-        ch_adata_core
         ch_hvgs
         ch_scanvi_model
         ch_integrations
@@ -17,7 +16,6 @@ workflow DOUBLETS {
     main:
         PREPARE_SOLO(
             ch_adata,
-            ch_adata_core,
             ch_hvgs
         )
 

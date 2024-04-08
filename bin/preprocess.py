@@ -13,7 +13,6 @@ columns_required = {
     "patient": True,
     "tissue": True,
     "dataset": True,
-    "transfer": True
 }
 
 parser = argparse.ArgumentParser(description="Filter dataset")
@@ -22,7 +21,6 @@ parser.add_argument("--id", help="Dataset ID", type=str)
 parser.add_argument("--output", help="Output file", type=str)
 parser.add_argument("--problems", help="Problems file", type=str)
 parser.add_argument("--no-symbols", help="Convert varnames to gene symbols", action="store_true")
-parser.add_argument("--transfer", help="Apply transfer leanring on dataset", action="store_true")
 parser.add_argument("--sure_raw", help="Skip check for raw counts", action="store_true")
 parser.add_argument("--custom_metadata", help="Additional metadata columns to include", type=str, nargs="*")
 
@@ -57,7 +55,6 @@ columns_considered = {**columns_required, **columns_additional}
 print("Reading input")
 adata = sc.read_h5ad(args.input)
 adata.obs["dataset"] = args.id
-adata.obs["transfer"] = args.transfer
 
 if adata.__dict__["_raw"] and "_index" in adata.__dict__["_raw"].__dict__["_var"]:
     adata.__dict__["_raw"].__dict__["_var"] = (
