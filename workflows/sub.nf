@@ -6,6 +6,7 @@ include { MERGE            } from '../modules/merge.nf'
 workflow SUB {
     ch_adata_input = Channel.fromPath(params.input)
         .map{ adata -> [[id: 'input'], adata]}
+
     ch_categories = params.category_annotation ? Channel.fromPath(params.category_annotation) : []
 
     CLEAN_ADATA(ch_adata_input, params.integration)

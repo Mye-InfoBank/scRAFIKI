@@ -10,9 +10,13 @@ include { INTEGRATION } from "../subworkflows/integration.nf"
 include { DOUBLETS } from "../subworkflows/doublets.nf"
 include { CLUSTERING } from "../subworkflows/clustering.nf"
 
-if (params.samplesheet) { ch_samplesheet = file(params.samplesheet) } else { exit 1, 'Samplesheet not specified!' }
-
 workflow BUILD {
+    if (!params.samplesheet) { 
+        exit 1, 'Samplesheet not specified!' 
+    }
+
+    ch_samplesheet = file(params.samplesheet) 
+
     PREPROCESSING(ch_samplesheet)
 
     ch_adata_integration = PREPROCESSING.out.integration
