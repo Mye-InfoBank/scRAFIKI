@@ -1,11 +1,12 @@
-include { NEIGHBORS } from "../modules/neighbors.nf"
-include { UMAP } from "../modules/umap.nf"
-include { LEIDEN } from "../modules/leiden.nf"
-include { SCSHC_CLUSTERING } from "../modules/sc_SHC.nf"
-include { SCSHC_CLUSTERING_QC } from "../modules/sc_SHC.nf"
-include { ENTROPY } from "../modules/entropy.nf"
-include { CELLTYPIST_MAJORITY } from "../modules/celltypist.nf"
-include { MERGE_CLUSTERING } from "../modules/merge_clustering.nf"
+include { SC_HPL } from "../modules/scHPL"
+include { NEIGHBORS } from "../modules/neighbors"
+include { UMAP } from "../modules/umap"
+include { LEIDEN } from "../modules/leiden"
+include { SCSHC_CLUSTERING } from "../modules/sc_SHC"
+include { SCSHC_CLUSTERING_QC } from "../modules/sc_SHC"
+include { ENTROPY } from "../modules/entropy"
+include { CELLTYPIST_MAJORITY } from "../modules/celltypist"
+include { MERGE_CLUSTERING } from "../modules/merge_clustering"
 
 
 workflow CLUSTERING {
@@ -16,6 +17,7 @@ workflow CLUSTERING {
         ch_entropy_smoothness
 
     main:
+        SC_HPL(ch_adata, [[], []])
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
