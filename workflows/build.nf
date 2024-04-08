@@ -46,7 +46,6 @@ workflow BUILD {
 
     DOUBLETS(
         ch_adata_intersection,
-        ch_hvgs,
         INTEGRATION.out.model,
         INTEGRATION.out.integrated,
         COUNTS.out

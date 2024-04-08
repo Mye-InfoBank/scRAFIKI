@@ -57,7 +57,6 @@ workflow EXTEND {
 
     DOUBLETS(
         ch_adata_transfer,
-        ch_hvgs,
         INTEGRATE_SCARCHES.out.model,
         INTEGRATE_SCARCHES.out.integrated,
         COUNTS.out
