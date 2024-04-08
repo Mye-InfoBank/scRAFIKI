@@ -27,7 +27,7 @@ process SPLIT_CATEGORIES {
 
         for category in adata.obs["category"].unique():
             adata_category = adata[adata.obs["category"] == category]
-            adata_category.write_h5ad(f"{category.replace(' ', '_')}.category.h5ad")
+            adata_category.write_h5ad(f"{category.replace(' ', '_') if type(category) == str else category}.category.h5ad")
         """
     else
         """

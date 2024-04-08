@@ -7,12 +7,12 @@ workflow SUB {
     ch_adata_input = Channel.fromPath(params.input)
         .map{ adata -> [[id: 'input'], adata]}
 
-    ch_categories = params.category_annotation ? Channel.fromPath(params.category_annotation) : []
+    ch_categories = params.annotation ? Channel.fromPath(params.annotation) : []
 
     CLEAN_ADATA(ch_adata_input, params.integration)
     ch_adata = CLEAN_ADATA.out.adata
 
-    SPLIT_CATEGORIES(ch_adata, ch_categories, params.category)
+    SPLIT_CATEGORIES(ch_adata, ch_categories, params.split_on)
 
     ch_categoric_adata = SPLIT_CATEGORIES.out
         .map{ meta, adatas -> adatas }
@@ -29,12 +29,8 @@ workflow SUB {
     ch_obsm = CLUSTERING.out.obsm
         .mix(CLEAN_ADATA.out.embedding)
         .mix(CLEAN_ADATA.out.umap)
-        .map{ meta, obsm -> obsm}
-        .collect()
 
     ch_obs = CLUSTERING.out.obs
-        .map{ meta, obs -> obs}
-        .collect()
 
     emit:
         adata = ch_adata
