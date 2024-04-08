@@ -17,7 +17,7 @@ workflow CLUSTERING {
         ch_entropy_smoothness
 
     main:
-        SC_HPL(ch_adata, [[], []])
+        SC_HPL(ch_adata, [[], []], [[], []])
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
