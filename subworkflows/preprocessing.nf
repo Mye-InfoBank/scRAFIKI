@@ -38,7 +38,7 @@ workflow PREPROCESSING {
             PREPROCESS.out.adata.map{ meta, adata -> adata }.collect(),
             ch_base.collect(),
             params.min_cells,
-            params.custom_hvgs
+            params.mode == "build" ? params.custom_hvgs : []
         )
         
         ch_adata_intersection = MERGE_DATASETS.out.intersection
