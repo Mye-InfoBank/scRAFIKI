@@ -6,9 +6,8 @@ process INTEGRATE_SCARCHES {
 
   input:
   tuple val(meta), path(query)
-  tuple val(meta2), path(reference), path(base_model, stageAs: "base_model")
+  tuple val(meta2), path(base_model, stageAs: "base_model")
   val(has_celltypes)
-  tuple val(meta3), path(hvgs)
   
   output:
   tuple val(meta_out), path("${method}.integrated.h5ad"), emit: integrated
@@ -27,20 +26,13 @@ process INTEGRATE_SCARCHES {
 
   reference_model_path = "${base_model}"
   surgery_model_path = "${model}"
-  reference_path = "${reference}"
   query_path = "${query}"
 
-  adata_reference = ad.read_h5ad(reference_path)
   adata_query = ad.read_h5ad(query_path)
-  df_hvgs = pd.read_pickle("${hvgs}")
 
-  adata_query = adata_query[:, df_hvgs[df_hvgs["highly_variable"]].index.to_list()].copy()
   adata_output = adata_query.copy()
 
   if ${has_celltypes ? "True" : "False"}:
-    known_cell_types = adata_reference.obs["cell_type"].unique()
-    adata_query.obs["cell_type"] = adata_query.obs["cell_type"].map(lambda original: original if original in known_cell_types else "Unknown")
-
     sca.models.SCANVI.prepare_query_anndata(
         adata=adata_query, reference_model=reference_model_path
     )

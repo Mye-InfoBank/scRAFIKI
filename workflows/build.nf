@@ -17,7 +17,7 @@ workflow BUILD {
 
     ch_samplesheet = file(params.samplesheet) 
 
-    PREPROCESSING(ch_samplesheet, Channel.value([[], []]))
+    PREPROCESSING(ch_samplesheet, Channel.value([[], []]), false)
 
     ch_adata_intersection = PREPROCESSING.out.intersection
     ch_adata_union = PREPROCESSING.out.union

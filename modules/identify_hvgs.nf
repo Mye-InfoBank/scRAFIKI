@@ -9,6 +9,7 @@ process IDENTIFY_HVGS {
     tuple val(meta), path(adata)
     val(n_hvgs)
     val(custom_hvgs)
+    val(hvgs_existing)
     
     output:
     tuple val(meta), path("${meta.id}.hvgs.pkl")
@@ -17,36 +18,48 @@ process IDENTIFY_HVGS {
     task.ext.when == null || task.ext.when
     
     script:
-    """
-    #!/opt/conda/bin/python
+    if (hvgs_existing) {
+        """
+        #!/opt/conda/bin/python
 
-    import scanpy as sc
+        import scanpy as sc
 
-    adata = sc.read_h5ad("${adata}")
+        adata = sc.read_h5ad("${adata}")
 
-    span = 0.3 # default
-    worked = False
+        adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
+        """
+    } else {
+        """
+        #!/opt/conda/bin/python
 
-    while not worked and span <= 1:
-        try:
-            sc.pp.highly_variable_genes(adata,
-                                        n_top_genes=10000,
-                                        flavor="seurat_v3",
-                                        span=span,
-                                        batch_key="batch")
-            worked = True
-        except:
-            span += 0.1
-            print(f"Increased span to {span}")
-    
-    custom_hvgs = "${custom_hvgs.join(" ")}".split(" ")
-    custom_hvgs = [x.upper().replace("_", "-").replace(".", "-") for x in custom_hvgs]
-    custom_hvgs = [x for x in custom_hvgs if x in adata.var_names]
+        import scanpy as sc
 
-    if len(custom_hvgs) > 0:
-        # Set "highly_variable" to True for custom HVGs
-        adata.var.loc[custom_hvgs, "highly_variable"] = True
+        adata = sc.read_h5ad("${adata}")
 
-    adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
-    """
+        span = 0.3 # default
+        worked = False
+
+        while not worked and span <= 1:
+            try:
+                sc.pp.highly_variable_genes(adata,
+                                            n_top_genes=10000,
+                                            flavor="seurat_v3",
+                                            span=span,
+                                            batch_key="batch")
+                worked = True
+            except:
+                span += 0.1
+                print(f"Increased span to {span}")
+        
+        custom_hvgs = "${custom_hvgs.join(" ")}".split(" ")
+        custom_hvgs = [x.upper().replace("_", "-").replace(".", "-") for x in custom_hvgs]
+        custom_hvgs = [x for x in custom_hvgs if x in adata.var_names]
+
+        if len(custom_hvgs) > 0:
+            # Set "highly_variable" to True for custom HVGs
+            adata.var.loc[custom_hvgs, "highly_variable"] = True
+
+        adata.var[["highly_variable"]].to_pickle("${meta.id}.hvgs.pkl")
+        """
+    }
 }

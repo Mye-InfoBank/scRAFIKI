@@ -9,7 +9,7 @@ workflow DOUBLETS {
     take:
         ch_adata
         ch_hvgs
-        ch_scanvi_model
+        ch_model
         ch_integrations
         ch_raw
     
@@ -25,7 +25,7 @@ workflow DOUBLETS {
 
         SOLO(
             PREPARE_SOLO.out.adata.collect(),
-            ch_scanvi_model.collect(),
+            ch_model.collect(),
             params.has_celltypes,
             ch_batches
         )

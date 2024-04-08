@@ -2,8 +2,6 @@ include { INTEGRATE } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_GPU } from "../modules/integrate.nf"
 include { INTEGRATE as INTEGRATE_SCVI } from "../modules/integrate.nf"
 include { INTEGRATE_SCANVI } from "../modules/integrate_scanvi.nf"
-include { INTEGRATE_SCARCHES } from "../modules/integrate_scarches.nf"
-include { MERGE_EXTENDED } from "../modules/merge_extended.nf"
 include { BENCHMARKING } from "./benchmarking.nf"
 
 

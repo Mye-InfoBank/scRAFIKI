@@ -1,12 +1,13 @@
 // Modules
-include { CELLTYPIST } from "../modules/celltypist.nf"
-include { CELL_CYCLE } from "../modules/cell_cycle.nf"
-include { CELL_QC    } from "../modules/cell_qc.nf"
+include { CELLTYPIST } from "../modules/celltypist"
+include { CELL_CYCLE } from "../modules/cell_cycle"
+include { CELL_QC    } from "../modules/cell_qc"
+include { INTEGRATE_SCARCHES } from "../modules/integrate_scarches"
 
 // Workflows
-include { PREPROCESSING } from "../subworkflows/preprocessing.nf"
-include { COUNTS } from "../subworkflows/counts.nf"
-
+include { PREPROCESSING } from "../subworkflows/preprocessing"
+include { COUNTS } from "../subworkflows/counts"
+include { DOUBLETS } from "../subworkflows/doublets.nf"
 
 workflow EXTEND {
     if (!params.samplesheet) { 
@@ -27,11 +28,12 @@ workflow EXTEND {
 
     ch_model = Channel.value(file(params.model)).map{ model -> [[id: "model"], model]}
 
-    PREPROCESSING(ch_samplesheet, ch_base)
+    PREPROCESSING(ch_samplesheet, ch_base, true)
 
     ch_adata_intersection = PREPROCESSING.out.intersection
     ch_adata_union = PREPROCESSING.out.union
     ch_adata_transfer = PREPROCESSING.out.transfer
+    ch_hvgs = PREPROCESSING.out.hvgs
 
     COUNTS(ch_adata_union, params.normalization_method)
 
@@ -46,6 +48,20 @@ workflow EXTEND {
     )
 
     CELL_QC(ch_adata_intersection)
+
+    INTEGRATE_SCARCHES(
+        ch_adata_transfer,
+        ch_model,
+        params.has_celltypes
+    )
+
+    DOUBLETS(
+        ch_adata_transfer,
+        ch_hvgs,
+        INTEGRATE_SCARCHES.out.model,
+        INTEGRATE_SCARCHES.out.integrated,
+        COUNTS.out
+    )
 
     ch_adata = Channel.empty()
     ch_obsm = Channel.empty()
