@@ -12,6 +12,9 @@ process IDENTIFY_HVGS {
     
     output:
     tuple val(meta), path("${meta.id}.hvgs.pkl")
+
+    when:
+    task.ext.when == null || task.ext.when
     
     script:
     """

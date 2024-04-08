@@ -13,6 +13,7 @@ include { IDENTIFY_HVGS } from "../modules/identify_hvgs.nf"
 workflow PREPROCESSING {
     take:
         ch_samplesheet
+        ch_base
 
     main:
         ch_samples = Channel.from(check_samplesheet(ch_samplesheet.toString()))
@@ -31,38 +32,43 @@ workflow PREPROCESSING {
         COLLECT_PROBLEMS(PREPROCESS.out.problems.map{ meta, problems -> problems}.collect())
         STOP_IF_PROBLEMS(COLLECT_PROBLEMS.out)
 
-        GENES_UPSET(PREPROCESS.out.adata.map{ meta, adata -> adata }.collect())
-        MERGE_DATASETS(
-            PREPROCESS.out.adata.flatMap{ meta, adata -> adata }.collect(),
-            params.min_cells,
-            params.custom_hvgs
-        )
+        GENES_UPSET(PREPROCESS.out.adata.mix(ch_base).map{ meta, adata -> adata }.collect())
 
-        ch_adata_integration = MERGE_DATASETS.out.integration
-            .map{ adata -> [[id: "integration"], adata] }
+        MERGE_DATASETS(
+            PREPROCESS.out.adata.map{ meta, adata -> adata }.collect(),
+            ch_base.collect(),
+            params.min_cells,
+            params.mode == "build" ? params.custom_hvgs : []
+        )
         
         ch_adata_intersection = MERGE_DATASETS.out.intersection
             .map{ adata -> [[id: "intersection"], adata] }
 
-        ch_adata_counts = MERGE_DATASETS.out.counts
-            .map{ adata -> [[id: "counts"], adata] }
+        ch_adata_union = MERGE_DATASETS.out.union
+            .map{ adata -> [[id: "union"], adata] }
 
-        ch_transfer = MERGE_DATASETS.out.transfer.flatten()
-            .map{ adata -> [[id: adata.simpleName], adata]}
+        ch_adata_transfer = MERGE_DATASETS.out.transfer
+            .map{ adata -> [[id: "transfer"], adata] }
 
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
-        IDENTIFY_HVGS(
-            ch_adata_integration,
-            params.integration_hvgs,
-            params.custom_hvgs
-        )
+        if (params.mode == "build") {
+            IDENTIFY_HVGS(
+                ch_adata_intersection,
+                params.integration_hvgs,
+                params.custom_hvgs
+            )
+            ch_hvgs = IDENTIFY_HVGS.out
+        } else {
+            ch_hvgs = Channel.empty()
+        }
+
+
 
     emit:
-        integration = ch_adata_integration
         intersection = ch_adata_intersection
-        counts = ch_adata_counts
-        transfer = ch_transfer
-        hvgs = IDENTIFY_HVGS.out
+        union        = ch_adata_union
+        transfer     = ch_adata_transfer
+        hvgs         = ch_hvgs
 }

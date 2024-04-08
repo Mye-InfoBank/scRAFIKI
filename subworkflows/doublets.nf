@@ -1,33 +1,29 @@
-include { PREPARE_SOLO } from "../modules/prepare_solo.nf"
-include { SOLO } from "../modules/solo.nf"
-include { DEDOUBLET_ADATA as DEDOUBLET_INTEGRATIONS } from "../modules/dedoublet_adata.nf"
-include { DEDOUBLET_ADATA as DEDOUBLET_COUNTS } from "../modules/dedoublet_adata.nf"
-include { EXTRACT_EMBEDDING } from "../modules/extract_embedding.nf"
+include { GET_BATCHES } from "../modules/get_batches"
+include { SOLO } from "../modules/solo"
+include { DEDOUBLET_ADATA as DEDOUBLET_INTEGRATIONS } from "../modules/dedoublet_adata"
+include { DEDOUBLET_ADATA as DEDOUBLET_COUNTS } from "../modules/dedoublet_adata"
+include { EXTRACT_EMBEDDING } from "../modules/extract_embedding"
 
 
 workflow DOUBLETS {
     take:
         ch_adata
-        ch_adata_core
-        ch_hvgs
-        ch_scanvi_model
+        ch_model
         ch_integrations
         ch_raw
     
     main:
-        PREPARE_SOLO(
-            ch_adata,
-            ch_adata_core,
-            ch_hvgs
+        GET_BATCHES(
+            ch_adata
         )
 
-        ch_batches = PREPARE_SOLO.out.batches
+        ch_batches = GET_BATCHES.out
             .splitText().flatten()
             .map{ batch -> batch.replace("\n", "") }
 
         SOLO(
-            PREPARE_SOLO.out.adata.collect(),
-            ch_scanvi_model.collect(),
+            ch_adata,
+            ch_model.collect(),
             params.has_celltypes,
             ch_batches
         )

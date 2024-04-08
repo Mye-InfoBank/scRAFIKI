@@ -26,15 +26,22 @@ process SOLO {
     threadpool_limits(${task.cpus})
 
     adata = sc.read_h5ad("${adata}")
-
     adata_batch = adata[adata.obs.batch == "${batch}"]
 
+    model_path = "${scvi_model}"
+
     if ${has_celltypes ? "True" : "False"}:
-        scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
-        scvi_model = scvi.model.SCANVI.load("${scvi_model}", adata=adata)
+        # scvi.model.SCANVI.setup_anndata(adata, batch_key="batch", labels_key="cell_type", unlabeled_category="Unknown")
+        scvi.model.SCANVI.prepare_query_anndata(
+            adata=adata, reference_model=model_path
+        )
+        scvi_model = scvi.model.SCANVI.load(model_path, adata=adata)
     else:
-        scvi.model.SCVI.setup_anndata(adata, batch_key="batch")
-        scvi_model = scvi.model.SCVI.load("${scvi_model}", adata=adata)
+        # scvi.model.SCVI.setup_anndata(adata, batch_key="batch")
+        scvi.model.SCVI.prepare_query_anndata(
+            adata=adata, reference_model=model_path
+        )
+        scvi_model = scvi.model.SCVI.load(model_path, adata=adata)
 
     solo = scvi.external.SOLO.from_scvi_model(scvi_model, restrict_to_batch="${batch}")
 
