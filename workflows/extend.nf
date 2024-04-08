@@ -3,11 +3,14 @@ include { CELLTYPIST } from "../modules/celltypist"
 include { CELL_CYCLE } from "../modules/cell_cycle"
 include { CELL_QC    } from "../modules/cell_qc"
 include { INTEGRATE_SCARCHES } from "../modules/integrate_scarches"
+include { MERGE_EXTENDED } from "../modules/merge_extended"
 
 // Workflows
 include { PREPROCESSING } from "../subworkflows/preprocessing"
 include { COUNTS } from "../subworkflows/counts"
 include { DOUBLETS } from "../subworkflows/doublets.nf"
+include { CLUSTERING } from "../subworkflows/clustering.nf"
+
 
 workflow EXTEND {
     if (!params.samplesheet) { 
@@ -28,12 +31,11 @@ workflow EXTEND {
 
     ch_model = Channel.value(file(params.model)).map{ model -> [[id: "model"], model]}
 
-    PREPROCESSING(ch_samplesheet, ch_base, true)
+    PREPROCESSING(ch_samplesheet, ch_base)
 
     ch_adata_intersection = PREPROCESSING.out.intersection
     ch_adata_union = PREPROCESSING.out.union
     ch_adata_transfer = PREPROCESSING.out.transfer
-    ch_hvgs = PREPROCESSING.out.hvgs
 
     COUNTS(ch_adata_union, params.normalization_method)
 
@@ -62,13 +64,33 @@ workflow EXTEND {
         COUNTS.out
     )
 
-    ch_adata = Channel.empty()
-    ch_obsm = Channel.empty()
-    ch_obs = Channel.empty()
+    MERGE_EXTENDED(
+        DOUBLETS.out.integrations.collect(),
+        ch_base,
+        params.has_celltypes ? "scanvi" : "scvi"
+    )
+
+    CLUSTERING(
+        MERGE_EXTENDED.out,
+        Channel.from(params.leiden_resolutions),
+        CELLTYPIST.out,
+        Channel.value(params.entropy_initial_smoothness)
+    )
+
+    ch_obs = CLUSTERING.out.obs.mix(
+        CELL_CYCLE.out,
+        CELLTYPIST.out,
+        CELL_QC.out
+    )
+
+    ch_obsm = CLUSTERING.out.obsm.mix(
+        DOUBLETS.out.obsm
+    )
+
     ch_var = Channel.empty()
     
     emit:
-        adata = ch_adata
+        adata = DOUBLETS.out.counts
         obsm = ch_obsm
         obs = ch_obs
         var = ch_var

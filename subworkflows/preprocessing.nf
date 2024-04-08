@@ -14,7 +14,6 @@ workflow PREPROCESSING {
     take:
         ch_samplesheet
         ch_base
-        hvgs_existing
 
     main:
         ch_samples = Channel.from(check_samplesheet(ch_samplesheet.toString()))
@@ -54,17 +53,22 @@ workflow PREPROCESSING {
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
-        IDENTIFY_HVGS(
-            ch_adata_intersection,
-            params.integration_hvgs,
-            params.custom_hvgs,
-            hvgs_existing
-        )
+        if (params.mode == "build") {
+            IDENTIFY_HVGS(
+                ch_adata_intersection,
+                params.integration_hvgs,
+                params.custom_hvgs
+            )
+            ch_hvgs = IDENTIFY_HVGS.out
+        } else {
+            ch_hvgs = Channel.empty()
+        }
+
 
 
     emit:
         intersection = ch_adata_intersection
         union        = ch_adata_union
         transfer     = ch_adata_transfer
-        hvgs         = IDENTIFY_HVGS.out
+        hvgs         = ch_hvgs
 }

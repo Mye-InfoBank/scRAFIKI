@@ -92,11 +92,6 @@ if args.base:
     adata_transfer = adata_intersection[~adata_intersection.obs.index.isin(adata_base.obs.index)]
     adata_transfer.write_h5ad(args.output_transfer)
 
-    highly_variable_genes_set = set(adata_base.var[adata_base.var["highly_variable"]].index)
-
-    adata_intersection.var["highly_variable"] = adata_intersection.var.index.isin(highly_variable_genes_set)
-    adata_union.var["highly_variable"] = adata_union.var.index.isin(highly_variable_genes_set)
-
 adata_intersection.write_h5ad(args.output_intersection)
 adata_union.write_h5ad(args.output_union)
 
