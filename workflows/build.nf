@@ -69,11 +69,8 @@ workflow BUILD {
         DOUBLETS.out.obsm
     )
 
-    ch_var = ch_hvgs
-
     emit:
         adata = DOUBLETS.out.counts
         obsm = ch_obsm
         obs = ch_obs
-        var = ch_var
 }

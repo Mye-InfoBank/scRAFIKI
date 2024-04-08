@@ -86,12 +86,9 @@ workflow EXTEND {
     ch_obsm = CLUSTERING.out.obsm.mix(
         DOUBLETS.out.obsm
     )
-
-    ch_var = Channel.empty()
     
     emit:
         adata = DOUBLETS.out.counts
         obsm = ch_obsm
         obs = ch_obs
-        var = ch_var
 }

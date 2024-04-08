@@ -10,7 +10,6 @@ process MERGE {
     tuple val(meta), path(base, stageAs: 'base.h5ad')
     path(obsm)
     path(obs)
-    path(var)
   
   output:
     tuple val(meta), file("merged.h5ad"), emit: adata
@@ -51,17 +50,6 @@ process MERGE {
   for col in adata.obs.columns:
     if adata.obs[col].dtype == np.float64:
       adata.obs[col] = adata.obs[col].astype(np.float32)
-
-  var_paths = "${var}".split(' ')
-
-  for var_path in var_paths:
-    df = pd.read_pickle(var_path)
-    df = df.reindex(adata.var_names)
-    adata.var = pd.concat([adata.var, df], axis=1)
-  
-  for col in adata.var.columns:
-    if adata.var[col].dtype == np.float64:
-      adata.var[col] = adata.var[col].astype(np.float32)
 
   adata.write('merged.h5ad')
   adata.obs.to_pickle('metadata.pkl')
