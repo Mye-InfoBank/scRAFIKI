@@ -32,8 +32,11 @@ workflow SUB {
 
     ch_obs = CLUSTERING.out.obs
 
+    ch_var = Channel.empty()
+
     emit:
         adata = ch_adata
         obsm = ch_obsm
         obs = ch_obs
+        var = ch_var
 }

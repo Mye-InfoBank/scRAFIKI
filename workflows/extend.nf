@@ -66,9 +66,11 @@ workflow EXTEND {
     ch_adata = Channel.empty()
     ch_obsm = Channel.empty()
     ch_obs = Channel.empty()
+    ch_var = Channel.empty()
     
     emit:
         adata = ch_adata
         obsm = ch_obsm
         obs = ch_obs
+        var = ch_var
 }

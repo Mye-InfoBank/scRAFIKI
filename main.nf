@@ -32,7 +32,8 @@ workflow {
     MERGE (
         subworkflow.adata,
         subworkflow.obsm.map{ meta, obsm -> obsm}.collect(),
-        subworkflow.obs.map{ meta, obs -> obs}.collect()
+        subworkflow.obs.map{ meta, obs -> obs}.collect(),
+        subworkflow.var.map{ meta, var -> var}.collect()
     )
 
     RENAME_INTEGRATIONS(MERGE.out.adata)
