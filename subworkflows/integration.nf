@@ -76,11 +76,11 @@ workflow INTEGRATION {
 
             ch_integrated = ch_integrated.mix(INTEGRATE_SCANVI.out.integrated)
 
-            ch_arches_basemodel = INTEGRATE_SCANVI.out.model
+            ch_model = INTEGRATE_SCANVI.out.model
             ch_scanvi_labels = INTEGRATE_SCANVI.out.labels
             ch_core_integrated = INTEGRATE_SCANVI.out.integrated
         } else {
-            ch_arches_basemodel = INTEGRATE_SCVI.out.model
+            ch_model = INTEGRATE_SCVI.out.model
             ch_scanvi_labels = Channel.empty()
             ch_core_integrated = INTEGRATE_SCVI.out.integrated
         }
@@ -96,6 +96,6 @@ workflow INTEGRATION {
 
     emit:
         integrated = ch_integrated
-        model = params.has_extended ? INTEGRATE_SCARCHES.out.model : ch_arches_basemodel
+        model = ch_model
         scanvi_labels = ch_scanvi_labels
 }

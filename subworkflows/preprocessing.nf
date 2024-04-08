@@ -53,15 +53,21 @@ workflow PREPROCESSING {
         COMPOSITION(ch_adata_intersection)
         DISTRIBUTION(ch_adata_intersection)
 
-        IDENTIFY_HVGS(
-            ch_adata_intersection,
-            params.integration_hvgs,
-            params.custom_hvgs
-        )
+        if (params.mode != "extend") {
+            IDENTIFY_HVGS(
+                ch_adata_intersection,
+                params.integration_hvgs,
+                params.custom_hvgs
+            )
+            ch_hvgs = IDENTIFY_HVGS.out
+        } else {
+            ch_hvgs = Channel.empty()
+        }
+
 
     emit:
         intersection = ch_adata_intersection
         union        = ch_adata_union
         transfer     = ch_adata_transfer
-        hvgs         = IDENTIFY_HVGS.out
+        hvgs         = ch_hvgs
 }
