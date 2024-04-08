@@ -17,7 +17,7 @@ workflow BUILD {
 
     ch_samplesheet = file(params.samplesheet) 
 
-    PREPROCESSING(ch_samplesheet)
+    PREPROCESSING(ch_samplesheet, [])
 
     ch_adata_integration = PREPROCESSING.out.integration
     ch_adata_intersection = PREPROCESSING.out.intersection

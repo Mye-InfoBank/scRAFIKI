@@ -13,6 +13,7 @@ include { IDENTIFY_HVGS } from "../modules/identify_hvgs.nf"
 workflow PREPROCESSING {
     take:
         ch_samplesheet
+        ch_base
 
     main:
         ch_samples = Channel.from(check_samplesheet(ch_samplesheet.toString()))
