@@ -32,9 +32,12 @@ workflow PREPROCESSING {
         COLLECT_PROBLEMS(PREPROCESS.out.problems.map{ meta, problems -> problems}.collect())
         STOP_IF_PROBLEMS(COLLECT_PROBLEMS.out)
 
-        GENES_UPSET(PREPROCESS.out.adata.map{ meta, adata -> adata }.collect())
+        adatas = PREPROCESS.out.adata.map{ meta, adata -> adata }.collect()
+
+        GENES_UPSET(adatas)
+
         MERGE_DATASETS(
-            PREPROCESS.out.adata.flatMap{ meta, adata -> adata }.collect(),
+            adatas,
             params.min_cells,
             params.custom_hvgs
         )
