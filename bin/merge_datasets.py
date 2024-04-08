@@ -7,14 +7,23 @@ from scipy.sparse import csr_matrix
 
 parser = argparse.ArgumentParser(description="Merge datasets")
 parser.add_argument("--input", help="Input file", type=str, nargs="+")
-parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str)
-parser.add_argument("--output_union", help="Output file, outer join of cells and genes", type=str)
+parser.add_argument("--base", help="Base dataset to use as reference", type=str, required=False)
+parser.add_argument("--output_intersection", help="Output file containing all cells but gene intersection", type=str, required=True)
+parser.add_argument("--output_union", help="Output file, outer join of cells and genes", type=str, required=True)
+parser.add_argument("--output_transfer", help="Output file, cells to project onto base", type=str, required=False)
 parser.add_argument("--min_cells", help='Minimum number of cells to keep a gene', type=int, required=False, default=50)
 parser.add_argument("--custom_genes", help="Additional genes to include", type=str, nargs="*")
 
 args = parser.parse_args()
 
 datasets = [ad.read_h5ad(f) for f in args.input]
+
+if args.base:
+    if not args.output_transfer:
+        raise ValueError("Transfer file required when using base dataset")
+
+    adata_base = ad.read_h5ad(args.base)
+    datasets = [adata_base] + datasets
 
 adata_intersection = ad.concat(datasets)
 adata_union = ad.concat(datasets, join='outer')
@@ -81,3 +90,7 @@ adata_union.layers["counts"] = adata_union.X
 
 adata_intersection.write_h5ad(args.output_intersection)
 adata_union.write_h5ad(args.output_union)
+
+if args.base:
+    adata_transfer = adata_intersection[~adata_intersection.obs.index.isin(adata_base.obs.index)]
+    adata_transfer.write_h5ad(args.output_transfer)

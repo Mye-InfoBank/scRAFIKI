@@ -36,6 +36,7 @@ workflow PREPROCESSING {
 
         MERGE_DATASETS(
             PREPROCESS.out.adata.map{ meta, adata -> adata }.collect(),
+            ch_base.collect(),
             params.min_cells,
             params.custom_hvgs
         )
