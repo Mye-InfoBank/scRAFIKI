@@ -42,6 +42,6 @@ jobs:
 
         - name: Run pipeline
           run: |
-            cp -r ${GITHUB_WORKSPACE}/example/${{ matrix.PROFILE }} . && \
-            cd ${{ matrix.PROFILE }} && \
+            cp -r ${GITHUB_WORKSPACE}/example . && \
+            cd example/${{ matrix.PROFILE }} && \
             nextflow run ${GITHUB_WORKSPACE} -profile docker,${{ matrix.PROFILE }}
