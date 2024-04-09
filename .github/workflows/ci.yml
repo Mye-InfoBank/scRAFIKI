@@ -42,5 +42,6 @@ jobs:
 
         - name: Run pipeline
           run: |
-            cd ${GITHUB_WORKSPACE}/example/${{ matrix.PROFILE }} && \
+            cp -r ${GITHUB_WORKSPACE}/example/${{ matrix.PROFILE }} . && \
+            cd ${{ matrix.PROFILE }} && \
             ./run.sh
