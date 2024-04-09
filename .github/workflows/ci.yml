@@ -10,6 +10,7 @@ on:
 
 env:
     NXF_ANSI_LOG: false
+    NXF_APPTAINER_CACHEDIR: /tmp/apptainer-cache
 
 concurrency:
     group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
@@ -42,6 +43,13 @@ jobs:
         
         - name: Install Apptainer
           uses: eWaterCycle/setup-apptainer@v2
+
+        - name: Apptainer cache
+          id: apptainer-cache
+          uses: actions/cache@v4
+          with:
+            path: ${{ env.NXF_APPTAINER_CACHEDIR }}
+            key: ${{ runner.os }}-apptainer-${{ hashFiles('docker/**') }}
 
         - name: Run pipeline
           run: |
