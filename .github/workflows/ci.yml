@@ -1,0 +1,46 @@
+name: SIMBA CI
+
+on:
+    push:
+      branches:
+        - dev
+    pull_request:
+    release:
+        types: [published]
+
+env:
+    NXF_ANSI_LOG: false
+
+concurrency:
+    group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+    cancel-in-progress: true
+    
+jobs:
+    test:
+        name: Run pipeline with test data
+        # Only run on push if this is the nf-core dev branch (merged PRs)
+        if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/circrna') }}"
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                NXF_VER:
+                - "23.04.0"
+                - "latest-everything"
+                PROFILE:
+                - "build"
+                - "extend"
+                - "sub"
+    
+        steps:
+        - name: Check out pipeline code
+          uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+    
+        - name: Install Nextflow
+          uses: nf-core/setup-nextflow@v1
+          with:
+            version: "${{ matrix.NXF_VER }}"
+
+        - name: Run pipeline
+          run: |
+            cd ${GITHUB_WORKSPACE}/example/${{ matrix.PROFILE }} && \
+            ./run.sh
