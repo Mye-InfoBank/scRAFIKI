@@ -2,6 +2,7 @@ process SC_HPL {
   tag "${meta.id}"
   container "bigdatainbiomedicine/sc-scarches:1.0"
 
+  publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"
 
   input:
