@@ -15,10 +15,16 @@ workflow CLUSTERING {
         ch_entropy_smoothness
 
     main:
-        SC_HPL(ch_adata, [[], []], [[], []])
         NEIGHBORS(ch_adata)
         UMAP(NEIGHBORS.out)
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
+
+        ch_leiden_per_integration = LEIDEN.out.table.map{meta, table -> [meta.integration, table]}.groupTuple()
+        ch_integations = ch_adata   .map{meta, adata -> [meta.integration, adata]}
+                                    .join(ch_leiden_per_integration)
+                                    .map{integration, adata, tables -> [[id: integration], adata, tables]}
+
+        SC_HPL(ch_integations)
 
         ENTROPY(LEIDEN.out.adata, ch_entropy_smoothness)
         CELLTYPIST_MAJORITY(LEIDEN.out.table, ch_celltypist)

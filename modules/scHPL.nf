@@ -5,9 +5,7 @@ process SC_HPL {
   label "process_high"
 
   input:
-  tuple val(meta ), path(adata)
-  tuple val(meta2), path(base_adata)
-  tuple val(meta3), path(base_tree)
+  tuple val(meta), path(adata), path(tables)
 
   output:
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
@@ -19,18 +17,25 @@ process SC_HPL {
   import scarches as sca
   import scanpy as sc
   import pickle
+  import pandas as pd
 
-  has_base = ${base_adata && base_tree ? "True" : "False"}
+  adata = sc.read_h5ad("${adata}")
+  adata_latent = sc.AnnData(X=adata.obsm['X_emb'], obs=adata.obs)
 
-  adata_full = sc.read_h5ad("${adata}")
-  adata_latent = sc.AnnData(X=adata_full.obsm['X_emb'], obs=adata_full.obs)
+  tables = [pd.read_pickle(table) for table in '${tables}'.split(' ')]
+  df = pd.concat(tables, axis=1)
 
-  adata_latent.obs['celltype_batch'] = adata_latent.obs['cell_type'].astype(str) + '_' + adata_latent.obs['batch'].astype(str)
+  # Prefix all values with their column key
+  df = df.apply(lambda x: x.index + '_' + x.astype(str), axis=1)
+
+  # For each row, choose a random column value
+  adata_latent.obs['random_cluster'] = df.apply(lambda x: x.sample().values[0], axis=1)
+  adata_latent.obs['batch_cluster'] = adata_latent.obs['batch'].astype(str) + '_' + adata_latent.obs['random_cluster'].astype(str)
 
   kwargs = {
       'data': adata_latent,
       'batch_key': 'batch',
-      'cell_type_key': 'celltype_batch',
+      'cell_type_key': 'batch_cluster',
       'classifier': 'knn',
       'dynamic_neighbors': True,
       'dimred': False
@@ -38,15 +43,6 @@ process SC_HPL {
 
   batch_counts = adata_latent.obs['batch'].value_counts().to_dict()
   batches_sorted_desc = sorted(batch_counts, key=batch_counts.get, reverse=True)
-
-  if has_base:
-    adata_base = sc.read_h5ad("${base_adata}")
-    batches_base = adata_base.obs['batch'].unique().tolist()
-    batches_sorted_desc = [x for x in batches_sorted_desc if x not in batches_base]
-
-    tree_ref = pickle.load(open("${base_tree}", "rb"))
-    kwargs['tree'] = tree_ref
-  
   kwargs['batch_order'] = batches_sorted_desc
 
   tree_ref, mp_ref = sca.classifiers.scHPL.learn_tree(**kwargs)
