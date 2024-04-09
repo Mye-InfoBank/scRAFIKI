@@ -44,4 +44,4 @@ jobs:
           run: |
             cp -r ${GITHUB_WORKSPACE}/example/${{ matrix.PROFILE }} . && \
             cd ${{ matrix.PROFILE }} && \
-            ./run.sh
+            nextflow run ${GITHUB_WORKSPACE} -profile docker,${{ matrix.PROFILE }} -r main -resume
