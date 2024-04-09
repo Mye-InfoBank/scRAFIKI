@@ -3,7 +3,7 @@ process BENCHMARK_INTEGRATIONS {
 
     label "process_high"
 
-    container = "bigdatainbiomedicine/sc-scib:1.2"
+    container = "bigdatainbiomedicine/sc-scib:1.3"
 
     input: 
         tuple val(meta1), path(uncorrected)

@@ -53,5 +53,4 @@ jobs:
 
         - name: Run pipeline
           run: |
-            cd example/${{ matrix.PROFILE }} && \
-            ./run.sh
+            cd example/${{ matrix.PROFILE }} && ./run.sh

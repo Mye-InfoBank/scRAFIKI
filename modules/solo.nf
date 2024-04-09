@@ -1,6 +1,6 @@
 process SOLO {
     tag "${meta.id}"
-    container "bigdatainbiomedicine/sc-scib:1.2"
+    container "bigdatainbiomedicine/sc-scib:1.3"
 
     label "process_medium"
     label "process_high_memory"
