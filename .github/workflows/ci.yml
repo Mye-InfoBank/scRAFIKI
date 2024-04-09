@@ -3,7 +3,7 @@ name: SIMBA CI
 on:
     push:
       branches:
-        - dev
+        - master
     pull_request:
     release:
         types: [published]
