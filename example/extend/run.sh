@@ -1,3 +1,3 @@
 #!/bin/bash
 
-nextflow run ../.. -resume -profile docker,extend
+nextflow run ../.. -resume -profile apptainer,extend

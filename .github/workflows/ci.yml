@@ -39,9 +39,11 @@ jobs:
           uses: nf-core/setup-nextflow@v1
           with:
             version: "${{ matrix.NXF_VER }}"
+        
+        - name: Install Apptainer
+          uses: eWaterCycle/setup-apptainer@v2
 
         - name: Run pipeline
           run: |
             cd example/${{ matrix.PROFILE }} && \
-            touch test.txt && \
             ./run.sh
