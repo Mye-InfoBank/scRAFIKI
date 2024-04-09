@@ -1,6 +1,6 @@
 process INTEGRATE_SCARCHES {
   tag "${method}"
-  container "bigdatainbiomedicine/sc-scarches:1.0"
+  container "bigdatainbiomedicine/sc-scib:1.3"
 
   label "process_high"
 

@@ -1,5 +1,5 @@
 process COLLECT_PROBLEMS {
-  container "bigdatainbiomedicine/sc-rpy:1.0"
+  container "bigdatainbiomedicine/sc-rpy:1.2"
 
   publishDir "${params.outdir}", mode: "${params.publish_mode}"
 

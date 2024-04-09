@@ -3,7 +3,7 @@ process BENCHMARK_INTEGRATIONS {
 
     label "process_high"
 
-    container = "bigdatainbiomedicine/sc-scib:1.0"
+    container = "bigdatainbiomedicine/sc-scib:1.3"
 
     input: 
         tuple val(meta1), path(uncorrected)
@@ -29,7 +29,7 @@ process MERGE_BENCHMARKS {
 
     publishDir "${params.outdir}", mode: "${params.publish_mode}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.0"
+    container = "bigdatainbiomedicine/sc-rpy:1.2"
 
     input:
         path(benchmarks)

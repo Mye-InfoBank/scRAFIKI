@@ -1,6 +1,0 @@
-*
-!.gitignore
-!minimal_example.h5ad
-!nextflow.config
-!run.sh
-!samplesheet.csv
