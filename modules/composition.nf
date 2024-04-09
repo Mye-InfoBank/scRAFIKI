@@ -1,5 +1,5 @@
 process COMPOSITION {
-    container "bigdatainbiomedicine/sc-rpy:1.0"
+    container "bigdatainbiomedicine/sc-rpy:1.2"
 
     publishDir "${params.outdir}/composition", mode: "${params.publish_mode}"
 

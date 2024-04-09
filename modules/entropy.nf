@@ -1,7 +1,7 @@
 process ENTROPY {
   tag "${meta.id}"
 
-  container "bigdatainbiomedicine/sc-rpy:1.0"
+  container "bigdatainbiomedicine/sc-rpy:1.2"
   label "process_medium"
   errorStrategy { task.attempt < 7 ? 'retry' : 'ignore'}
 

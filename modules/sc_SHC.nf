@@ -1,7 +1,7 @@
 process SCSHC_CLUSTERING {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.1"
+    container = "bigdatainbiomedicine/sc-rpy:1.2"
     label "process_high"
 
     input:
@@ -44,7 +44,7 @@ process SCSHC_CLUSTERING {
 process SCSHC_CLUSTERING_QC {
     tag "${meta.id}"
 
-    container = "bigdatainbiomedicine/sc-rpy:1.1"
+    container = "bigdatainbiomedicine/sc-rpy:1.2"
     publishDir "${params.outdir}/clustering_qc", mode: "${params.publish_mode}", pattern: "*.png"
     label "process_high"
 
