@@ -5,7 +5,7 @@ process CELL_CYCLE {
     label "process_high_memory"
     errorStrategy 'retry'
 
-    container = "bigdatainbiomedicine/sc-scib:1.3"
+    container = "bigdatainbiomedicine/sc-scib:1.3.1"
 
     input:
         tuple val(meta), path(adata)
