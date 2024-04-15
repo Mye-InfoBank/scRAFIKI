@@ -6,7 +6,7 @@ process SC_HPL {
   label "process_high"
 
   input:
-  tuple val(meta), path(adata), path(tables)
+  tuple val(meta), path(adata), val(resolutions), path(tables)
 
   output:
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
@@ -24,24 +24,24 @@ process SC_HPL {
   adata = ad.read_h5ad("${adata}")
   adata_latent = ad.AnnData(X=adata.obsm['X_emb'], obs=adata.obs)
 
-  tables = [pd.read_pickle(table) for table in '${tables}'.split(' ')]
+  tables = zip([${resolutions.join(", ")}], [pd.read_pickle(table) for table in '${tables}'.split(' ')])
+  tables = [x[1] for x in sorted(tables, key=lambda x: x[0])]
   df = pd.concat(tables, axis=1)
 
-  # Prefix all values with their column key
-  df = df.apply(lambda x: x.index + '_' + x.astype(str), axis=1)
+  adatas = []
 
-  # For each row, choose a random column value
-  adata_latent.obs['random_cluster'] = df.apply(lambda x: x.sample().values[0], axis=1)
-  adata_latent.obs['batch_cluster'] = adata_latent.obs['batch'].astype(str) + '_' + adata_latent.obs['random_cluster'].astype(str)
+  for column in df.columns:
+    adata_resolution = adata_latent.copy()
+    adata_resolution.obs['cluster'] = column + '_' + df[column].astype(str)
+    adata_resolution.obs['resolution'] = column
+    adatas.append(adata_resolution)
 
-  # Drop all batch_cluster combinations with less than 5 cells
-  qualified_combinations = [comb for comb, count in adata_latent.obs['batch_cluster'].value_counts().to_dict().items() if count >= 5]
-  adata_latent = adata_latent[adata_latent.obs['batch_cluster'].isin(qualified_combinations)]
+  adata_clusterings = ad.concat(adatas)
 
   kwargs = {
-      'data': adata_latent,
-      'batch_key': 'batch',
-      'cell_type_key': 'batch_cluster',
+      'data': adata_clusterings,
+      'batch_key': 'resolution',
+      'cell_type_key': 'cluster',
       'classifier': 'knn',
       'dynamic_neighbors': True,
       'dimred': False,
@@ -49,9 +49,7 @@ process SC_HPL {
       'gpu': ${gpu}
   }
 
-  batch_counts = adata_latent.obs['batch'].value_counts().to_dict()
-  batches_sorted_desc = sorted(batch_counts, key=batch_counts.get, reverse=True)
-  kwargs['batch_order'] = batches_sorted_desc
+  kwargs['batch_order'] = df.columns
 
   tree_ref, mp_ref = scHPL.learn_tree(**kwargs)
   pickle.dump(tree_ref, open("${meta.id}.tree.pkl", "wb"))
