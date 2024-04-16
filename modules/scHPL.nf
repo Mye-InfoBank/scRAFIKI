@@ -1,6 +1,6 @@
 process SC_HPL {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-schpl:1.0.2"
+  container "bigdatainbiomedicine/sc-schpl:1.0.3"
 
   publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"
@@ -45,7 +45,6 @@ process SC_HPL {
       'classifier': 'knn',
       'dynamic_neighbors': True,
       'dimred': False,
-      'print_tree': False,
       'gpu': ${gpu},
       'compress': ${compress}
   }
