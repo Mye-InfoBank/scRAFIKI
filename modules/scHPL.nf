@@ -1,6 +1,6 @@
 process SC_HPL {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-schpl:1.0.1"
+  container "bigdatainbiomedicine/sc-schpl:1.0.2"
 
   publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"

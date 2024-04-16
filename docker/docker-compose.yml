@@ -10,7 +10,7 @@ services:
   scHPL:
     build: 
       context: scHPL
-    image: bigdatainbiomedicine/sc-schpl:1.0.1
+    image: bigdatainbiomedicine/sc-schpl:1.0.2
   cellxgene:
     build: 
       context: cellxgene
