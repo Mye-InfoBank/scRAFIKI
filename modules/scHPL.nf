@@ -21,25 +21,25 @@ process SC_HPL {
   import anndata as ad
   import pickle
   import pandas as pd
+  import numpy as np
 
   adata = ad.read_h5ad("${adata}")
   adata_latent = ad.AnnData(X=adata.obsm['X_emb'], obs=adata.obs)
 
-  tables = zip([${resolutions.join(", ")}], [pd.read_pickle(table) for table in '${tables}'.split(' ')])
-  tables = [x[1] for x in sorted(tables, key=lambda x: x[0])]
+  tables = [pd.read_pickle(table) for table in '${tables}'.split(' ')]
   df = pd.concat(tables, axis=1)
 
-  adatas = []
+  # Prefix all values with their column key
+  df = df.apply(lambda x: x.index + '_' + x.astype(str), axis=1)
 
-  for column in df.columns:
-    adata_resolution = adata_latent.copy()
-    adata_resolution.obs['cluster'] = column + '_' + df[column].astype(str)
-    adatas.append(adata_resolution)
+  resolutions = df.columns
 
-  adata_clusterings = ad.concat(adatas, keys=df.columns, label='resolution', index_unique='-')
+  # For each row, choose a random column
+  adata_latent.obs['resolution'] = np.random.choice(resolutions, size=adata_latent.shape[0])
+  adata_latent.obs['cluster'] = df.lookup(adata_latent.obs.index, adata_latent.obs['resolution'])
 
   kwargs = {
-      'data': adata_clusterings,
+      'data': adata_latent,
       'batch_key': 'resolution',
       'cell_type_key': 'cluster',
       'classifier': 'knn',
@@ -50,7 +50,7 @@ process SC_HPL {
       'compress': ${compress}
   }
 
-  kwargs['batch_order'] = df.columns
+  kwargs['batch_order'] = adata_latent.obs['resolution'].unique()
 
   tree_ref, mp_ref = scHPL.learn_tree(**kwargs)
   pickle.dump(tree_ref, open("${meta.id}.tree.pkl", "wb"))
