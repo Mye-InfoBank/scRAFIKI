@@ -1,4 +1,4 @@
-process SC_HPL {
+process SC_HPL_LEARN {
   tag "${meta.id}"
   container "bigdatainbiomedicine/sc-schpl:1.0.3"
 
@@ -12,7 +12,7 @@ process SC_HPL {
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
   
   script:
-  gpu = task.ext.use_gpu ? '0' : 'None'
+  gpu = task.ext.use_gpu ? '1' : 'None'
   compress = task.ext.compress ? 'True' : 'False'
   """
   #!/usr/bin/env python
@@ -53,5 +53,42 @@ process SC_HPL {
 
   tree_ref, mp_ref = scHPL.learn_tree(**kwargs)
   pickle.dump(tree_ref, open("${meta.id}.tree.pkl", "wb"))
+  """
+}
+
+process SC_HPL_PREDICT {
+  tag "${meta.id}"
+  container "bigdatainbiomedicine/sc-schpl:1.0.3"
+
+  label "process_high"
+
+  input:
+  tuple val(meta), path(adata), path(tree)
+
+  output:
+  tuple val(meta), path("${meta.id}.scHPL.pkl")
+  
+  script:
+  gpu = task.ext.use_gpu ? '1' : 'None'
+  """
+  #!/usr/bin/env python
+
+  import scHPL
+  import anndata as ad
+  import pickle
+
+  adata = ad.read_h5ad("${adata}")
+  tree = pickle.load(open("${tree}", "rb"))
+
+  kwargs = {
+      'tree': tree,
+      'gpu': ${gpu}
+  }
+
+  labels, probabilities = scHPL.predict_labels(adata.obsm['X_emb'], **kwargs)
+  adata.obs['${meta.id}_scHPL'] = labels
+
+  df = adata.obs[['${meta.id}_scHPL']]
+  df.to_pickle("${meta.id}.scHPL.pkl")
   """
 }
