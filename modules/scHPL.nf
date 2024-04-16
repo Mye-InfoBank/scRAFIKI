@@ -1,6 +1,6 @@
 process SC_HPL {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-schpl:1.0"
+  container "bigdatainbiomedicine/sc-schpl:1.0.1"
 
   publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"
@@ -13,6 +13,7 @@ process SC_HPL {
   
   script:
   gpu = task.ext.use_gpu ? '0' : 'None'
+  compress = task.ext.compress ? 'True' : 'False'
   """
   #!/usr/bin/env python
 
@@ -33,10 +34,9 @@ process SC_HPL {
   for column in df.columns:
     adata_resolution = adata_latent.copy()
     adata_resolution.obs['cluster'] = column + '_' + df[column].astype(str)
-    adata_resolution.obs['resolution'] = column
     adatas.append(adata_resolution)
 
-  adata_clusterings = ad.concat(adatas)
+  adata_clusterings = ad.concat(adatas, keys=df.columns, label='resolution', index_unique='-')
 
   kwargs = {
       'data': adata_clusterings,
@@ -46,7 +46,8 @@ process SC_HPL {
       'dynamic_neighbors': True,
       'dimred': False,
       'print_tree': False,
-      'gpu': ${gpu}
+      'gpu': ${gpu},
+      'compress': ${compress}
   }
 
   kwargs['batch_order'] = df.columns

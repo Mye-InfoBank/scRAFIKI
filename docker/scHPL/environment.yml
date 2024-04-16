@@ -60,7 +60,7 @@ dependencies:
       - pyparsing==3.1.2
       - python-dateutil==2.9.0.post0
       - pytz==2024.1
-      - schpl@git+https://github.com/Mye-InfoBank/scHPL.git@1dc16b7288ba9503ff088f903594fb3e65845048
+      - schpl@git+https://github.com/Mye-InfoBank/scHPL.git@64a2f6a508382b865d1d0e8da92a5f758d331eed
       - scikit-learn==1.4.2
       - scipy==1.13.0
       - seaborn==0.13.2
