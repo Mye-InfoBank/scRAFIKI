@@ -1,11 +1,11 @@
-include { SC_HPL_LEARN } from "../modules/scHPL"
-include { SC_HPL_PREDICT } from "../modules/scHPL"
-include { NEIGHBORS } from "../modules/neighbors"
-include { UMAP } from "../modules/umap"
-include { LEIDEN } from "../modules/leiden"
-include { ENTROPY } from "../modules/entropy"
+include { SC_HPL_LEARN        } from "../modules/scHPL"
+include { SC_HPL_PREDICT      } from "../modules/scHPL"
+include { NEIGHBORS           } from "../modules/neighbors"
+include { UMAP                } from "../modules/umap"
+include { LEIDEN              } from "../modules/leiden"
+include { ENTROPY             } from "../modules/entropy"
 include { CELLTYPIST_MAJORITY } from "../modules/celltypist"
-include { MERGE_CLUSTERING } from "../modules/merge_clustering"
+include { MERGE_CLUSTERING    } from "../modules/merge_clustering"
 
 
 workflow CLUSTERING {
@@ -21,7 +21,7 @@ workflow CLUSTERING {
         LEIDEN(NEIGHBORS.out.combine(ch_leiden_resolutions))
 
         ch_leiden_per_integration = LEIDEN.out.table.map{meta, table -> [meta.integration, meta.resolution, table]}.groupTuple()
-        ch_integrations = ch_adata   .map{meta, adata -> [meta.integration, adata]}
+        ch_integrations = ch_adata  .map{meta, adata -> [meta.integration, adata]}
                                     .join(ch_leiden_per_integration)
                                     .map{integration, adata, resolutions, tables -> [[id: integration], adata, resolutions, tables]}
 

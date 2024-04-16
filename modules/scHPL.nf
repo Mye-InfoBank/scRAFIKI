@@ -1,6 +1,6 @@
 process SC_HPL_LEARN {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-schpl:1.0.3"
+  container "bigdatainbiomedicine/sc-schpl:1.0.4"
 
   publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"
@@ -12,7 +12,7 @@ process SC_HPL_LEARN {
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
   
   script:
-  gpu = task.ext.use_gpu ? '1' : 'None'
+  gpu = task.ext.use_gpu ? '0' : 'None'
   compress = task.ext.compress ? 'True' : 'False'
   """
   #!/usr/bin/env python
@@ -58,7 +58,7 @@ process SC_HPL_LEARN {
 
 process SC_HPL_PREDICT {
   tag "${meta.id}"
-  container "bigdatainbiomedicine/sc-schpl:1.0.3"
+  container "bigdatainbiomedicine/sc-schpl:1.0.4"
 
   label "process_high"
 
@@ -69,7 +69,7 @@ process SC_HPL_PREDICT {
   tuple val(meta), path("${meta.id}.scHPL.pkl")
   
   script:
-  gpu = task.ext.use_gpu ? '1' : 'None'
+  gpu = task.ext.use_gpu ? '0' : 'None'
   """
   #!/usr/bin/env python
 
