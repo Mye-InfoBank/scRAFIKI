@@ -11,6 +11,9 @@ process SC_HPL_LEARN {
 
   output:
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
+
+  when:
+  task.ext.when == null || task.ext.when
   
   script:
   gpu = task.ext.use_gpu ? '0' : 'None'

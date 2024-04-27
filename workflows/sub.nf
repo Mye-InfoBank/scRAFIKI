@@ -23,7 +23,8 @@ workflow SUB {
         ch_categoric_adata,
         Channel.from(params.leiden_resolutions),
         Channel.empty(),
-        Channel.value(params.entropy_initial_smoothness)
+        Channel.value(params.entropy_initial_smoothness),
+        Channel.empty()
     )
 
     ch_obsm = CLUSTERING.out.obsm
