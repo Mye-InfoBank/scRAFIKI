@@ -14,6 +14,7 @@ workflow CLUSTERING {
         ch_leiden_resolutions
         ch_celltypist
         ch_entropy_smoothness
+        ch_tree
 
     main:
         NEIGHBORS(ch_adata)
@@ -25,7 +26,7 @@ workflow CLUSTERING {
                                     .join(ch_leiden_per_integration)
                                     .map{integration, adata, resolutions, tables -> [[id: integration], adata, resolutions, tables]}
 
-        SC_HPL_LEARN(ch_integrations)
+        SC_HPL_LEARN(ch_integrations, ch_tree)
 
         SC_HPL_PREDICT(ch_integrations
                         .map{meta, adata, resolutions, tables -> [meta, adata]}
@@ -35,7 +36,8 @@ workflow CLUSTERING {
         CELLTYPIST_MAJORITY(LEIDEN.out.table, ch_celltypist)
 
         ch_clustering = LEIDEN.out.table.mix(
-            ENTROPY.out, CELLTYPIST_MAJORITY.out,
+            ENTROPY.out,
+            CELLTYPIST_MAJORITY.out,
             SC_HPL_PREDICT.out
         )
 

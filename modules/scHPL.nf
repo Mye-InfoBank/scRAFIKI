@@ -7,6 +7,7 @@ process SC_HPL_LEARN {
 
   input:
   tuple val(meta), path(adata), val(resolutions), path(tables)
+  tuple val(meta2), path(base_tree)
 
   output:
   tuple val(meta), path("${meta.id}.tree.pkl"), emit: tree
@@ -41,6 +42,7 @@ process SC_HPL_LEARN {
   kwargs = {
       'data': adata_latent,
       'batch_key': 'resolution',
+      ${base_tree ? "'tree': pickle.load(open('" + base_tree + "', 'rb'))," : ""}
       'cell_type_key': 'cluster',
       'classifier': 'knn',
       'dynamic_neighbors': True,
