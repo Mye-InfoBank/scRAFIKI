@@ -14,7 +14,6 @@ process SC_HPL_LEARN {
   
   script:
   gpu = task.ext.use_gpu ? '0' : 'None'
-  compress = task.ext.compress ? 'True' : 'False'
   """
   #!/usr/bin/env python
 
@@ -46,8 +45,7 @@ process SC_HPL_LEARN {
       'classifier': 'knn',
       'dynamic_neighbors': True,
       'dimred': False,
-      'gpu': ${gpu},
-      'compress': ${compress}
+      'gpu': ${gpu}
   }
 
   kwargs['batch_order'] = adata_latent.obs['resolution'].unique()
