@@ -1,8 +1,9 @@
 process INTEGRATE_SCARCHES {
   tag "${method}"
-  container "bigdatainbiomedicine/sc-scib:1.3"
+  container "bigdatainbiomedicine/sc-scib:1.3.1"
 
   label "process_high"
+  label "gpu"
 
   input:
   tuple val(meta), path(query)

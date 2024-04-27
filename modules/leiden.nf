@@ -12,7 +12,7 @@ process LEIDEN {
     tuple val(new_meta), path("${new_meta.id}.clustering.pkl"), emit: table
 
     script:
-    new_meta = meta + [id: "${meta.id}_leiden_${resolution}"]
+    new_meta = meta + [id: "${meta.id}_leiden_${resolution}", resolution: resolution]
     """
     #!/opt/conda/bin/python
 

@@ -2,11 +2,15 @@ services:
   scib:
     build: 
       context: scib
-    image: bigdatainbiomedicine/sc-scib:1.3
+    image: bigdatainbiomedicine/sc-scib:1.3.1
   rpy:
     build: 
       context: rpy
     image: bigdatainbiomedicine/sc-rpy:1.2
+  scHPL:
+    build: 
+      context: scHPL
+    image: bigdatainbiomedicine/sc-schpl:1.0.4
   cellxgene:
     build: 
       context: cellxgene

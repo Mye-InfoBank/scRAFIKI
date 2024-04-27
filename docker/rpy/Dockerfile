@@ -12,7 +12,6 @@ COPY --chown=$MAMBA_USER:$MAMBA_USER environment.yml /tmp/environment.yml
 RUN micromamba install -y -n base -f /tmp/environment.yml && \
     micromamba clean --all --yes
 
-RUN micromamba run -n base R -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE)" && \
-    micromamba run -n base R -e "devtools::install_github('igrabski/sc-SHC', dependencies = TRUE)"
+RUN micromamba run -n base R -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE)"
 
 ENV PATH /opt/conda/bin:$PATH
