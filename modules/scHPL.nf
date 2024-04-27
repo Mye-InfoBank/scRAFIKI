@@ -4,6 +4,7 @@ process SC_HPL_LEARN {
 
   publishDir "${params.outdir}/tree", mode: "${params.publish_mode}"
   label "process_high"
+  label "gpu"
 
   input:
   tuple val(meta), path(adata), val(resolutions), path(tables)
@@ -63,6 +64,7 @@ process SC_HPL_PREDICT {
   container "bigdatainbiomedicine/sc-schpl:1.0.4"
 
   label "process_high"
+  label "gpu"
 
   input:
   tuple val(meta), path(adata), path(tree)

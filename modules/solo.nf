@@ -4,6 +4,7 @@ process SOLO {
 
     label "process_medium"
     label "process_high_memory"
+    label "gpu"
 
     input:
         tuple val(meta), path(adata)

@@ -3,6 +3,7 @@ process INTEGRATE_SCANVI {
   container "bigdatainbiomedicine/sc-scib:1.3.1"
 
   label "process_high"
+  label "gpu"
 
   publishDir "${params.outdir}", mode: "${params.publish_mode}", pattern: "model"
 
