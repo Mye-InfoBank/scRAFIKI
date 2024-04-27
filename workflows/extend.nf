@@ -31,8 +31,6 @@ workflow EXTEND {
 
     ch_model = Channel.value(file(params.model)).map{ model -> [[id: "model"], model]}
 
-    ch_tree = params.tree ? Channel.value(file(params.tree)).map{ tree -> [[id: "tree"], tree]} : Channel.value([[], []])
-
     PREPROCESSING(ch_samplesheet, ch_base)
 
     ch_adata_intersection = PREPROCESSING.out.intersection
@@ -76,8 +74,7 @@ workflow EXTEND {
         MERGE_EXTENDED.out,
         Channel.from(params.leiden_resolutions),
         CELLTYPIST.out,
-        Channel.value(params.entropy_initial_smoothness),
-        ch_tree
+        Channel.value(params.entropy_initial_smoothness)
     )
 
     ch_obs = CLUSTERING.out.obs.mix(
