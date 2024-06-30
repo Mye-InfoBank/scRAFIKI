@@ -1,8 +1,6 @@
-# SIMBA🦁 - **S**ingle-cell **I**ntegration **M**ethods pipeline for **B**ig **A**tlases
+# scRAFIKI - Single-cell RNA-seq Atlas Framework for Integration and Key Insights
 
-<img src="./www/SIMBA_sticker.png" width="250">
-
-SIMBA is a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
+scRAFIKI is a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
 
 This pipeline is written in nextflow and based on the LUCA pipeline:
   
@@ -15,7 +13,7 @@ Created using [Tennessine](https://tennessine.co.uk/metro/f51c720e6111045)
 
 ## Documentation
 
-The SIMBA pipeline comes with documentation about preprocessing, usage and downstream analysis. It is available [here](https://github.com/Mye-InfoBank/SIMBA/wiki).
+The scRAFIKI pipeline comes with documentation about preprocessing, usage and downstream analysis. It is available [here](https://github.com/Mye-InfoBank/scRAFIKI/wiki).
 
 
 ## Contact
