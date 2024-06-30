@@ -1,5 +1,8 @@
 # scRAFIKI - Single-cell RNA-seq Atlas Framework for Integration and Key Insights
 
+> [!NOTE]
+> This tool has recently been renamed. Previously, it was called SIMBA.
+
 scRAFIKI is a pipeline designed to integrate single-cell RNA-seq datasets to generate atlases. It incorporates several integration methods, cell filtering and automated annotation tools.
 
 This pipeline is written in nextflow and based on the LUCA pipeline:
